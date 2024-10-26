@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">tecnisis</string>
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="crear_cuenta">Crear cuenta</string>
+    <string name="lista_de_solicitudes">Lista de solicitudes</string>
+    <string name="iniciar_solicitud">Iniciar solicitud</string>
 </resources>
