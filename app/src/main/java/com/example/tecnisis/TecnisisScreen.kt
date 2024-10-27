@@ -12,6 +12,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,8 +25,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.tecnisis.ui.ListRequestsScreen
+import com.example.tecnisis.ui.LoginScreen
 import com.example.tecnisis.ui.components.ScreenTitle
 
 enum class TecnisisScreen(@StringRes val title: Int) {
@@ -61,29 +64,47 @@ fun TopAppBar() {
 @Composable
 fun TecnisisApp() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     Scaffold(
-        topBar = { TopAppBar() }
+        topBar = {
+            // Mostrar TopAppBar solo si no estamos en la pantalla de Login
+            if (currentRoute != TecnisisScreen.Login.name) {
+                TopAppBar()
+            }
+        }
     ) { innerPadding ->
-        //val uiState by viewModel.uiState.collectAsState()
         NavHost(
             navController = navController,
             startDestination = TecnisisScreen.Login.name,
             modifier = Modifier.padding(innerPadding)
         ) {
-            /*
+            // Pantalla de Login
             composable(route = TecnisisScreen.Login.name) {
+                LoginScreen(
+                    onLogin = { navController.navigate(TecnisisScreen.ListRequests.name) },
+                    onSignUp = { navController.navigate(TecnisisScreen.SignUp.name) }
+                )
             }
+
+            // Pantalla de Registro (SignUp)
             composable(route = TecnisisScreen.SignUp.name) {
+                // Implementa la pantalla de registro o llama a una función composable
+                Text(text = "Pantalla de Registro")
             }
-            */
+
+            // Pantalla de Lista de Solicitudes
             composable(route = TecnisisScreen.ListRequests.name) {
                 ScreenTitle(text = TecnisisScreen.ListRequests.name)
                 ListRequestsScreen(viewModel = viewModel())
             }
-            /*
-            composable(route = TecnisisScreen.AddRequest.name) {
 
-            }*/
+            // Pantalla de Agregar Solicitud (AddRequest)
+            composable(route = TecnisisScreen.AddRequest.name) {
+                // Implementa la pantalla de agregar solicitud o llama a una función composable
+                Text(text = "Pantalla de Agregar Solicitud")
+            }
         }
     }
 }
