@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.storage)
     implementation(libs.androidx.espresso.core)
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.constraintlayout.compose)

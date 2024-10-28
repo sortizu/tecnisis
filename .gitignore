@@ -1,15 +1,24 @@
+# Archivos específicos de IntelliJ/Android Studio
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Configuración específica de la máquina
+local.properties
+
+# Archivos generados por el sistema operativo
 .DS_Store
+
+# Carpetas de compilación y generación
+.gradle
 /build
 /captures
+
+# Directorios para compilación nativa
 .externalNativeBuild
 .cxx
-local.properties
