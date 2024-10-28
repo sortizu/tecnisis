@@ -4,4 +4,10 @@
     <string name="crear_cuenta">Crear cuenta</string>
     <string name="lista_de_solicitudes">Lista de solicitudes</string>
     <string name="iniciar_solicitud">Iniciar solicitud</string>
+    <string name="login_title">TECNISIS</string>
+    <string name="login_subtitle">Sistema para solicitud de registro en galería de arte</string>
+    <string name="login_instructions">Ingrese sus credenciales para acceder al sistema.</string>
+    <string name="email">Correo</string>
+    <string name="password">Contraseña</string>
+    <string name="no_account">No tengo una cuenta</string>
 </resources>

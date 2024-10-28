@@ -40,6 +40,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.tecnisis.ui.ListRequestsScreen
+import com.example.tecnisis.ui.LoginScreen
 import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.FloatingButton
 import com.example.tecnisis.ui.components.ScreenTitle
@@ -89,6 +90,7 @@ fun TopAppBar() {
 @Composable
 fun TecnisisApp() {
     val navController = rememberNavController()
+    // val currentRoute = navBackStackEntry?.destination?.route
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = TecnisisScreen.valueOf(
         backStackEntry?.destination?.route ?: TecnisisScreen.ListRequests.name
@@ -96,12 +98,16 @@ fun TecnisisApp() {
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { TopAppBar() },
+        topBar = {
+            // Mostrar TopAppBar solo si no estamos en la pantalla de Login
+            if (currentRoute != TecnisisScreen.Login.name) {
+                TopAppBar()
+            }
+        },
         modifier = Modifier
             .padding(top = 16.dp),
         floatingActionButton = {FloatingButton(onClick = { /*TODO*/ }, icon = Icons.Default.Add)}
     ) { innerPadding ->
-        //val uiState by viewModel.uiState.collectAsState()
         NavHost(
             navController = navController,
             startDestination = TecnisisScreen.ListRequests.name,
@@ -109,11 +115,16 @@ fun TecnisisApp() {
                 .padding(innerPadding)
                 .background(color = Color.Transparent)
         ) {
+            // Pantalla de Login
+            composable(route = TecnisisScreen.Login.name) {
+                LoginScreen(
+                    onLogin = { navController.navigate(TecnisisScreen.ListRequests.name) },
+                    onSignUp = { navController.navigate(TecnisisScreen.SignUp.name) }
+                )
+            }
             composable(route = TecnisisScreen.ListRequests.name) {
                 ScreenTitle(text = context.getString(currentScreen.title))
                 ListRequestsScreen(viewModel = viewModel())
-                // This box will be placed at the bottom of the screen amd show a image that will fill all the horizontal space, this image will also have an absolute position and other other (as a floatin button) can be used in front of it
-                //FloatingButton(onClick = { /*TODO*/ }, icon = Icons.Default.Add)
             }
         }
         BottomPattern()
