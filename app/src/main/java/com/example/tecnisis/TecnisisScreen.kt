@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,12 +51,13 @@ import com.example.tecnisis.ui.components.ScreenTitle
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import com.example.tecnisis.ui.SignUpScreen
+import com.example.tecnisis.ui.StartRequestScreen
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
     SignUp(title = R.string.crear_cuenta),
     ListRequests(title = R.string.lista_de_solicitudes),
-    AddRequest(title = R.string.iniciar_solicitud)
+    StartRequest(title = R.string.iniciar_solicitud)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,10 +128,22 @@ fun TecnisisApp() {
                         onClick = { navController.navigate(TecnisisScreen.ListRequests.name) }
                     )
                 }
+                TecnisisScreen.SignUp -> {
+                    FloatingButton(
+                        icon = Icons.Default.ArrowForward,
+                        onClick = { navController.navigate(TecnisisScreen.ListRequests.name) }
+                    )
+                }
                 TecnisisScreen.ListRequests -> {
                     FloatingButton(
                         icon = Icons.Default.Add,
-                        onClick = { navController.navigate(TecnisisScreen.AddRequest.name) }
+                        onClick = { navController.navigate(TecnisisScreen.StartRequest.name) }
+                    )
+                }
+                TecnisisScreen.StartRequest -> {
+                    FloatingButton(
+                        icon = Icons.Default.Save,
+                        onClick = { navController.navigate(TecnisisScreen.ListRequests.name) }
                     )
                 }
                 else -> {}
@@ -162,7 +176,9 @@ fun TecnisisApp() {
                     viewModel = viewModel()
                 )
             }
-
+            composable(route = TecnisisScreen.StartRequest.name) {
+                StartRequestScreen()
+            }
         }
         BottomPattern()
     }

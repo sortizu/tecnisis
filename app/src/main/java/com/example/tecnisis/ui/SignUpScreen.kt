@@ -67,8 +67,7 @@ fun FormContent(navController: NavHostController, padding: PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = padding.calculateTopPadding())
-            .padding(horizontal = 20.dp),
+            .padding(vertical = padding.calculateTopPadding()),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         NameFields() // Campos Nombre y Apellidos
