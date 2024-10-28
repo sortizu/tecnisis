@@ -10,4 +10,5 @@
     <string name="email">Correo</string>
     <string name="password">Contraseña</string>
     <string name="no_account">No tengo una cuenta</string>
+    <string name="sign_up_info">Llene sus datos personales en cada página del formulario para finalizar su registro.</string>
 </resources>

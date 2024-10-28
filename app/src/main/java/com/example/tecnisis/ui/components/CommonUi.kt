@@ -48,6 +48,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 
 @Composable
@@ -98,8 +99,8 @@ fun BottomPattern() {
 @Composable
 fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier.padding(horizontal = 16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
     ) {
         HorizontalDivider(thickness = 1.dp)
         Text(text = text, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray))
@@ -157,5 +158,29 @@ fun RequestCard(orden: Int, solicitudWithObra: SolicitudWithObra) {
                 modifier = Modifier.size(100.dp)
             )
         }
+    }
+}
+
+@Composable
+fun InfoBox(
+    modifier: Modifier = Modifier,
+    description: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .background(
+                color = Color(0xFFFFA726),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+            )
+            .padding(vertical = 2.dp, horizontal = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = description,
+            color = Color.Black,
+            fontSize = 14.sp
+        )
     }
 }

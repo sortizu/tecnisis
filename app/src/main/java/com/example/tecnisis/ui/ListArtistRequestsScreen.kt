@@ -24,17 +24,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tecnisis.R
+import com.example.tecnisis.TecnisisScreen
 import com.example.tecnisis.ui.components.RequestList
+import com.example.tecnisis.ui.components.ScreenTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListRequestsScreen(
     viewModel: ListArtistRequestsViewModel = viewModel(),
+    currentScreen: TecnisisScreen = TecnisisScreen.ListRequests,
     modifier: Modifier = Modifier
 ) {
     // Collect the UI state from the ViewModel
@@ -43,11 +47,14 @@ fun ListRequestsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+            .padding(start = 16.dp, end = 16.dp)
             .background(color = Color.Transparent)
     ) {
         // Search bar at the top
+        val context = LocalContext.current
         var searchQuery by remember { mutableStateOf("") }
+        ScreenTitle(text = context.getString(currentScreen.title))
+        Spacer(modifier = Modifier.height(8.dp))
         SearchBar(
             query = searchQuery,
             onQueryChange = { searchQuery = it },

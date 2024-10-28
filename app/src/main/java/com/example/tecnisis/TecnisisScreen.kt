@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -44,6 +47,9 @@ import com.example.tecnisis.ui.LoginScreen
 import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.FloatingButton
 import com.example.tecnisis.ui.components.ScreenTitle
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import com.example.tecnisis.ui.SignUpScreen
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
@@ -52,40 +58,46 @@ enum class TecnisisScreen(@StringRes val title: Int) {
     AddRequest(title = R.string.iniciar_solicitud)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ){
-            Text(
-                text = "TECNISIS",
-                style = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color.Red)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo",
-                tint = Color.Red,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-        IconButton(onClick = { /* TODO: Open profile */ }) {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Profile",
-                tint = Color.Black,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-    }
+fun TecnisisTopAppBar(
+    onProfileClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+
+            ) {
+                Text(
+                    text = "TECNISIS",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo",
+                    tint = Color.Red,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onProfileClick) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Profile",
+                    tint = Color.Black,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
+        modifier = Modifier.padding(0.dp)
+    )
 }
+
 
 @Composable
 fun TecnisisApp() {
@@ -100,17 +112,33 @@ fun TecnisisApp() {
     Scaffold(
         topBar = {
             // Mostrar TopAppBar solo si no estamos en la pantalla de Login
-            if (currentRoute != TecnisisScreen.Login.name) {
-                TopAppBar()
+            if (currentScreen != TecnisisScreen.Login) {
+                TecnisisTopAppBar({})
             }
         },
         modifier = Modifier
-            .padding(top = 16.dp),
-        floatingActionButton = {FloatingButton(onClick = { /*TODO*/ }, icon = Icons.Default.Add)}
+            .padding(top = 0.dp),
+        floatingActionButton = {
+            when (currentScreen) {
+                TecnisisScreen.Login -> {
+                    FloatingButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowForward,
+                        onClick = { navController.navigate(TecnisisScreen.ListRequests.name) }
+                    )
+                }
+                TecnisisScreen.ListRequests -> {
+                    FloatingButton(
+                        icon = Icons.Default.Add,
+                        onClick = { navController.navigate(TecnisisScreen.AddRequest.name) }
+                    )
+                }
+                else -> {}
+            }
+        }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = TecnisisScreen.ListRequests.name,
+            startDestination = TecnisisScreen.Login.name,
             modifier = Modifier
                 .padding(innerPadding)
                 .background(color = Color.Transparent)
@@ -122,10 +150,19 @@ fun TecnisisApp() {
                     onSignUp = { navController.navigate(TecnisisScreen.SignUp.name) }
                 )
             }
-            composable(route = TecnisisScreen.ListRequests.name) {
-                ScreenTitle(text = context.getString(currentScreen.title))
-                ListRequestsScreen(viewModel = viewModel())
+            // Pantalla de Crear Cuenta
+            composable(route = TecnisisScreen.SignUp.name) {
+                SignUpScreen(
+                    navController = navController
+                )
             }
+            // Pantalla de Lista de Solicitudes
+            composable(route = TecnisisScreen.ListRequests.name) {
+                ListRequestsScreen(
+                    viewModel = viewModel()
+                )
+            }
+
         }
         BottomPattern()
     }
