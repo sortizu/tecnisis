@@ -7,14 +7,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -22,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -30,20 +27,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tecnisis.R
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    onLogin: () -> Unit,
-    onSignUp: () -> Unit
+    onSignUp: () -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit
 ) {
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-
-    // Estado del Snackbar
-    val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+    var errorMessage by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -58,7 +52,6 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .clipToBounds()
         )
 
         Column(
@@ -105,7 +98,10 @@ fun LoginScreen(
 
         BasicTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = {
+                email = it
+                onEmailChange(it)
+            },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .padding(8.dp),
@@ -117,7 +113,7 @@ fun LoginScreen(
                         .background(Color.White)
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    if (email.text.isEmpty()) {
+                    if (email.isEmpty()) {
                         Text(
                             text = stringResource(id = R.string.email),
                             style = TextStyle(color = Color.Gray, fontSize = 16.sp)
@@ -132,7 +128,10 @@ fun LoginScreen(
 
         BasicTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                onPasswordChange(it)
+            },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .padding(8.dp),
@@ -147,7 +146,7 @@ fun LoginScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(Modifier.weight(1f)) {
-                        if (password.text.isEmpty()) {
+                        if (password.isEmpty()) {
                             Text(
                                 text = stringResource(id = R.string.password),
                                 style = TextStyle(color = Color.Gray, fontSize = 16.sp)
@@ -180,45 +179,7 @@ fun LoginScreen(
                 .clickable { onSignUp() }
         )
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 16.dp),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            Button(
-                onClick = {
-                    if (email.text.isNotBlank() && password.text.isNotBlank()) {
-                        onLogin()
-                    } else {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Por favor, complete todos los campos")
-                        }
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .size(width = 60.dp, height = 50.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Login,
-                    contentDescription = stringResource(id = R.string.iniciar_sesion),
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // SnackbarHost para mostrar el mensaje de error
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
     }
 }
 
@@ -226,7 +187,8 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     LoginScreen(
-        onLogin = {},
-        onSignUp = {}
+        onSignUp = {},
+        onEmailChange = {},
+        onPasswordChange = {}
     )
 }

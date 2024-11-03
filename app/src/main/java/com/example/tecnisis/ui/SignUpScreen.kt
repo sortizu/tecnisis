@@ -1,37 +1,9 @@
 package com.example.tecnisis.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -40,58 +12,113 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.data.UserRepository
+import com.example.tecnisis.data.Persona
+import com.example.tecnisis.data.Usuario
 import com.example.tecnisis.ui.components.InfoBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(navController: NavHostController) {
+fun SignUpScreen(
+    navController: NavHostController,
+    userRepository: UserRepository,
+    onSignUp: (Usuario, Persona) -> Unit,
+    nombre: MutableState<String>,
+    apellidos: MutableState<String>,
+    correo: MutableState<String>,
+    contrasena: MutableState<String>,
+    repetirContrasena: MutableState<String>,
+    dni: MutableState<String>,
+    telefono: MutableState<String>,
+    direccion: MutableState<String>,
+    errorMessage: MutableState<String>
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp)
     ) {
-        InfoBox( description = stringResource(R.string.sign_up_info)) // Caja informativa
+        InfoBox(description = stringResource(R.string.sign_up_info))
         Spacer(modifier = Modifier.height(8.dp))
-        FormContent(navController, PaddingValues(10.dp))
+
+        FormContent(
+            nombre = nombre.value,
+            onNombreChange = { nombre.value = it },
+            apellidos = apellidos.value,
+            onApellidosChange = { apellidos.value = it },
+            correo = correo.value,
+            onCorreoChange = { correo.value = it },
+            contrasena = contrasena.value,
+            onContrasenaChange = { contrasena.value = it },
+            repetirContrasena = repetirContrasena.value,
+            onRepetirContrasenaChange = { repetirContrasena.value = it },
+            dni = dni.value,
+            onDniChange = { dni.value = it },
+            telefono = telefono.value,
+            onTelefonoChange = { telefono.value = it },
+            direccion = direccion.value,
+            onDireccionChange = { direccion.value = it }
+        )
+
+        AccountLink(navController)
+
+        if (errorMessage.value.isNotEmpty()) {
+            Text(
+                text = errorMessage.value,
+                color = Color.Red,
+                modifier = Modifier.padding(16.dp),
+                fontSize = 14.sp
+            )
+        }
     }
 }
 
-
 @Composable
-fun FormContent(navController: NavHostController, padding: PaddingValues) {
+fun FormContent(
+    nombre: String,
+    onNombreChange: (String) -> Unit,
+    apellidos: String,
+    onApellidosChange: (String) -> Unit,
+    correo: String,
+    onCorreoChange: (String) -> Unit,
+    contrasena: String,
+    onContrasenaChange: (String) -> Unit,
+    repetirContrasena: String,
+    onRepetirContrasenaChange: (String) -> Unit,
+    dni: String,
+    onDniChange: (String) -> Unit,
+    telefono: String,
+    onTelefonoChange: (String) -> Unit,
+    direccion: String,
+    onDireccionChange: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = padding.calculateTopPadding()),
+            .padding(vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        NameFields() // Campos Nombre y Apellidos
-        EmailField() // Campo de Correo
-        PasswordFields() // Campos de Contraseña
-        DNIAndPhoneFields() // Campos DNI y Teléfono
-        AddressField() // Campo de Dirección
-        AccountLink(navController) // Enlace a "Ya tengo una cuenta"
+        NameFields(nombre = nombre, onNombreChange = onNombreChange, apellidos = apellidos, onApellidosChange = onApellidosChange)
+        EmailField(correo = correo, onCorreoChange = onCorreoChange)
+        PasswordFields(contrasena = contrasena, onContrasenaChange = onContrasenaChange, repetirContrasena = repetirContrasena, onRepetirContrasenaChange = onRepetirContrasenaChange)
+        DNIAndPhoneFields(dni = dni, onDniChange = onDniChange, telefono = telefono, onTelefonoChange = onTelefonoChange)
+        AddressField(direccion = direccion, onDireccionChange = onDireccionChange)
     }
 }
 
 @Composable
-fun NameFields() {
+fun NameFields(nombre: String, onNombreChange: (String) -> Unit,
+               apellidos: String, onApellidosChange: (String) -> Unit) {
     val inputBackgroundColor = Color(0xFFFFEBEE)
-    var nombre by remember { mutableStateOf("") }
-    var apellidos by remember { mutableStateOf("") }
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         TextField(
             value = nombre,
-            onValueChange = { nombre = it },
+            onValueChange = onNombreChange,
             label = { Text("Nombre") },
             modifier = Modifier.weight(1f),
             colors = TextFieldDefaults.colors(
@@ -101,7 +128,7 @@ fun NameFields() {
         )
         TextField(
             value = apellidos,
-            onValueChange = { apellidos = it },
+            onValueChange = onApellidosChange,
             label = { Text("Apellidos") },
             modifier = Modifier.weight(1f),
             colors = TextFieldDefaults.colors(
@@ -113,13 +140,11 @@ fun NameFields() {
 }
 
 @Composable
-fun EmailField() {
+fun EmailField(correo: String, onCorreoChange: (String) -> Unit) {
     val inputBackgroundColor = Color(0xFFFFEBEE)
-    var correo by remember { mutableStateOf("") }
-
     TextField(
         value = correo,
-        onValueChange = { correo = it },
+        onValueChange = onCorreoChange,
         label = { Text("Correo") },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -131,14 +156,14 @@ fun EmailField() {
 }
 
 @Composable
-fun PasswordFields() {
+fun PasswordFields(
+    contrasena: String, onContrasenaChange: (String) -> Unit,
+    repetirContrasena: String, onRepetirContrasenaChange: (String) -> Unit
+) {
     val inputBackgroundColor = Color(0xFFFFEBEE)
-    var contrasena by remember { mutableStateOf("") }
-    var repetirContrasena by remember { mutableStateOf("") }
-
     TextField(
         value = contrasena,
-        onValueChange = { contrasena = it },
+        onValueChange = onContrasenaChange,
         label = { Text("Contraseña") },
         visualTransformation = PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth(),
@@ -149,7 +174,7 @@ fun PasswordFields() {
     )
     TextField(
         value = repetirContrasena,
-        onValueChange = { repetirContrasena = it },
+        onValueChange = onRepetirContrasenaChange,
         label = { Text("Repetir contraseña") },
         visualTransformation = PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth(),
@@ -161,18 +186,16 @@ fun PasswordFields() {
 }
 
 @Composable
-fun DNIAndPhoneFields() {
+fun DNIAndPhoneFields(dni: String, onDniChange: (String) -> Unit,
+                      telefono: String, onTelefonoChange: (String) -> Unit) {
     val inputBackgroundColor = Color(0xFFFFEBEE)
-    var dni by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         TextField(
             value = dni,
-            onValueChange = { dni = it },
+            onValueChange = onDniChange,
             label = { Text("DNI") },
             modifier = Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -183,7 +206,7 @@ fun DNIAndPhoneFields() {
         )
         TextField(
             value = telefono,
-            onValueChange = { telefono = it },
+            onValueChange = onTelefonoChange,
             label = { Text("Teléfono") },
             modifier = Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -196,13 +219,11 @@ fun DNIAndPhoneFields() {
 }
 
 @Composable
-fun AddressField() {
+fun AddressField(direccion: String, onDireccionChange: (String) -> Unit) {
     val inputBackgroundColor = Color(0xFFFFEBEE)
-    var direccion by remember { mutableStateOf("") }
-
     TextField(
         value = direccion,
-        onValueChange = { direccion = it },
+        onValueChange = onDireccionChange,
         label = { Text("Dirección") },
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
@@ -219,7 +240,7 @@ fun AccountLink(navController: NavHostController) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        TextButton(onClick = { navController.navigate(TecnisisScreen.Login.name)}) {
+        TextButton(onClick = { navController.navigate(TecnisisScreen.Login.name) }) {
             Text(
                 text = "Ya tengo una cuenta",
                 style = androidx.compose.ui.text.TextStyle(
