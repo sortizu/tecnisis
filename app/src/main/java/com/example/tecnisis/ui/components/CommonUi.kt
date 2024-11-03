@@ -43,7 +43,6 @@ import com.example.tecnisis.R
 import androidx.compose.material3.*
 import androidx.compose.ui.layout.ContentScale
 import com.example.tecnisis.data.Solicitud
-import com.example.tecnisis.data.SolicitudWithObra
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -64,6 +63,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
+import com.example.tecnisis.data.Obra
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -125,17 +125,18 @@ fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
 }
 
 @Composable
-fun RequestList(solicitudes: List<SolicitudWithObra>) {
+fun RequestList(solicitudes: Map<Solicitud, Obra>) {
     LazyColumn {
-        items(solicitudes.size) { index ->
-            RequestCard(index+1,solicitudes[index])
-            Spacer(modifier = Modifier.height(16.dp))
+        items(solicitudes.size) { orden ->
+            val solicitud = solicitudes.keys.elementAt(orden)
+            val obra = solicitudes.values.elementAt(orden)
+            RequestCard(orden + 1, solicitud, obra)
         }
     }
 }
 
 @Composable
-fun RequestCard(orden: Int, solicitudWithObra: SolicitudWithObra) {
+fun RequestCard(orden: Int, solicitud: Solicitud, obra: Obra) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -165,8 +166,8 @@ fun RequestCard(orden: Int, solicitudWithObra: SolicitudWithObra) {
                     .weight(1f)
                     .padding(start = 16.dp)
             ) {
-                Text(text = solicitudWithObra.obra.titulo , fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = solicitudWithObra.solicitud.estado , fontSize = 14.sp, color = Color.Gray)
+                Text(text = obra.titulo , fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = solicitud.estado , fontSize = 14.sp, color = Color.Gray)
             }
             // Imagen de la obra
             Image(

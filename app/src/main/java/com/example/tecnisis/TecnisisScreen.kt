@@ -172,9 +172,7 @@ fun TecnisisApp() {
             }
             // Pantalla de Lista de Solicitudes
             composable(route = TecnisisScreen.ListRequests.name) {
-                ListRequestsScreen(
-                    viewModel = viewModel()
-                )
+                ListRequestsScreen()
             }
             composable(route = TecnisisScreen.StartRequest.name) {
                 StartRequestScreen()

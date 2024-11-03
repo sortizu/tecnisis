@@ -37,7 +37,7 @@ import com.example.tecnisis.ui.components.ScreenTitle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListRequestsScreen(
-    viewModel: ListArtistRequestsViewModel = viewModel(),
+    viewModel: ListArtistRequestsViewModel = viewModel(factory = AppViewModelProvider.Factory),
     currentScreen: TecnisisScreen = TecnisisScreen.ListRequests,
     modifier: Modifier = Modifier
 ) {
@@ -86,7 +86,7 @@ fun ListRequestsScreen(
             else -> {
                 // Display the list of requests if data is loaded successfully
                 RequestList(
-                    solicitudes = uiState.solicitudesWithObra
+                    solicitudes = uiState.solicitudesWithObras
                 )
             }
         }
