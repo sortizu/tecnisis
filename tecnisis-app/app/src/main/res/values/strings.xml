@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">tecnisis</string>
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="crear_cuenta">Crear cuenta</string>
+    <string name="lista_de_solicitudes">Lista de solicitudes</string>
+    <string name="iniciar_solicitud">Iniciar solicitud</string>
+    <string name="login_title">TECNISIS</string>
+    <string name="login_subtitle">Sistema para solicitud de registro en galería de arte</string>
+    <string name="login_instructions">Ingrese sus credenciales para acceder al sistema.</string>
+    <string name="email">Correo</string>
+    <string name="password">Contraseña</string>
+    <string name="no_account">No tengo una cuenta</string>
+    <string name="sign_up_info">Llene sus datos personales en cada página del formulario para finalizar su registro.</string>
+    <string name="date_of_realisation">Fecha de realización</string>
+    <string name="select_technique">Seleccionar técnica</string>
+    <string name="name">Nombre</string>
+    <string name="surnames">Apellidos</string>
+    <string name="repeat_pass">Repetir contraseña</string>
+    <string name="dni">DNI</string>
+    <string name="phone">Teléfono</string>
+    <string name="address">Dirección</string>
+</resources>
