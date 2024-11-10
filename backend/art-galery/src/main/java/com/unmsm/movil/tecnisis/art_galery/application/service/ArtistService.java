@@ -16,7 +16,7 @@ public class ArtistService implements ArtistServicePort {
     private final ArtistPersistencePort persistencePort;
 
     @Override
-    public Artist findArtistById(Long id) {
+    public Artist findById(Long id) {
         return persistencePort
                 .findById(id)
                 .orElseThrow(ArtistNotFoundException::new);
@@ -28,12 +28,12 @@ public class ArtistService implements ArtistServicePort {
     }
 
     @Override
-    public Artist saveArtist(Artist artist) {
+    public Artist save(Artist artist) {
         return persistencePort.save(artist);
     }
 
     @Override
-    public Artist updateArtist(Long id, Artist artist) {
+    public Artist update(Long id, Artist artist) {
         return persistencePort.findById(id)
                 .map(artistToUpdate -> {
                     artistToUpdate.setPerson(artist.getPerson());
@@ -43,7 +43,7 @@ public class ArtistService implements ArtistServicePort {
     }
 
     @Override
-    public void deleteArtist(Long id) {
+    public void delete(Long id) {
         if (persistencePort.findById(id).isEmpty()) throw new ArtistNotFoundException();
         persistencePort.deleteById(id);
     }

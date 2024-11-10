@@ -1,4 +1,7 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.repository;
 
-public class ArtistRepository {
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity.ArtistEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ArtistRepository extends JpaRepository<ArtistEntity, Long>{
 }
