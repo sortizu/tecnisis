@@ -9,6 +9,7 @@ import lombok.Setter;
 public class ManagerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_manager")
     private Long id;
 
     @ManyToOne

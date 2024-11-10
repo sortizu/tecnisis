@@ -10,7 +10,7 @@ public class Person {
     private String name;
     private String dni;
     private String address;
-    private String gender;
+    private Character gender;
     private String phone;
     private String userRole;
     private  User user;

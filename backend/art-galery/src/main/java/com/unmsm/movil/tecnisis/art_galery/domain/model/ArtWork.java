@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Builder @Getter @Setter
@@ -13,8 +14,8 @@ public class ArtWork {
     private LocalDate creationDate;
     private String description;
     private String image;
-    private Double height;
-    private Double width;
+    private BigDecimal height;
+    private BigDecimal width;
     private Technique technique;
     private Artist artist;
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity @Getter @Setter
@@ -22,8 +23,8 @@ public class ArtWorkEntity {
     @Column(name = "image_address")
     private String imageUrl;
 
-    private Double height;
-    private Double width;
+    private BigDecimal height;
+    private BigDecimal width;
 
     @ManyToOne
     @JoinColumn(name = "id_technique", nullable = false)

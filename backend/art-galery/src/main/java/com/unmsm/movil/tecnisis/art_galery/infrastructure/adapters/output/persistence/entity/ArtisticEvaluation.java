@@ -3,6 +3,8 @@ package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persi
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity @Getter @Setter
@@ -16,7 +18,7 @@ public class ArtisticEvaluation {
     @Column(name = "evaluation_date")
     private LocalDate evaluationDate;
 
-    private String rating;
+    private BigDecimal rating;
 
     private String result;
 

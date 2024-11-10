@@ -23,7 +23,7 @@ public class EconomicEvaluation {
     private BigDecimal salesPrice;
 
     @Column(name = "gallery_percentage")
-    private Double percentage;
+    private BigDecimal percentage;
 
     @ManyToOne
     @JoinColumn(name = "id_specialist", nullable = false)
