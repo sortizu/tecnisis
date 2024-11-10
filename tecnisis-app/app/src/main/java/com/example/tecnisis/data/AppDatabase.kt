@@ -4,6 +4,18 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
+import com.example.tecnisis.data.artista.Artista
+import com.example.tecnisis.data.artista.ArtistaDao
+import com.example.tecnisis.data.obra.Obra
+import com.example.tecnisis.data.obra.ObraDao
+import com.example.tecnisis.data.person.Persona
+import com.example.tecnisis.data.person.PersonaDao
+import com.example.tecnisis.data.solicitud.Solicitud
+import com.example.tecnisis.data.solicitud.SolicitudDao
+import com.example.tecnisis.data.tecnica.Tecnica
+import com.example.tecnisis.data.tecnica.TecnicaDao
+import com.example.tecnisis.data.user.Usuario
+import com.example.tecnisis.data.user.UsuarioDao
 
 @Database(
     entities = [Usuario::class, Persona::class, Obra::class, Solicitud::class, Tecnica::class, Artista::class], // Agrega Artista aquí

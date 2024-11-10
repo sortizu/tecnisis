@@ -1,6 +1,5 @@
 package com.example.tecnisis
 
-import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,31 +14,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.tecnisis.data.AppDatabase
-import com.example.tecnisis.data.UserRepository
-import com.example.tecnisis.data.Usuario
-import com.example.tecnisis.data.Persona
-import com.example.tecnisis.data.PersonaDao
-import com.example.tecnisis.data.UsuarioDao
-import com.example.tecnisis.ui.ListRequestsScreen
-import com.example.tecnisis.ui.LoginScreen
-import com.example.tecnisis.ui.SignUpScreen
-import com.example.tecnisis.ui.StartRequestScreen
+import com.example.tecnisis.data.user.UserRepository
+import com.example.tecnisis.ui.list_artist_requests.ListRequestsScreen
+import com.example.tecnisis.ui.login.LoginScreen
+import com.example.tecnisis.ui.sign_up.SignUpScreen
+import com.example.tecnisis.ui.start_request.StartRequestScreen
 import com.example.tecnisis.ui.components.BottomPattern
-import com.example.tecnisis.ui.theme.TecnisisTheme
+import com.example.tecnisis.ui.sign_up.SignUpViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
@@ -93,6 +86,8 @@ fun TecnisisApp(userRepository: UserRepository) {
         backStackEntry?.destination?.route ?: TecnisisScreen.ListRequests.name
     )
 
+    val floatingButtonPressed = remember { mutableStateOf({}) }
+
     val nombre = remember { mutableStateOf("") }
     val apellidos = remember { mutableStateOf("") }
     val correo = remember { mutableStateOf("") }
@@ -127,6 +122,7 @@ fun TecnisisApp(userRepository: UserRepository) {
                 dni = dni,
                 telefono = telefono,
                 direccion = direccion,
+                onFloatingButtonClick = floatingButtonPressed,
                 errorMessage = errorMessage
             )
         },
@@ -148,20 +144,10 @@ fun TecnisisApp(userRepository: UserRepository) {
             }
             composable(route = TecnisisScreen.SignUp.name) {
                 SignUpScreen(
+                    viewModel = viewModel(modelClass = SignUpViewModel::class.java),
                     navController = navController,
+                    onSignUp = floatingButtonPressed/*,
                     userRepository = userRepository,
-                    onSignUp = { usuario, persona ->
-                        coroutineScope.launch {
-                            try {
-                                userRepository.registerUserWithPersona(usuario, persona)
-                                errorMessage.value = ""
-                                snackbarHostState.showSnackbar("Registro exitoso")
-                                navController.navigate(TecnisisScreen.Login.name)
-                            } catch (e: Exception) {
-                                snackbarHostState.showSnackbar("Error al registrar: ${e.message}")
-                            }
-                        }
-                    },
                     nombre = nombre,
                     apellidos = apellidos,
                     correo = correo,
@@ -170,7 +156,7 @@ fun TecnisisApp(userRepository: UserRepository) {
                     dni = dni,
                     telefono = telefono,
                     direccion = direccion,
-                    errorMessage = errorMessage
+                    errorMessage = errorMessage*/
                 )
             }
             composable(route = TecnisisScreen.ListRequests.name) {
@@ -199,6 +185,7 @@ fun TecnisisFloatingActionButton(
     dni: MutableState<String>,
     telefono: MutableState<String>,
     direccion: MutableState<String>,
+    onFloatingButtonClick: MutableState<() -> Unit>,
     errorMessage: MutableState<String>
 ) {
     val icon = when (currentScreen) {
@@ -209,7 +196,8 @@ fun TecnisisFloatingActionButton(
     }
 
     FloatingActionButton(
-        onClick = {
+        onClick = onFloatingButtonClick.value/*
+        {
             when (currentScreen) {
                 TecnisisScreen.Login -> {
                     coroutineScope.launch {
@@ -267,7 +255,7 @@ fun TecnisisFloatingActionButton(
                     navController.navigate(TecnisisScreen.ListRequests.name)
                 }
             }
-        },
+        }*/,
         containerColor = Color.Red,
         modifier = Modifier.size(60.dp)
     ) {
@@ -282,17 +270,17 @@ fun TecnisisFloatingActionButton(
         }
     }
 }
-
+/*
 @Composable
 fun provideUsuarioRepository(context: Context): UserRepository {
     val database = AppDatabase.getDatabase(context)
     return UserRepository(database.usuarioDao(), database.personaDao())
-}
+}*/
 
 @Preview(showBackground = true)
 @Composable
 fun TecnisisAppPreview() {
-    val fakeUsuarioDao = object : UsuarioDao {
+    /*val fakeUsuarioDao = object : UsuarioDao {
         override suspend fun validateUser(email: String, password: String): Usuario? {
             return if (email == "preview@example.com" && password == "preview") Usuario(1, email, password) else null
         }
@@ -315,5 +303,5 @@ fun TecnisisAppPreview() {
 
     TecnisisTheme {
         TecnisisApp(userRepository = fakeRepository)
-    }
+    }*/
 }

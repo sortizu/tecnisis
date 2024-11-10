@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.tecnisis.data.AppDatabase
-import com.example.tecnisis.data.UserRepository
+import com.example.tecnisis.data.user.UserRepository
 import com.example.tecnisis.ui.theme.TecnisisTheme
 
 class MainActivity : ComponentActivity() {
