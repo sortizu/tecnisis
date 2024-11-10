@@ -5,6 +5,6 @@ import retrofit2.http.POST
 import retrofit2.Response
 
 interface SignUpService {
-    @POST("api/patient")
+    @POST("signup")
     suspend fun registerPerson(@Body personRequest: PersonRequest): Response<SignUpResponse>
 }

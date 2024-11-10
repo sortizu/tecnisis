@@ -3,191 +3,118 @@ package com.example.tecnisis.ui.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.tecnisis.R
+import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.config.datastore.DataStoreManager
+import com.example.tecnisis.ui.components.CustomEmailField
+import com.example.tecnisis.ui.components.CustomPasswordField
+import com.example.tecnisis.ui.components.InfoBox
 
 @Composable
 fun LoginScreen(
-    onSignUp: () -> Unit,
-    onEmailChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit
+    viewModel: LoginViewModel,
+    onLogin: MutableState<()->Unit>,
+    navController: NavHostController
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+
+    val email by viewModel.email.observeAsState("")
+    val password by viewModel.password.observeAsState("")
+    val loginError by viewModel.loginError.observeAsState("")
+    val context = LocalContext.current
+    val dataStoreManager = remember { DataStoreManager(context) }
+
+    onLogin.value = {
+        viewModel.validateUser(dataStoreManager)
+    }
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFFFF7F0)),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.backgroundlogin),
             contentDescription = stringResource(id = R.string.login_title),
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
+            modifier = Modifier.fillMaxWidth().height(175.dp)
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Red)
-                .padding(vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().background(Color.Red).padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(id = R.string.login_title),
-                style = TextStyle(
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                ),
-                textAlign = TextAlign.Center
-            )
-
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ){
+                Text(
+                    text = stringResource(id = R.string.login_title),
+                    style = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color.White),
+                    textAlign = TextAlign.Center)
+                Icon(
+                    painter = painterResource(id = R.drawable.logo),
+                    tint = Color.White,
+                    contentDescription = stringResource(id = R.string.login_title),
+                    //contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
             Text(
                 text = stringResource(id = R.string.login_subtitle),
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    color = Color.White
-                ),
+                style = TextStyle(fontSize = 14.sp, color = Color.White),
                 textAlign = TextAlign.Center
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = stringResource(id = R.string.login_instructions),
-            style = TextStyle(
-                fontSize = 14.sp,
-                color = Color(0xFFFFA726)
-            ),
-            modifier = Modifier
-                .background(Color(0xFFFFE0B2))
-                .padding(8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        BasicTextField(
-            value = email,
-            onValueChange = {
-                email = it
-                onEmailChange(it)
-            },
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(8.dp),
-            textStyle = TextStyle(fontSize = 16.sp),
-            decorationBox = { innerTextField ->
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    if (email.isEmpty()) {
-                        Text(
-                            text = stringResource(id = R.string.email),
-                            style = TextStyle(color = Color.Gray, fontSize = 16.sp)
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        BasicTextField(
-            value = password,
-            onValueChange = {
-                password = it
-                onPasswordChange(it)
-            },
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(8.dp),
-            textStyle = TextStyle(fontSize = 16.sp),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            decorationBox = { innerTextField ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(Modifier.weight(1f)) {
-                        if (password.isEmpty()) {
-                            Text(
-                                text = stringResource(id = R.string.password),
-                                style = TextStyle(color = Color.Gray, fontSize = 16.sp)
-                            )
-                        }
-                        innerTextField()
-                    }
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible }
-                    ) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                        )
-                    }
-                }
-            }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = stringResource(id = R.string.no_account),
-            style = TextStyle(
-                fontSize = 14.sp,
-                color = Color.Gray,
-                textDecoration = TextDecoration.Underline
-            ),
-            modifier = Modifier
-                .clickable { onSignUp() }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Column (
+            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            InfoBox(description = stringResource(id = R.string.login_instructions))
+            CustomEmailField(label = stringResource(id = R.string.email), value = email, modifier = Modifier.fillMaxWidth(), onValueChange = {viewModel.emailUpdate(it)})
+            CustomPasswordField(label = stringResource(id = R.string.password), value = password, modifier = Modifier.fillMaxWidth(), onValueChange = {viewModel.passwordUpdate(it)})
+            Text(
+                text = stringResource(id = R.string.no_account),
+                style = TextStyle(fontSize = 14.sp, color = Color.Gray, textDecoration = TextDecoration.Underline
+                ), modifier = Modifier.clickable { navController.navigate(TecnisisScreen.SignUp.name) }
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(
-        onSignUp = {},
-        onEmailChange = {},
-        onPasswordChange = {}
-    )
+
 }

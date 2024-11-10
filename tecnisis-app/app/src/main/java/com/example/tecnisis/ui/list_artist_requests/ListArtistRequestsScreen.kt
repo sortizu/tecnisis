@@ -23,21 +23,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tecnisis.TecnisisScreen
-import com.example.tecnisis.ui.AppViewModelProvider
+import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.ui.components.RequestList
 import com.example.tecnisis.ui.components.ScreenTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListRequestsScreen(
-    viewModel: ListArtistRequestsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: ListArtistRequestsViewModel,
     currentScreen: TecnisisScreen = TecnisisScreen.ListRequests,
     modifier: Modifier = Modifier
 ) {
     // Collect the UI state from the ViewModel
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val dataStoreManager = remember { DataStoreManager(context) }
+
+    viewModel.loadArtistRequests(dataStoreManager)
 
     Column(
         modifier = Modifier
@@ -46,7 +49,6 @@ fun ListRequestsScreen(
             .background(color = Color.Transparent)
     ) {
         // Search bar at the top
-        val context = LocalContext.current
         var searchQuery by remember { mutableStateOf("") }
         ScreenTitle(text = context.getString(currentScreen.title))
         Spacer(modifier = Modifier.height(8.dp))
@@ -81,7 +83,7 @@ fun ListRequestsScreen(
             else -> {
                 // Display the list of requests if data is loaded successfully
                 RequestList(
-                    solicitudes = uiState.solicitudesWithObras
+                    requests = uiState.requests
                 )
             }
         }
@@ -93,5 +95,5 @@ fun ListRequestsScreen(
 @Preview(showBackground = true)
 @Composable
 fun ListRequestsScreenPreview() {
-    ListRequestsScreen()
+
 }
