@@ -53,6 +53,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Popup
 import com.example.tecnisis.data.obra.Obra
+import com.example.tecnisis.ui.list_artist_requests.data.GeneralUserRequestInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -114,24 +115,21 @@ fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
 }
 
 @Composable
-fun RequestList(solicitudes: Map<Solicitud, Obra>) {
+fun RequestList(requests: List<GeneralUserRequestInfo>) {
     LazyColumn {
-        items(solicitudes.size) { orden ->
-            val solicitud = solicitudes.keys.elementAt(orden)
-            val obra = solicitudes.values.elementAt(orden)
-            RequestCard(orden + 1, solicitud, obra)
+        items(requests.size) { index ->
+            RequestCard(index + 1, requests[index])
         }
     }
 }
 
 @Composable
-fun RequestCard(orden: Int, solicitud: Solicitud, obra: Obra) {
+fun RequestCard(orden: Int, request: GeneralUserRequestInfo) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         Row(
-            // Aplica padding horizontal solo a la izquierda
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 0.dp),
@@ -149,14 +147,14 @@ fun RequestCard(orden: Int, solicitud: Solicitud, obra: Obra) {
                 Text(text = orden.toString(), color = Color.White)
             }
 
-            // Detalles de la solicitud
+            // Request details
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 16.dp)
             ) {
-                Text(text = obra.titulo , fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = solicitud.estado , fontSize = 14.sp, color = Color.Gray)
+                Text(text = request.artworkTitle , fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = request.status , fontSize = 14.sp, color = Color.Gray)
             }
             // Imagen de la obra
             Image(
