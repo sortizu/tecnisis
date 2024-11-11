@@ -31,6 +31,6 @@ public class AppUser {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.person = null; // Asigna null o un objeto `Person` predeterminado.
+        this.person = null;
     }
 }

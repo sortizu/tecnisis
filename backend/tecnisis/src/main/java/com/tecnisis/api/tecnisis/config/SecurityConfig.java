@@ -17,7 +17,7 @@ public class SecurityConfig {
         http
                 .csrf().disable() // Deshabilita CSRF solo si es necesario (e.g., en APIs REST)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login").permitAll() // Permite acceso público a la ruta de login
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // Permite acceso público a login y register
                         .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
                 );
         return http.build();
@@ -28,4 +28,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-
