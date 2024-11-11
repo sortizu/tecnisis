@@ -9,31 +9,31 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-// implements the output por of application and use the repository
+// implements the output port of application and use the repository
 @Component
 @RequiredArgsConstructor
 public class ArtistPersistenceAdapter implements ArtistPersistencePort {
 
-    private final ArtistRepository repository;
-    private final ArtistPersistenceMapper mapper;
+    private final ArtistRepository artistRepository;
+    private final ArtistPersistenceMapper artistMapper;
 
     @Override
     public Optional<Artist> findById(Long id) {
-        return repository.findById(id).map(mapper::toArtist);
+        return artistRepository.findById(id).map(artistMapper::toArtist);
     }
 
     @Override
     public List<Artist> findAll() {
-        return mapper.toArtistList(repository.findAll());
+        return artistMapper.toArtistList(artistRepository.findAll());
     }
 
     @Override
     public Artist save(Artist artist) {
-        return mapper.toArtist(repository.save(mapper.toArtistEntity(artist)));
+        return artistMapper.toArtist(artistRepository.save(artistMapper.toArtistEntity(artist)));
     }
 
     @Override
     public void deleteById(Long id) {
-        repository.deleteById(id);
+        artistRepository.deleteById(id);
     }
 }

@@ -2,7 +2,9 @@ package com.unmsm.movil.tecnisis.art_galery.application.service;
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.input.ArtistServicePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.ArtistPersistencePort;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.PersonPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtistNotFoundException;
+import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Artist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,38 +15,45 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArtistService implements ArtistServicePort {
 
-    private final ArtistPersistencePort persistencePort;
+    private final ArtistPersistencePort artistPersistencePort;
+    private final PersonPersistencePort personPersistencePort;
 
     @Override
     public Artist findById(Long id) {
-        return persistencePort
+        return artistPersistencePort
                 .findById(id)
                 .orElseThrow(ArtistNotFoundException::new);
     }
 
     @Override
     public List<Artist> findAll() {
-        return persistencePort.findAll();
+        return artistPersistencePort.findAll();
     }
 
     @Override
     public Artist save(Artist artist) {
-        return persistencePort.save(artist);
+        return personPersistencePort.findById(artist.getPerson().getId())
+                .map(person -> {
+                    artist.setPerson(person);
+                    return artistPersistencePort.save(artist);
+                })
+                .orElseThrow(PersonNotFoundException::new);
     }
 
     @Override
     public Artist update(Long id, Artist artist) {
-        return persistencePort.findById(id)
-                .map(artistToUpdate -> {
-                    artistToUpdate.setPerson(artist.getPerson());
-                    return persistencePort.save(artistToUpdate);
+        if (artistPersistencePort.findById(id).isEmpty()) throw new ArtistNotFoundException();
+        return personPersistencePort.findById(artist.getPerson().getId())
+                .map(person -> {
+                    artist.setPerson(person);
+                    return artistPersistencePort.save(artist);
                 })
-                .orElseThrow(ArtistNotFoundException::new);
+                .orElseThrow(PersonNotFoundException::new);
     }
 
     @Override
     public void delete(Long id) {
-        if (persistencePort.findById(id).isEmpty()) throw new ArtistNotFoundException();
-        persistencePort.deleteById(id);
+        if (artistPersistencePort.findById(id).isEmpty()) throw new ArtistNotFoundException();
+        artistPersistencePort.deleteById(id);
     }
 }

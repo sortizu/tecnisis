@@ -1,12 +1,11 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Builder @Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public class ArtistCreateRequest {
-    @NotNull(message = "Person is required")
-    private Long PersonId;
+    @NotNull(message = "person_id is required")
+    private Long personId;
 }

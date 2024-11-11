@@ -4,11 +4,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Builder @Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public class PersonCreateRequest {
     @NotEmpty(message = "Name is required")
     @Max(value = 255, message = "Name must be less than 255 characters")
