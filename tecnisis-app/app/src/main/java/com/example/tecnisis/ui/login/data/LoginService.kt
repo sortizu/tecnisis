@@ -7,5 +7,4 @@ import retrofit2.Response
 interface LoginService {
     @POST("login")
     suspend fun loginUser(@Body loginRequest: LoginRequest): Response<LoginResponse>
-
 }
