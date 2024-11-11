@@ -28,8 +28,8 @@ public class PersonPersistenceAdapter implements PersonPersistencePort {
     }
 
     @Override
-    public Person save(Person artist) {
-        return personMapper.toPerson(personRepository.save(personMapper.toPersonEntity(artist)));
+    public Person save(Person person) {
+        return personMapper.toPerson(personRepository.save(personMapper.toPersonEntity(person)));
     }
 
     @Override

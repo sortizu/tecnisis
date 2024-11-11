@@ -3,6 +3,7 @@ package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persi
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Person;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity.PersonEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 

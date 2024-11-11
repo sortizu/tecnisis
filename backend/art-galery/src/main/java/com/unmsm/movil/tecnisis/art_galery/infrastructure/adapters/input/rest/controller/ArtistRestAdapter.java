@@ -4,6 +4,7 @@ import com.unmsm.movil.tecnisis.art_galery.application.ports.input.ArtistService
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.ArtistRestMapper;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request.ArtistCreateRequest;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.ArtistResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-@RestController
+@RestController @Tag(name = "Artist Controller", description = "Endpoint to management artists")
 @RequiredArgsConstructor
 @RequestMapping("/artists")
 public class ArtistRestAdapter {
@@ -35,7 +36,7 @@ public class ArtistRestAdapter {
         ArtistResponse response = restMapper.toArtistResponse(
                         servicePort.save(restMapper.toArtist(request)));
         return ResponseEntity
-                .created(URI.create("/artists/v1/api" + response.getId()))
+                .created(URI.create("/artists/v1/api/" + response.getId()))
                 .body(response);
     }
 

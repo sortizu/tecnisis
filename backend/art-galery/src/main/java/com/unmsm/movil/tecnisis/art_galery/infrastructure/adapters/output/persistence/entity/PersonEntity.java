@@ -19,7 +19,7 @@ public class PersonEntity {
 
     private String address;
 
-    private Character gender;
+    private String gender;
 
     private String phone;
 

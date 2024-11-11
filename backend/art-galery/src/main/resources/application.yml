@@ -5,7 +5,7 @@ spring:
     default-property-inclusion: non_null # Avoid null elements in JSON
     property-naming-strategy: SNAKE_CASE # JSON in format snake case
   datasource:
-    url: jdbc:postgresql://localhost:5432/tecnisis_project
+    url: jdbc:postgresql://localhost:5432/tecnisis
     username: ${DB_USERNAME_POSTGRESQL}
     password: ${DB_PASSWORD_POSTGRESQL}
     driver-class-name: org.postgresql.Driver
@@ -13,3 +13,14 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enable: true
+  info:
+    title: Art Gallery API
+    description: Tecnisis API
+    version: 1.0.0
