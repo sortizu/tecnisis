@@ -1,122 +1,105 @@
--- Crear ENUM de roles de usuario
-CREATE TYPE rol_usuario AS ENUM ('Artista', 'Especialista', 'Gerente');
--- Crear ENUM de tipos de reporte
-CREATE TYPE reporte_gerente AS ENUM ('Ventas', 'Obras aceptadas');
-
--- Crear tabla de usuarios
-CREATE TABLE usuarios (
-                          id SERIAL PRIMARY KEY,
-                          email VARCHAR(255) UNIQUE NOT NULL,
-                          password VARCHAR(255) NOT NULL
+-- Create users table
+CREATE TABLE users (
+                       id_user SERIAL PRIMARY KEY,
+                       email VARCHAR(255) UNIQUE NOT NULL,
+                       password VARCHAR(255) NOT NULL
 );
 
--- Crear tabla de personas, que referencia a usuarios y guarda datos comunes
-CREATE TABLE personas (
-                          id SERIAL PRIMARY KEY,
-                          nombre VARCHAR(255) NOT NULL,
-                          dni VARCHAR(20) NOT NULL UNIQUE,
-                          direccion VARCHAR(255),
-                          sexo CHAR(1) CHECK (sexo IN ('M', 'F')),
-                          telefono VARCHAR(20),
-                          tipo rol_usuario NOT NULL,
-                          user_id INT UNIQUE,  -- Relación con la tabla usuarios
-                          CONSTRAINT fk_persona_user_id FOREIGN KEY (user_id) REFERENCES usuarios(id)
+-- Create persons table, which references users and stores common data
+CREATE TABLE persons (
+                         id_person SERIAL PRIMARY KEY,
+                         name VARCHAR(255) NOT NULL,
+                         id_number VARCHAR(20) NOT NULL UNIQUE,
+                         address VARCHAR(255),
+                         gender CHAR(1) CHECK (gender IN ('M', 'F')),
+                         phone VARCHAR(20),
+                         user_role VARCHAR(50) NOT NULL,
+                         id_user INT UNIQUE,  -- Relationship with the users table
+                         CONSTRAINT fk_person_user_id FOREIGN KEY (id_user) REFERENCES users(id_user)
 );
 
--- Crear tabla de artistas
-CREATE TABLE artistas (
-                          id SERIAL PRIMARY KEY,
-                          persona_id INT UNIQUE NOT NULL,
-                          CONSTRAINT fk_artista_persona_id FOREIGN KEY (persona_id) REFERENCES personas(id)
+-- Create artists table
+CREATE TABLE artists (
+                         id_artist SERIAL PRIMARY KEY,
+                         id_person INT UNIQUE NOT NULL,
+                         CONSTRAINT fk_artist_person_id FOREIGN KEY (id_person) REFERENCES persons(id_person)
 );
 
--- Crear tabla de gerentes
-CREATE TABLE gerentes (
-                          id SERIAL PRIMARY KEY,
-                          persona_id INT UNIQUE NOT NULL,
-                          CONSTRAINT fk_gerente_persona_id FOREIGN KEY (persona_id) REFERENCES personas(id)
+-- Create managers table
+CREATE TABLE managers (
+                          id_manager SERIAL PRIMARY KEY,
+                          id_person INT UNIQUE NOT NULL,
+                          CONSTRAINT fk_manager_person_id FOREIGN KEY (id_person) REFERENCES persons(id_person)
 );
 
--- Crear tabla de especialistas
-CREATE TABLE especialistas (
-                               id SERIAL PRIMARY KEY,
-                               persona_id INT UNIQUE NOT NULL,
-                               disponibilidad BOOLEAN,
-                               CONSTRAINT fk_especialista_persona_id FOREIGN KEY (persona_id) REFERENCES personas(id)
+-- Create specialists table
+CREATE TABLE specialists (
+                             id_specialist SERIAL PRIMARY KEY,
+                             id_person INT UNIQUE NOT NULL,
+                             availability BOOLEAN,
+                             CONSTRAINT fk_specialist_person_id FOREIGN KEY (id_person) REFERENCES persons(id_person)
 );
 
-
--- Crear tabla de técnicas
-CREATE TABLE tecnicas (
-                          id SERIAL PRIMARY KEY,
-                          nombre VARCHAR(255) NOT NULL,
-                          descripcion TEXT
+-- Create techniques table
+CREATE TABLE techniques (
+                            id_technique SERIAL PRIMARY KEY,
+                            name VARCHAR(255) NOT NULL,
+                            description TEXT
 );
 
--- Crear tabla de obras
-CREATE TABLE obras (
-                       id SERIAL PRIMARY KEY,
-                       titulo VARCHAR(255) NOT NULL,
-                       fecha_realizacion DATE NOT NULL,
-                       imagen VARCHAR(255),
-                       alto DECIMAL(10, 2),
-                       ancho DECIMAL(10, 2),
-                       tecnica_id INT NOT NULL,
-                       artista_id INT NOT NULL,
-                       CONSTRAINT fk_obra_tecnica_id FOREIGN KEY (tecnica_id) REFERENCES tecnicas(id),
-                       CONSTRAINT fk_obra_artista_id FOREIGN KEY (artista_id) REFERENCES artistas(id)
+-- Create documents table (moved here to ensure foreign key dependencies are met)
+CREATE TABLE documents (
+                           id_document SERIAL PRIMARY KEY,
+                           document_path VARCHAR(255) NOT NULL
 );
 
--- Crear tabla de solicitudes
-CREATE TABLE solicitudes (
-                             id SERIAL PRIMARY KEY,
-                             fecha_solicitud DATE NOT NULL,
-                             estado VARCHAR(50) CHECK (estado IN ('Pendiente', 'Aprobada', 'Rechazada')) NOT NULL,
-                             obra_id INT NOT NULL,
-                             artista_id INT NOT NULL,
-                             CONSTRAINT fk_solicitud_obra_id FOREIGN KEY (obra_id) REFERENCES obras(id),
-                             CONSTRAINT fk_solicitud_artista_id FOREIGN KEY (artista_id) REFERENCES artistas(id)
+-- Create artworks table
+CREATE TABLE artworks (
+                          id_artwork SERIAL PRIMARY KEY,
+                          title VARCHAR(255) NOT NULL,
+                          creation_date DATE NOT NULL,
+                          image_address VARCHAR(255) NOT NULL,
+                          height DECIMAL(10, 2),
+                          width DECIMAL(10, 2),
+                          id_technique INT NOT NULL,
+                          id_artist INT NOT NULL,
+                          CONSTRAINT fk_artwork_technique_id FOREIGN KEY (id_technique) REFERENCES techniques(id_technique),
+                          CONSTRAINT fk_artwork_artist_id FOREIGN KEY (id_artist) REFERENCES artists(id_artist)
 );
 
--- Crear tabla de evaluación económica
-CREATE TABLE evaluacion_economica (
-                                      id SERIAL PRIMARY KEY,
-                                      fecha_evaluacion DATE NOT NULL,
-                                      precio_venta DECIMAL(10, 2) NOT NULL,
-                                      porcentaje_galeria DECIMAL(5, 2) NOT NULL,
-                                      especialista_id INT NOT NULL,
-                                      obra_id INT NOT NULL,
-                                      solicitud_id INT NOT NULL,
-                                      id_documento INT,  -- Para relacionar el documento generado
-                                      CONSTRAINT fk_evaluacion_economica_especialista_id FOREIGN KEY (especialista_id) REFERENCES especialistas(id),
-                                      CONSTRAINT fk_evaluacion_economica_obra_id FOREIGN KEY (obra_id) REFERENCES obras(id),
-                                      CONSTRAINT fk_evaluacion_economica_solicitud_id FOREIGN KEY (solicitud_id) REFERENCES solicitudes(id)
+-- Create requests table
+CREATE TABLE requests (
+                          id_request SERIAL PRIMARY KEY,
+                          request_date DATE NOT NULL,
+                          status VARCHAR(50) CHECK (status IN ('Pending', 'Approved', 'Rejected')) NOT NULL,
+                          id_artwork INT NOT NULL,
+                          CONSTRAINT fk_request_artwork_id FOREIGN KEY (id_artwork) REFERENCES artworks(id_artwork)
 );
 
--- Crear tabla de evaluación artística
-CREATE TABLE evaluacion_artistica (
-                                      id SERIAL PRIMARY KEY,
-                                      fecha_evaluacion DATE NOT NULL,
-                                      resultado VARCHAR(50) CHECK (resultado IN ('Aceptada', 'Rechazada')) NOT NULL,
-                                      calificacion DECIMAL(3, 1),
-                                      especialista_id INT NOT NULL,
-                                      obra_id INT NOT NULL,
-                                      solicitud_id INT NOT NULL,
-                                      id_documento INT,  -- Para relacionar el documento generado
-                                      CONSTRAINT fk_evaluacion_artistica_especialista_id FOREIGN KEY (especialista_id) REFERENCES especialistas(id),
-                                      CONSTRAINT fk_evaluacion_artistica_obra_id FOREIGN KEY (obra_id) REFERENCES obras(id),
-                                      CONSTRAINT fk_evaluacion_artistica_solicitud_id FOREIGN KEY (solicitud_id) REFERENCES solicitudes(id)
+-- Create economic evaluations table
+CREATE TABLE economic_evaluations (
+                                      id_evaluation SERIAL PRIMARY KEY,
+                                      evaluation_date DATE NOT NULL,
+                                      sale_price DECIMAL(10, 2) NOT NULL,
+                                      gallery_percentage DECIMAL(5, 2) NOT NULL,
+                                      id_specialist INT NOT NULL,
+                                      id_request INT NOT NULL,
+                                      id_document INT,  -- To link the generated document
+                                      CONSTRAINT fk_economic_evaluation_specialist_id FOREIGN KEY (id_specialist) REFERENCES specialists(id_specialist),
+                                      CONSTRAINT fk_economic_evaluation_request_id FOREIGN KEY (id_request) REFERENCES requests(id_request),
+                                      CONSTRAINT fk_economic_evaluation_document_id FOREIGN KEY (id_document) REFERENCES documents(id_document)
 );
 
--- Crear tabla de documentos
-CREATE TABLE documentos (
-                            id SERIAL PRIMARY KEY,
-                            tipo_documento VARCHAR(100) NOT NULL,
-                            ruta_documento VARCHAR(255) NOT NULL,
-                            solicitud_id INT,
-                            evaluacion_artistica_id INT,
-                            evaluacion_economica_id INT,
-                            CONSTRAINT fk_documento_solicitud_id FOREIGN KEY (solicitud_id) REFERENCES solicitudes(id),
-                            CONSTRAINT fk_documento_evaluacion_artistica_id FOREIGN KEY (evaluacion_artistica_id) REFERENCES evaluacion_artistica(id),
-                            CONSTRAINT fk_documento_evaluacion_economica_id FOREIGN KEY (evaluacion_economica_id) REFERENCES evaluacion_economica(id)
+-- Create artistic evaluations table
+CREATE TABLE artistic_evaluations (
+                                      id_evaluation SERIAL PRIMARY KEY,
+                                      evaluation_date DATE NOT NULL,
+                                      rating DECIMAL(3, 1),
+                                      result VARCHAR(1) CHECK (result IN ('A', 'R')),
+                                      id_specialist INT NOT NULL,
+                                      id_request INT NOT NULL,
+                                      id_document INT,  -- To link the generated document
+                                      CONSTRAINT fk_artistic_evaluation_specialist_id FOREIGN KEY (id_specialist) REFERENCES specialists(id_specialist),
+                                      CONSTRAINT fk_artistic_evaluation_request_id FOREIGN KEY (id_request) REFERENCES requests(id_request),
+                                      CONSTRAINT fk_artistic_evaluation_document_id FOREIGN KEY (id_document) REFERENCES documents(id_document)
 );

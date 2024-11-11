@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN ./gradlew bootJar
+# Cambia a `./gradlew build` para asegurar que todas las dependencias se instalen
+RUN ./gradlew bootJar -x test
 
 FROM openjdk:21-jdk-slim
 
