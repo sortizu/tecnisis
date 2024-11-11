@@ -35,10 +35,20 @@ public class PersonService implements PersonServicePort {
 
     @Override
     public Person update(Long id, Person person) {
-        if (personPersistencePort.findById(id).isEmpty()) throw new PersonNotFoundException();
 
-        person.setId(id);
-        return personPersistencePort.save(person);
+        return personPersistencePort
+                .findById(id)
+                .map(personToUpdate -> {
+                    personToUpdate.setId(id);
+                    personToUpdate.setName(person.getName());
+                    personToUpdate.setDni(person.getDni());
+                    personToUpdate.setAddress(person.getAddress());
+                    personToUpdate.setGender(person.getGender());
+                    personToUpdate.setPhone(person.getPhone());
+                    personToUpdate.setRole(person.getRole());
+                    return personPersistencePort.save(personToUpdate);
+                })
+                .orElseThrow(PersonNotFoundException::new);
     }
 
     @Override

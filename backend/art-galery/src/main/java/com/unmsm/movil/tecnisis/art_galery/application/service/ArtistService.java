@@ -41,14 +41,17 @@ public class ArtistService implements ArtistServicePort {
     }
 
     @Override
-    public Artist update(Long id, Artist artist) {
-        if (artistPersistencePort.findById(id).isEmpty()) throw new ArtistNotFoundException();
-        return personPersistencePort.findById(artist.getPerson().getId())
-                .map(person -> {
-                    artist.setPerson(person);
-                    return artistPersistencePort.save(artist);
-                })
-                .orElseThrow(PersonNotFoundException::new);
+    public Artist update(Long id, Artist request) {
+        return artistPersistencePort.findById(id)
+                .map(artist -> personPersistencePort
+                        .findById(request.getPerson().getId())
+                        .map(person -> {
+                            artist.setPerson(request.getPerson());
+                            return artistPersistencePort.save(artist);
+                        })
+                        .orElseThrow(PersonNotFoundException::new)
+                )
+                .orElseThrow(ArtistNotFoundException::new);
     }
 
     @Override
