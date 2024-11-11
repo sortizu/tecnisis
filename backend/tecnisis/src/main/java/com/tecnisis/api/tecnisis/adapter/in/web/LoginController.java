@@ -1,5 +1,6 @@
 package com.tecnisis.api.tecnisis.adapter.in.web;
 
+import com.tecnisis.api.tecnisis.adapter.in.web.dto.LoginRequest;
 import com.tecnisis.api.tecnisis.application.port.in.LoginUseCase;
 import com.tecnisis.api.tecnisis.domain.model.AppUser;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AppUser> login(@RequestParam String email, @RequestParam String password) {
-        AppUser user = loginUseCase.login(email, password);
+    public ResponseEntity<AppUser> login(@RequestBody LoginRequest loginRequest) {
+        AppUser user = loginUseCase.login(loginRequest.getEmail(), loginRequest.getPassword());
         if (user != null) {
             return ResponseEntity.ok(user); // Retorna el usuario completo con la información de 'persons'
         }
