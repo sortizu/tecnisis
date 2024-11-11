@@ -2,6 +2,7 @@ package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.c
 
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtistNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
+import com.unmsm.movil.tecnisis.art_galery.domain.exception.TechniqueNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -33,6 +34,16 @@ public class GlobalControllerAdvice {
         return ErrorResponse.builder()
                 .code(PERSON_NOT_FOUND.getCode())
                 .message(PERSON_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(TechniqueNotFoundException.class)
+    public ErrorResponse handleTechniqueNotFoundException() {
+        return ErrorResponse.builder()
+                .code(TECHNIQUE_NOT_FOUND.getCode())
+                .message(TECHNIQUE_NOT_FOUND.getMessage())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }

@@ -39,7 +39,6 @@ public class PersonService implements PersonServicePort {
         return personPersistencePort
                 .findById(id)
                 .map(personToUpdate -> {
-                    personToUpdate.setId(id);
                     personToUpdate.setName(person.getName());
                     personToUpdate.setDni(person.getDni());
                     personToUpdate.setAddress(person.getAddress());

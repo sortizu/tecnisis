@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-@RestController @Tag(name = "Artist Controller", description = "Endpoint to management artists")
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/artists")
+@Tag(name = "Artist Controller", description = "Endpoint to management artists")
 public class ArtistRestAdapter {
 
     private final ArtistServicePort servicePort;
