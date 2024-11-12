@@ -21,7 +21,7 @@ public class ArtWorkEntity {
     private LocalDate creationDate;
 
     @Column(name = "image_address")
-    private String imageUrl;
+    private String image;
 
     private BigDecimal height;
     private BigDecimal width;
@@ -33,4 +33,9 @@ public class ArtWorkEntity {
     @ManyToOne
     @JoinColumn(name = "id_artist", nullable = false)
     private ArtistEntity artist;
+
+    @PrePersist
+    public void prePersist() {
+        this.creationDate = LocalDate.now();
+    }
 }

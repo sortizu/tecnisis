@@ -46,7 +46,7 @@ public class ArtistService implements ArtistServicePort {
                 .map(artist -> personPersistencePort
                         .findById(request.getPerson().getId())
                         .map(person -> {
-                            artist.setPerson(request.getPerson());
+                            artist.setPerson(person);
                             return artistPersistencePort.save(artist);
                         })
                         .orElseThrow(PersonNotFoundException::new)

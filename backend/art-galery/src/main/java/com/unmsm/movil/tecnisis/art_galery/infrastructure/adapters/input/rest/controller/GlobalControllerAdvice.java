@@ -1,5 +1,6 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.controller;
 
+import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtWorkNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtistNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.TechniqueNotFoundException;
@@ -44,6 +45,16 @@ public class GlobalControllerAdvice {
         return ErrorResponse.builder()
                 .code(TECHNIQUE_NOT_FOUND.getCode())
                 .message(TECHNIQUE_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ArtWorkNotFoundException.class)
+    public ErrorResponse handleArtWorkNotFoundException() {
+        return ErrorResponse.builder()
+                .code(ARTWORK_NOT_FOUND.getCode())
+                .message(ARTWORK_NOT_FOUND.getMessage())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }
