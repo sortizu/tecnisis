@@ -1,4 +1,4 @@
-package com.unmsm.movil.tecnisis.art_galery.domain.model;
+package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response;
 
 import lombok.*;
 
@@ -6,10 +6,9 @@ import java.time.LocalDate;
 
 @Builder @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-public class Request {
+public class RequestResponse {
     private Long id;
     private LocalDate date;
     private String status;
-    private ArtWork artWork;
+    private ArtWorkResponse artWork;
 }
-

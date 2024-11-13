@@ -27,12 +27,12 @@ public class ArtWorkEntity {
     private BigDecimal width;
 
     @ManyToOne
-    @JoinColumn(name = "id_technique", nullable = false)
-    private TechniqueEntity technique;
-
-    @ManyToOne
     @JoinColumn(name = "id_artist", nullable = false)
     private ArtistEntity artist;
+
+    @ManyToOne
+    @JoinColumn(name = "id_technique", nullable = false)
+    private TechniqueEntity technique;
 
     @PrePersist
     public void prePersist() {

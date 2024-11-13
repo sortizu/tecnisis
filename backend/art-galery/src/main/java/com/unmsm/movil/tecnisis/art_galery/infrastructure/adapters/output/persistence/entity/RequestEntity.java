@@ -15,11 +15,16 @@ public class RequestEntity {
     private Long id;
 
     @Column(name = "request_date")
-    private LocalDate requestDate;
+    private LocalDate date;
 
     private String status;
 
     @ManyToOne
     @JoinColumn(name = "id_artwork", nullable = false)
     private ArtWorkEntity artWork;
+
+    @PrePersist
+    public void prePersist() {
+        this.date = LocalDate.now();
+    }
 }

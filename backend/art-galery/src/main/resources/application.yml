@@ -2,8 +2,8 @@ spring:
   application:
     name: art-galery
   jackson:
-    default-property-inclusion: non_null # Avoid null elements in JSON
-    property-naming-strategy: SNAKE_CASE # JSON in format snake case
+    default-property-inclusion: non_null # avoid null in JSON response
+    property-naming-strategy: SNAKE_CASE # set snake case format in JSON
   datasource:
     url: jdbc:postgresql://localhost:5432/tecnisis
     username: ${DB_USERNAME_POSTGRESQL}
@@ -13,6 +13,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
+    open-in-view: false
 
 springdoc:
   api-docs:
@@ -24,3 +25,7 @@ springdoc:
     title: Art Gallery API
     description: Tecnisis API
     version: 1.0.0
+
+mapstruct:
+  default:
+    unmappedTargetPolicy: IGNORE # Avoid properties didn't mapped

@@ -10,7 +10,6 @@ import org.mapstruct.ReportingPolicy;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = {PersonRestMapper.class})
 public interface ArtistRestMapper {
     @Mapping(target = "person", expression = "java(mapToPerson(artistCreateRequest.getPersonId()))")

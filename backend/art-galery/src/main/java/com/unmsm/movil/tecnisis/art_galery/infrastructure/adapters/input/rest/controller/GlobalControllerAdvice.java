@@ -1,9 +1,6 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.controller;
 
-import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtWorkNotFoundException;
-import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtistNotFoundException;
-import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
-import com.unmsm.movil.tecnisis.art_galery.domain.exception.TechniqueNotFoundException;
+import com.unmsm.movil.tecnisis.art_galery.domain.exception.*;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -55,6 +52,16 @@ public class GlobalControllerAdvice {
         return ErrorResponse.builder()
                 .code(ARTWORK_NOT_FOUND.getCode())
                 .message(ARTWORK_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(RequestNotFoundException.class)
+    public ErrorResponse handleRequestNotFoundException() {
+        return ErrorResponse.builder()
+                .code(REQUEST_NOT_FOUND.getCode())
+                .message(REQUEST_NOT_FOUND.getMessage())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }

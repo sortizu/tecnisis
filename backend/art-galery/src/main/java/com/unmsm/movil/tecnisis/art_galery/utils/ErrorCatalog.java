@@ -10,6 +10,7 @@ public enum ErrorCatalog {
     PERSON_NOT_FOUND("ERR_PER_001", "Person not found"),
     TECHNIQUE_NOT_FOUND("ERR_TEC_001", "Technique not found"),
     ARTWORK_NOT_FOUND("ERR_ART_003", "Artwork not found"),
+    REQUEST_NOT_FOUND("ERR_REQ_001", "Request not found"),
     INVALID_PARAMETER("ERR_GEN_001", "Invalid parameter"),
     GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred");
 
