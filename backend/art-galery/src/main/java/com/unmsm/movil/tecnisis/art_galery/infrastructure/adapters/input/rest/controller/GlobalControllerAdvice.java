@@ -76,6 +76,16 @@ public class GlobalControllerAdvice {
                 .build();
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(DocumentNotFoundException.class)
+    public ErrorResponse handleDocumentNotFoundException() {
+        return ErrorResponse.builder()
+                .code(DOCUMENT_NOT_FOUND.getCode())
+                .message(DOCUMENT_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleMethodArgumentNotValidException(

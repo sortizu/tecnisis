@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-@RestController @Tag(name = "Person Controller", description = "Endpoint to management persons")
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/persons")
+@Tag(name = "Person Controller", description = "Endpoint to management persons")
 public class PersonRestAdapter {
     private final PersonServicePort servicePort;
     private final PersonRestMapper restMapper;

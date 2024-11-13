@@ -13,5 +13,5 @@ public class DocumentEntity {
     private Long id;
 
     @Column(name = "document_path")
-    private String documentUrl;
+    private String path;
 }
