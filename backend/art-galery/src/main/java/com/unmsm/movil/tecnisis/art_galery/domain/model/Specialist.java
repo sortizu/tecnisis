@@ -6,6 +6,6 @@ import lombok.*;
 @NoArgsConstructor @AllArgsConstructor
 public class Specialist {
     private Long id;
-    private Person person;
     private Boolean isAvailable;
+    private Person person;
 }

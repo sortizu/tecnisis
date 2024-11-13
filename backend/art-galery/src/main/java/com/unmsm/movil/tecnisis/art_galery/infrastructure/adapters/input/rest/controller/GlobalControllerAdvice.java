@@ -66,6 +66,16 @@ public class GlobalControllerAdvice {
                 .build();
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(SpecialistNotFoundException.class)
+    public ErrorResponse handleSpecialistNotFoundException() {
+        return ErrorResponse.builder()
+                .code(SPECIALIST_NOT_FOUND.getCode())
+                .message(SPECIALIST_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleMethodArgumentNotValidException(

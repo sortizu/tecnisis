@@ -9,8 +9,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import java.util.List;
 
-@Mapper(componentModel = "spring",
-        uses = {PersonRestMapper.class})
+@Mapper(componentModel = "spring", uses = {PersonRestMapper.class})
 public interface ArtistRestMapper {
     @Mapping(target = "person", expression = "java(mapToPerson(artistCreateRequest.getPersonId()))")
     Artist toArtist(ArtistCreateRequest artistCreateRequest);
