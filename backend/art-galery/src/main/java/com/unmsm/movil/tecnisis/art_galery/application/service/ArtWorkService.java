@@ -12,7 +12,6 @@ import com.unmsm.movil.tecnisis.art_galery.domain.model.Artist;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Technique;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 // implements the input port and use the output port

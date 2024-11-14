@@ -1,6 +1,7 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,8 +9,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity @Getter @Setter
-@Table(name = "artistic_evaluations")
-public class ArtisticEvaluation {
+@Table(name = "economic_evaluations")
+public class EconomicEvaluationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_evaluation")
@@ -18,9 +19,11 @@ public class ArtisticEvaluation {
     @Column(name = "evaluation_date")
     private LocalDate evaluationDate;
 
-    private BigDecimal rating;
+    @Column(name = "sale_price")
+    private BigDecimal salesPrice;
 
-    private String result;
+    @Column(name = "gallery_percentage")
+    private BigDecimal percentage;
 
     @ManyToOne
     @JoinColumn(name = "id_specialist", nullable = false)

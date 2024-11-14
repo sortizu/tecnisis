@@ -86,6 +86,16 @@ public class GlobalControllerAdvice {
                 .build();
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ArtisticEvaluationNotFundException.class)
+    public ErrorResponse handleArtisticEvaluationNotFoundException() {
+        return ErrorResponse.builder()
+                .code(ARTISTIC_EVALUATION_NOT_FOUND.getCode())
+                .message(ARTISTIC_EVALUATION_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleMethodArgumentNotValidException(
