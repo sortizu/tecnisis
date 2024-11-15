@@ -1,6 +1,7 @@
 package com.example.tecnisis.ui.sign_up
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -13,9 +14,8 @@ import com.example.tecnisis.config.navigation.ContextAplication
 import com.example.tecnisis.config.retrofit.TecnisisApi
 
 import com.example.tecnisis.data.ui_states.SignUpUiState
-import com.example.tecnisis.ui.sign_up.data.PersonRequest
+import com.example.tecnisis.ui.sign_up.data.SignUpRequest
 import com.example.tecnisis.ui.sign_up.data.SignUpService
-import com.example.tecnisis.ui.sign_up.data.UserRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -102,20 +102,21 @@ class SignUpViewModel () : ViewModel() {
                 } else if (_pass.value != _repeatedPass.value) {
                     _message.value = "Las contraseñas no coinciden"
                 } else {
-                    val userRequest = UserRequest(email = _email.value!!, password = _pass.value!!)
-                    val personRequest = PersonRequest(
-                        name = _name.value!!,
-                        surnames = _surnames.value!!,
-                        dni = _dni.value!!,
-                        phone = _phone.value!!,
+                    val signUpRequest = SignUpRequest(
+                        email = _email.value!!,
+                        password = _pass.value!!,
+                        name = _name.value!! + " " + _surnames.value!!,
+                        idNumber = _dni.value!!,
                         address = _address.value!!,
-                        sex = "Otro",
-                        userRequest = userRequest
+                        gender = "X",
+                        phone = _phone.value!!,
+                        userRole = "USER"
                     )
-                    val response = TecnisisApi.signUpService.registerPerson(personRequest)
+                    val response = TecnisisApi.signUpService.registerPerson(signUpRequest)
                     if (response.isSuccessful) {
                         response.body()?.let {
-                            _message.value = it.message
+                            //_message.value = it.message
+                            Log.i("Response", it.toString())
                         }
                     } else {
                         val errorBody = JSONObject(response.errorBody()?.string()!!)
@@ -128,4 +129,9 @@ class SignUpViewModel () : ViewModel() {
         }
 
     }
+
+    fun clearMessage() {
+        _message.value = ""
+    }
+
 }
