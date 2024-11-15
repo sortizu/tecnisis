@@ -1,5 +1,6 @@
 package com.example.tecnisis.ui.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,8 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.ui.login.data.LoginRequest
+import com.example.tecnisis.ui.login.data.LoginResponse
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import retrofit2.Response
 
 class LoginViewModel : ViewModel() {
 
@@ -46,13 +49,12 @@ class LoginViewModel : ViewModel() {
 
                 val loginRequest = LoginRequest(_email.value!!, _password.value!!)
                 val response = TecnisisApi.loginService.loginUser(loginRequest)
-
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _loginError.value = null // Limpiar el mensaje de error en caso de éxito
                         _isLoginSuccessful.value = true // Indicar que el login fue exitoso
-                        dataStoreManager.saveId(it.userId.toString())
-                        dataStoreManager.saveRole(it.role)
+                        dataStoreManager.saveId(it.id.toString())
+                        //dataStoreManager.saveRole(it.role)
                     }
                 } else {
                     val errorBody = JSONObject(response.errorBody()?.string()!!)

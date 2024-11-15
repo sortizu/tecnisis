@@ -3,6 +3,7 @@ package com.example.tecnisis.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -37,11 +38,11 @@ import androidx.compose.ui.draw.clip
 import com.example.tecnisis.R
 import androidx.compose.material3.*
 import androidx.compose.ui.layout.ContentScale
-import com.example.tecnisis.data.solicitud.Solicitud
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,8 +53,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Popup
-import com.example.tecnisis.data.obra.Obra
-import com.example.tecnisis.ui.list_artist_requests.data.GeneralUserRequestInfo
+import com.example.tecnisis.ui.list_user_requests.data.GeneralUserRequestInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -114,20 +114,13 @@ fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
     }
 }
 
-@Composable
-fun RequestList(requests: List<GeneralUserRequestInfo>) {
-    LazyColumn {
-        items(requests.size) { index ->
-            RequestCard(index + 1, requests[index])
-        }
-    }
-}
 
 @Composable
-fun RequestCard(orden: Int, request: GeneralUserRequestInfo) {
+fun RequestCard(orden: Int, request: GeneralUserRequestInfo,onCardClick: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onCardClick(request.requestId) }
     ) {
         Row(
             modifier = Modifier
@@ -308,5 +301,29 @@ fun SelectableListItem(
             }
         )
         HorizontalDivider()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomSingleChoiceSegmentedButton(
+    options: List<String>,
+    onSelectionChanged: (Int) -> Unit
+) {
+    var selectedIndex by remember { mutableStateOf(0) }
+
+    SingleChoiceSegmentedButtonRow {
+        options.forEachIndexed { index, label ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                onClick = {
+                    selectedIndex = index
+                    onSelectionChanged(index) // Notify the caller
+                },
+                selected = index == selectedIndex
+            ) {
+                Text(label)
+            }
+        }
     }
 }

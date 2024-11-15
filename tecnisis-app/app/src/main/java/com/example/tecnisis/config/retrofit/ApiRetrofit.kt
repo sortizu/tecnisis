@@ -1,6 +1,6 @@
 package com.example.tecnisis.config.retrofit
 
-import com.example.tecnisis.ui.list_artist_requests.data.ListUserRequestsService
+import com.example.tecnisis.ui.list_user_requests.data.ListUserRequestsService
 import com.example.tecnisis.ui.login.data.LoginService
 import com.example.tecnisis.ui.sign_up.data.SignUpService
 import okhttp3.OkHttpClient
@@ -8,7 +8,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val BASE_URL = "http://192.168.18.85:8080/api/auth/"
+private const val BASE_URL = "http://:8080/api/auth/"
 
 // Configura el interceptor para los logs de Retrofit
 private val loggingInterceptor = HttpLoggingInterceptor().apply {

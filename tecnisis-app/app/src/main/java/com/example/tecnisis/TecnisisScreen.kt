@@ -20,27 +20,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.tecnisis.data.user.UserRepository
-import com.example.tecnisis.ui.list_artist_requests.ListRequestsScreen
+import com.example.tecnisis.ui.list_user_requests.ListUserRequestsScreen
 import com.example.tecnisis.ui.login.LoginScreen
 import com.example.tecnisis.ui.sign_up.SignUpScreen
 import com.example.tecnisis.ui.start_request.StartRequestScreen
 import com.example.tecnisis.ui.components.BottomPattern
-import com.example.tecnisis.ui.list_artist_requests.ListArtistRequestsViewModel
+import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
 import com.example.tecnisis.ui.login.LoginViewModel
 import com.example.tecnisis.ui.sign_up.SignUpViewModel
-import kotlinx.coroutines.CoroutineScope
+import com.example.tecnisis.ui.review_request.ReviewRequestScreen
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
     SignUp(title = R.string.crear_cuenta),
     ListRequests(title = R.string.lista_de_solicitudes),
-    StartRequest(title = R.string.iniciar_solicitud)
+    StartRequest(title = R.string.iniciar_solicitud),
+    ReviewRequest(title = R.string.review_request)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,7 +88,7 @@ fun TecnisisApp(userRepository: UserRepository) {
         backStackEntry?.destination?.route ?: TecnisisScreen.ListRequests.name
     )
 
-    val userId = remember { mutableStateOf(0) }
+    val enableFloatingActionButton = remember { mutableStateOf(true) }
     val floatingButtonPressed = remember { mutableStateOf({}) }
     val errorMessage = remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -99,13 +99,16 @@ fun TecnisisApp(userRepository: UserRepository) {
                 TecnisisTopAppBar(onProfileClick = {})
             }
         },
-        floatingActionButton = {
-            TecnisisFloatingActionButton(
-                currentScreen = currentScreen,
-                snackbarHostState = snackbarHostState,
-                onFloatingButtonClick = floatingButtonPressed,
-                errorMessage = errorMessage
-            )
+        floatingActionButton =
+        {
+            if (enableFloatingActionButton.value){
+                TecnisisFloatingActionButton(
+                    currentScreen = currentScreen,
+                    snackbarHostState = snackbarHostState,
+                    onFloatingButtonClick = floatingButtonPressed,
+                    errorMessage = errorMessage
+                )
+            }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
@@ -132,12 +135,18 @@ fun TecnisisApp(userRepository: UserRepository) {
                 )
             }
             composable(route = TecnisisScreen.ListRequests.name) {
-                ListRequestsScreen(
-                    viewModel = viewModel(modelClass = ListArtistRequestsViewModel::class.java),
+                ListUserRequestsScreen(
+                    viewModel = viewModel(modelClass = ListUserRequestsViewModel::class.java),
+                    enableFloatingActionButton = enableFloatingActionButton,
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed
                 )
             }
             composable(route = TecnisisScreen.StartRequest.name) {
                 StartRequestScreen()
+            }
+            composable(route = TecnisisScreen.ReviewRequest.name) {
+                ReviewRequestScreen()
             }
         }
         BottomPattern()
@@ -156,6 +165,7 @@ fun TecnisisFloatingActionButton(
         TecnisisScreen.SignUp -> Icons.Default.ArrowForward
         TecnisisScreen.ListRequests -> Icons.Default.Add
         TecnisisScreen.StartRequest -> Icons.Default.Save
+        TecnisisScreen.ReviewRequest -> TODO()
     }
     FloatingActionButton(
         onClick = onFloatingButtonClick.value,

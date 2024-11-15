@@ -1,4 +1,4 @@
-package com.example.tecnisis.ui.list_artist_requests.data
+package com.example.tecnisis.ui.list_user_requests.data
 
 import retrofit2.http.GET
 import retrofit2.http.Query
