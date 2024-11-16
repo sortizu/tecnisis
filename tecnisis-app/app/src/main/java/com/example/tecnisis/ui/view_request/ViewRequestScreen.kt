@@ -46,7 +46,37 @@ fun ViewRequestScreen(
     currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestReview,
     modifier: Modifier = Modifier
 ){
+    Column(
+        modifier = Modifier
+            .padding(0.dp)
+            .fillMaxSize()
+            .padding(start = 16.dp, end = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        val context = LocalContext.current
+        ScreenTitle(text = context.getString(currentScreen.title))
+        ImageCard(
+            imageResource = R.drawable.media,
+            title = "Artwork Title",
+            date = "dd/MM/YYYY",
+            dimensions = "ww x hh"
+        )
+        HighlightButton(
+            onClick = { },
+            text = stringResource(R.string.inspect_image)
+        )
+        SelectableListItem(
+            text = stringResource(R.string.technique),
+            icon = Icons.Filled.ContentCut,
+            iconDescription = stringResource(R.string.technique)
+        )
 
+        SectionHeader(text = stringResource(R.string.request_progress),
+            Modifier.align(Alignment.Start).padding(vertical = 8.dp)
+        )
+
+    }
 }
 
 @Preview(showBackground = true)

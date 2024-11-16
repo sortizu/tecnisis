@@ -1,7 +1,7 @@
-package com.example.tecnisis.data.solicitud
+package com.example.tecnisis.data.request
 
-import com.example.tecnisis.data.obra.Obra
-import com.example.tecnisis.data.obra.ObraDao
+import com.example.tecnisis.data.artwork.Obra
+import com.example.tecnisis.data.artwork.ObraDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

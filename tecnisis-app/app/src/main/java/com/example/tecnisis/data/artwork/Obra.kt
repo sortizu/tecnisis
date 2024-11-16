@@ -1,11 +1,11 @@
-package com.example.tecnisis.data.obra
+package com.example.tecnisis.data.artwork
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.tecnisis.data.tecnica.Tecnica
-import com.example.tecnisis.data.artista.Artista
+import com.example.tecnisis.data.technique.Tecnica
+import com.example.tecnisis.data.artist.Artista
 
 @Entity(tableName = "obra",
         foreignKeys = [

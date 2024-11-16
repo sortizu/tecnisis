@@ -1,10 +1,10 @@
-package com.example.tecnisis.data.solicitud
+package com.example.tecnisis.data.request
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.tecnisis.data.obra.Obra
+import com.example.tecnisis.data.artwork.Obra
 
 @Entity(tableName = "solicitud",
         foreignKeys = [

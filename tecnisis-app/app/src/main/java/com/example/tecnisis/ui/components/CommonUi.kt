@@ -3,7 +3,6 @@ package com.example.tecnisis.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -20,8 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -34,7 +31,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.Card
 import androidx.compose.ui.draw.clip
 import com.example.tecnisis.R
 import androidx.compose.material3.*
@@ -43,11 +39,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.SquareFoot
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +52,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Popup
-import com.example.tecnisis.ui.list_user_requests.data.GeneralUserRequestInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -99,54 +92,12 @@ fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
 }
 
 @Composable
-fun SectionHeader(text: String){
-    Text(text = text, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray))
+fun SectionHeader(text: String, modifier: Modifier = Modifier){
+    Text(text = text,
+        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray),
+        modifier = modifier)
 }
 
-
-@Composable
-fun RequestCard(orden: Int, request: GeneralUserRequestInfo,onCardClick: (Int) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onCardClick(request.requestId) }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 0.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Priority Circle
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color.Red),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = orden.toString(), color = Color.White)
-            }
-
-            // Request details
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 16.dp)
-            ) {
-                Text(text = request.artworkTitle , fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = request.status , fontSize = 14.sp, color = Color.Gray)
-            }
-            // Imagen de la obra
-            Image(
-                painter = painterResource(id = R.drawable.media),
-                contentDescription = "Obra",
-                modifier = Modifier.size(100.dp)
-            )
-        }
-    }
-}
 
 @Composable
 fun InfoBox(
@@ -265,56 +216,6 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
 fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
-}
-
-@Composable
-fun SelectableListItem(
-    text: String,
-    icon: ImageVector,
-    iconDescription: String
-) {
-    Column {
-        ListItem(
-            headlineContent = { Text(text) },
-            leadingContent = {
-                Icon(
-                    icon,
-                    contentDescription = iconDescription,
-                )
-            },
-            trailingContent = {
-                Icon(
-                    Icons.Default.ArrowRight,
-                    contentDescription = "Open Modal"
-                )
-            }
-        )
-        HorizontalDivider()
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomSingleChoiceSegmentedButton(
-    options: List<String>,
-    onSelectionChanged: (Int) -> Unit
-) {
-    var selectedIndex by remember { mutableStateOf(0) }
-
-    SingleChoiceSegmentedButtonRow {
-        options.forEachIndexed { index, label ->
-            SegmentedButton(
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                onClick = {
-                    selectedIndex = index
-                    onSelectionChanged(index) // Notify the caller
-                },
-                selected = index == selectedIndex
-            ) {
-                Text(label)
-            }
-        }
-    }
 }
 
 @Composable

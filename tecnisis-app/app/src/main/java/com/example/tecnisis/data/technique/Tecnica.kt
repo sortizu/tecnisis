@@ -1,4 +1,4 @@
-package com.example.tecnisis.data.tecnica
+package com.example.tecnisis.data.technique
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

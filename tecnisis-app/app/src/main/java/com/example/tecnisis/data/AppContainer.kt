@@ -1,7 +1,7 @@
 package com.example.tecnisis.data
 
 import android.content.Context
-import com.example.tecnisis.data.solicitud.SolicitudRepository
+import com.example.tecnisis.data.request.SolicitudRepository
 import com.example.tecnisis.data.user.UserRepository
 
 interface AppContainer {

@@ -1,4 +1,4 @@
-package com.example.tecnisis.data.solicitud
+package com.example.tecnisis.data.request
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -1,4 +1,4 @@
-package com.example.tecnisis.data.artista
+package com.example.tecnisis.data.artist
 
 import androidx.room.Dao
 import androidx.room.Insert

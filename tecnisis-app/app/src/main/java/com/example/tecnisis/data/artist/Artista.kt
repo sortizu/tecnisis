@@ -1,4 +1,4 @@
-package com.example.tecnisis.data.artista
+package com.example.tecnisis.data.artist
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
