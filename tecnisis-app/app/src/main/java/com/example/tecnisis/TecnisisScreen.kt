@@ -24,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.tecnisis.data.user.UserRepository
 import com.example.tecnisis.ui.artistic_request_review.ArtisticRequestReviewScreen
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsScreen
 import com.example.tecnisis.ui.login.LoginScreen
@@ -84,7 +83,7 @@ fun TecnisisTopAppBar(onProfileClick: () -> Unit) {
 }
 
 @Composable
-fun TecnisisApp(userRepository: UserRepository) {
+fun TecnisisApp() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = TecnisisScreen.valueOf(
