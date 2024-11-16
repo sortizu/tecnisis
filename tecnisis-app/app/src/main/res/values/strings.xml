@@ -24,4 +24,8 @@
     <string name="inspect_image">Inspeccionar imagen</string>
     <string name="technique">Técnica</string>
     <string name="request_progress">Progreso de solicitud</string>
+    <string name="specialist_selection">Selección de especialista</string>
+    <string name="artistic_evaluation">Evaluación artística</string>
+    <string name="economic_evaluation">Evaluación económica</string>
+    <string name="finished">Finalizado</string>
 </resources>

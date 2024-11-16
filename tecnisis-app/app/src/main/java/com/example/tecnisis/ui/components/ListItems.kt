@@ -32,8 +32,12 @@ import com.example.tecnisis.R
 import com.example.tecnisis.ui.list_user_requests.data.GeneralUserRequestInfo
 
 @Composable
-fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> Unit) {
-    Column {
+fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> Unit = { }) {
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClicked() }
+    ){
         ListItem(
             headlineContent = {
                 Box(
@@ -53,10 +57,12 @@ fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> 
                 }
             },
             trailingContent = {
-                Icon(
-                    Icons.Default.ArrowRight,
-                    contentDescription = "View Details"
-                )
+                if (onClicked != { }){
+                    Icon(
+                        Icons.Default.ArrowRight,
+                        contentDescription = "View Details"
+                    )
+                }
             }
         )
         HorizontalDivider()

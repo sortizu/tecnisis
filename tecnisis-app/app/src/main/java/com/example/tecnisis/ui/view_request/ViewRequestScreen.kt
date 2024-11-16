@@ -1,42 +1,23 @@
 package com.example.tecnisis.ui.view_request
 
-import android.graphics.drawable.Icon
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.example.tecnisis.TecnisisScreen
-import com.example.tecnisis.ui.components.ScreenTitle
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.ContentCut
-import androidx.compose.material.icons.filled.SquareFoot
-import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.tecnisis.R
+import com.example.tecnisis.TecnisisScreen
 import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
+import com.example.tecnisis.ui.components.ProgressCard
+import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SectionHeader
 import com.example.tecnisis.ui.components.SelectableListItem
 import com.example.tecnisis.ui.theme.TecnisisTheme
@@ -44,8 +25,15 @@ import com.example.tecnisis.ui.theme.TecnisisTheme
 @Composable
 fun ViewRequestScreen(
     currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestReview,
+    viewModel: ViewRequestViewModel = ViewRequestViewModel(),
+    requestId: Int,
     modifier: Modifier = Modifier
 ){
+    val request = viewModel.request.observeAsState()
+    val message = viewModel.message.observeAsState()
+    val isLoading = viewModel.isLoading.observeAsState()
+    viewModel.getRequest(requestId)
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -54,28 +42,61 @@ fun ViewRequestScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val context = LocalContext.current
         ScreenTitle(text = context.getString(currentScreen.title))
-        ImageCard(
-            imageResource = R.drawable.media,
-            title = "Artwork Title",
-            date = "dd/MM/YYYY",
-            dimensions = "ww x hh"
-        )
-        HighlightButton(
-            onClick = { },
-            text = stringResource(R.string.inspect_image)
-        )
-        SelectableListItem(
-            text = stringResource(R.string.technique),
-            icon = Icons.Filled.ContentCut,
-            iconDescription = stringResource(R.string.technique)
-        )
-
-        SectionHeader(text = stringResource(R.string.request_progress),
-            Modifier.align(Alignment.Start).padding(vertical = 8.dp)
-        )
-
+        when {
+            isLoading.value == true -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+            else -> {
+                ImageCard(
+                    imageResource = R.drawable.media,
+                    title = "Artwork Title",
+                    date = "dd/MM/YYYY",
+                    dimensions = "ww x hh"
+                )
+                HighlightButton(
+                    onClick = { },
+                    text = stringResource(R.string.inspect_image)
+                )
+                SelectableListItem(
+                    text = stringResource(R.string.technique),
+                    icon = Icons.Filled.ContentCut,
+                    iconDescription = stringResource(R.string.technique)
+                )
+                SectionHeader(text = stringResource(R.string.request_progress),
+                    Modifier
+                        .align(Alignment.Start)
+                        .padding(vertical = 8.dp)
+                )
+                request.value?.let {
+                    ProgressCard(
+                        order = 1,
+                        status = it.request.status,
+                        stepName = stringResource(R.string.specialist_selection)
+                    )
+                    if (it.artisticEvaluation != null){
+                        ProgressCard(
+                            order = 2,
+                            status = it.artisticEvaluation.result,
+                            stepName = stringResource(R.string.artistic_evaluation)
+                        )
+                    }else if(it.request.status == "Aprobada"){
+                        ProgressCard(
+                            order = 2,
+                            status = "Pendiente",
+                            stepName = stringResource(R.string.artistic_evaluation)
+                        )
+                    }
+                    if(it.economicEvaluation != null){
+                        ProgressCard(
+                            order = 3,
+                            status = stringResource(R.string.finished),
+                            stepName = stringResource(R.string.economic_evaluation)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -83,6 +104,6 @@ fun ViewRequestScreen(
 @Composable
 fun ViewRequestScreenPreview() {
     TecnisisTheme {
-        ViewRequestScreen()
+        ViewRequestScreen(requestId = 1)
     }
 }

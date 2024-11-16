@@ -93,7 +93,6 @@ fun ListUserRequestsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Mostrar la lista de solicitudes o un indicador de carga
         when {
             uiState.isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
