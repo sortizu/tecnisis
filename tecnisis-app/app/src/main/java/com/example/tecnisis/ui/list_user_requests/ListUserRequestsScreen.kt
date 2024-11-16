@@ -11,10 +11,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SingleChoiceSegmentedButtonRowScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -89,9 +85,10 @@ fun ListUserRequestsScreen(
                 options = listOf("Pendientes", "Aprobadas", "Rechazadas"),
                 onSelectionChanged = { }
             )
-        }else{
+        } else {
             enableFloatingActionButton.value = true
-            floatingButtonPressed.value = { navController.navigate(TecnisisScreen.StartRequest.name) }
+            floatingButtonPressed.value =
+                { navController.navigate(TecnisisScreen.StartRequest.name) }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -115,7 +112,14 @@ fun ListUserRequestsScreen(
                 val requests = uiState.requests
                 LazyColumn {
                     items(requests.size) { index ->
-                        RequestCard(index + 1, requests[index], onCardClick = { navController.navigate(TecnisisScreen.ReviewRequest.name) })
+                        RequestCard(index + 1, requests[index], onCardClick = {
+                            if (role == "specialist") {
+                                navController.navigate(TecnisisScreen.ArtisticRequestReview.name)
+                            } else {
+                                navController.navigate(TecnisisScreen.ViewRequest.name)
+                            }
+                        }
+                        )
                     }
                 }
             }

@@ -19,5 +19,9 @@
     <string name="dni">DNI</string>
     <string name="phone">Teléfono</string>
     <string name="address">Dirección</string>
-    <string name="review_request">Revisar solicitud</string>
+    <string name="artistic_request_review">Revisar solicitud</string>
+    <string name="view_request">Ver solicitud</string>
+    <string name="inspect_image">Inspeccionar imagen</string>
+    <string name="technique">Técnica</string>
+    <string name="request_progress">Progreso de solicitud</string>
 </resources>

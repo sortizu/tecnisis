@@ -54,7 +54,7 @@ class LoginViewModel : ViewModel() {
                         _loginError.value = null // Limpiar el mensaje de error en caso de éxito
                         _isLoginSuccessful.value = true // Indicar que el login fue exitoso
                         dataStoreManager.saveId(it.id.toString())
-                        //dataStoreManager.saveRole(it.role)
+                        dataStoreManager.saveRole("user")
                     }
                 } else {
                     val errorBody = JSONObject(response.errorBody()?.string()!!)

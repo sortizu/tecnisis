@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,9 +40,13 @@ import com.example.tecnisis.R
 import androidx.compose.material3.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.SquareFoot
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,27 +63,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@Composable
-fun FloatingButton(
-    onClick: () -> Unit,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-){
-    FloatingActionButton(
-        onClick = onClick,
-        containerColor = Color.White,
-        contentColor = Color.Red,
-        modifier = modifier
-            .size(75.dp)
-//            .offset(x = screenWidth - 100.dp, y = screenHeight - 150.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = "Add Request",
-            modifier = Modifier.size(32.dp)
-        )
-    }
-}
 
 // Patron de la parte inferior de la pantalla
 @Composable
@@ -110,8 +94,13 @@ fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
         modifier = modifier
     ) {
         HorizontalDivider(thickness = 1.dp)
-        Text(text = text, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray))
+        SectionHeader(text = text)
     }
+}
+
+@Composable
+fun SectionHeader(text: String){
+    Text(text = text, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray))
 }
 
 
@@ -325,5 +314,76 @@ fun CustomSingleChoiceSegmentedButton(
                 Text(label)
             }
         }
+    }
+}
+
+@Composable
+fun ImageCard(
+    imageResource: Int,  // Replace with actual image resource ID
+    title: String,
+    date: String,
+    dimensions: String
+) {
+    Surface(
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .height(250.dp),
+        color = Color.LightGray
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Background image with scaling
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            // Bottom-left title text
+            Text(
+                text = title,
+                color = Color.Black,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
+            )
+
+            // Top-right date and dimensions labels
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+            ) {
+                LabelItem(text = date, icon = Icons.Filled.CalendarToday)
+                Spacer(modifier = Modifier.height(4.dp))
+                LabelItem(text = dimensions, icon = Icons.Filled.SquareFoot)
+            }
+        }
+    }
+}
+
+@Composable
+fun LabelItem(text: String, icon: ImageVector) { // Change icon type to ImageVector
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0xFFEFEFEF))
+            .padding(horizontal = 4.dp, vertical = 2.dp)
+    ) {
+        Icon( // Use Icon composable instead of Image
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            color = Color.Black,
+            fontSize = 12.sp
+        )
     }
 }

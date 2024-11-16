@@ -18,6 +18,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<AppUser> login(@RequestBody LoginRequest loginRequest) {
+        System.out.println("LoginController.login----------------------------------------------------");
         AppUser user = loginUseCase.login(loginRequest.getEmail(), loginRequest.getPassword());
         if (user != null) {
             return ResponseEntity.ok(user); // Retorna el usuario completo con la información de 'persons'

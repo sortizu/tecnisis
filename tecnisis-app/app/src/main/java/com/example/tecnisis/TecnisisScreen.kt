@@ -25,22 +25,25 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.tecnisis.data.user.UserRepository
+import com.example.tecnisis.ui.artistic_request_review.ArtisticRequestReviewScreen
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsScreen
 import com.example.tecnisis.ui.login.LoginScreen
 import com.example.tecnisis.ui.sign_up.SignUpScreen
 import com.example.tecnisis.ui.start_request.StartRequestScreen
 import com.example.tecnisis.ui.components.BottomPattern
+import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
 import com.example.tecnisis.ui.login.LoginViewModel
 import com.example.tecnisis.ui.sign_up.SignUpViewModel
-import com.example.tecnisis.ui.review_request.ReviewRequestScreen
+import com.example.tecnisis.ui.view_request.ViewRequestScreen
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
     SignUp(title = R.string.crear_cuenta),
     ListRequests(title = R.string.lista_de_solicitudes),
     StartRequest(title = R.string.iniciar_solicitud),
-    ReviewRequest(title = R.string.review_request)
+    ArtisticRequestReview(title = R.string.artistic_request_review),
+    ViewRequest(title = R.string.view_request)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,11 +105,24 @@ fun TecnisisApp(userRepository: UserRepository) {
         floatingActionButton =
         {
             if (enableFloatingActionButton.value){
-                TecnisisFloatingActionButton(
+                /*TecnisisFloatingActionButton(
                     currentScreen = currentScreen,
                     snackbarHostState = snackbarHostState,
                     onFloatingButtonClick = floatingButtonPressed,
                     errorMessage = errorMessage
+                )*/
+                val icon = when (currentScreen) {
+                    TecnisisScreen.Login -> Icons.AutoMirrored.Filled.ArrowForward
+                    TecnisisScreen.SignUp -> Icons.Default.ArrowForward
+                    TecnisisScreen.ListRequests -> Icons.Default.Add
+                    TecnisisScreen.StartRequest -> Icons.Default.Save
+                    TecnisisScreen.ArtisticRequestReview -> Icons.Default.Save
+                    TecnisisScreen.ViewRequest -> Icons.Default.Save
+                }
+                CustomFloatingButton(
+                    onClick = floatingButtonPressed.value,
+                    icon = icon,
+                    modifier = Modifier.size(75.dp)
                 )
             }
         },
@@ -145,8 +161,11 @@ fun TecnisisApp(userRepository: UserRepository) {
             composable(route = TecnisisScreen.StartRequest.name) {
                 StartRequestScreen()
             }
-            composable(route = TecnisisScreen.ReviewRequest.name) {
-                ReviewRequestScreen()
+            composable(route = TecnisisScreen.ArtisticRequestReview.name) {
+                ArtisticRequestReviewScreen()
+            }
+            composable(route = TecnisisScreen.ViewRequest.name) {
+                ViewRequestScreen()
             }
         }
         BottomPattern()
@@ -165,7 +184,8 @@ fun TecnisisFloatingActionButton(
         TecnisisScreen.SignUp -> Icons.Default.ArrowForward
         TecnisisScreen.ListRequests -> Icons.Default.Add
         TecnisisScreen.StartRequest -> Icons.Default.Save
-        TecnisisScreen.ReviewRequest -> TODO()
+        TecnisisScreen.ArtisticRequestReview -> Icons.Default.Save
+        TecnisisScreen.ViewRequest -> Icons.Default.Save
     }
     FloatingActionButton(
         onClick = onFloatingButtonClick.value,
