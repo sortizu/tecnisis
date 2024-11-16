@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tecnisis.R
-import com.example.tecnisis.ui.list_user_requests.data.GeneralUserRequestInfo
+import com.example.tecnisis.data.request.RequestResponse
 
 @Composable
 fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> Unit = { }) {
@@ -70,11 +70,11 @@ fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> 
 }
 
 @Composable
-fun RequestCard(order: Int, request: GeneralUserRequestInfo, onCardClick: (Int) -> Unit) {
+fun RequestCard(order: Int, request: RequestResponse, onCardClick: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCardClick(request.requestId) }
+            .clickable { onCardClick(request.idRequest.toInt()) }
     ) {
         Row(
             modifier = Modifier
@@ -100,7 +100,7 @@ fun RequestCard(order: Int, request: GeneralUserRequestInfo, onCardClick: (Int) 
                     .weight(1f)
                     .padding(start = 16.dp)
             ) {
-                Text(text = request.artworkTitle, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = request.artwork.title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Text(text = request.status, fontSize = 14.sp, color = Color.Gray)
             }
             // Imagen de la obra
