@@ -1,10 +1,9 @@
-package com.example.tecnisis.ui.artistic_request_review
+package com.example.tecnisis.ui.artistic_request_evaluation
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tecnisis.TecnisisApp
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.evaluations.ArtisticEvaluationRequest
 import kotlinx.coroutines.launch
