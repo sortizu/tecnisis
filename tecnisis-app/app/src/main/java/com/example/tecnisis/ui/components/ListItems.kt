@@ -117,9 +117,14 @@ fun RequestCard(order: Int, request: RequestResponse, onCardClick: (Int) -> Unit
 fun SelectableListItem(
     text: String,
     icon: ImageVector,
-    iconDescription: String
+    iconDescription: String,
+    onClick: () -> Unit = {}
 ) {
-    Column {
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+    ){
         ListItem(
             headlineContent = { Text(text) },
             leadingContent = {

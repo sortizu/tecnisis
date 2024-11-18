@@ -1,23 +1,12 @@
 package com.example.tecnisis.ui.sign_up
 
-import android.content.Context
 import android.util.Log
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tecnisis.config.navigation.ContextAplication
 import com.example.tecnisis.config.retrofit.TecnisisApi
-
-import com.example.tecnisis.data.ui_states.SignUpUiState
 import com.example.tecnisis.ui.sign_up.data.SignUpRequest
-import com.example.tecnisis.ui.sign_up.data.SignUpService
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 

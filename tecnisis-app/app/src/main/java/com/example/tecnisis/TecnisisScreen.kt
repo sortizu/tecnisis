@@ -164,7 +164,10 @@ fun TecnisisApp() {
                 ArtisticRequestReviewScreen()
             }
             composable(route = TecnisisScreen.ViewRequest.name) {
-                ViewRequestScreen()
+                val requestId = it.arguments?.getString("requestId")?.toInt()
+                if (requestId != null) {
+                    ViewRequestScreen(requestId = requestId)
+                }
             }
         }
         BottomPattern()

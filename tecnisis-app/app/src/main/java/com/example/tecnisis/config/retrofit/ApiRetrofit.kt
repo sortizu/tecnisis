@@ -1,8 +1,10 @@
 package com.example.tecnisis.config.retrofit
 
+import com.example.tecnisis.data.technique.TechniquesService
 import com.example.tecnisis.ui.list_user_requests.data.ListUserRequestsService
 import com.example.tecnisis.ui.login.data.LoginService
 import com.example.tecnisis.ui.sign_up.data.SignUpService
+import com.example.tecnisis.ui.start_request.data.StartRequestService
 import com.example.tecnisis.ui.view_request.data.ViewRequestService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -45,5 +47,11 @@ object TecnisisApi {
     }
     val viewRequestService: ViewRequestService by lazy {
         retrofit.create(ViewRequestService::class.java)
+    }
+    val startRequestService: StartRequestService by lazy {
+        retrofit.create(StartRequestService::class.java)
+    }
+    val TechniquesService: TechniquesService by lazy {
+        retrofit.create(TechniquesService::class.java)
     }
 }

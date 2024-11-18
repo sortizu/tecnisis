@@ -112,10 +112,16 @@ fun ListUserRequestsScreen(
                 LazyColumn {
                     items(requests.size) { index ->
                         RequestCard(index + 1, requests[index], onCardClick = {
-                            if (role == "specialist") {
-                                navController.navigate(TecnisisScreen.ArtisticRequestReview.name)
-                            } else {
-                                navController.navigate(TecnisisScreen.ViewRequest.name)
+                            when {
+                                role == "art-specialist" -> {
+                                    navController.navigate(TecnisisScreen.ArtisticRequestReview.name + "/${requests[index].idRequest}")
+                                }
+                                role == "economic-specialist" -> {
+                                    navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].idRequest}")
+                                }
+                                else -> {
+                                    navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].idRequest}")
+                                }
                             }
                         }
                         )

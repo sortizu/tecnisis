@@ -3,6 +3,7 @@ package com.example.tecnisis.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -125,7 +126,9 @@ fun InfoBox(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDocked() {
+fun DatePickerDocked(
+    onValueChange: (String) -> Unit = {}
+) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
@@ -137,7 +140,7 @@ fun DatePickerDocked() {
     ) {
         OutlinedTextField(
             value = selectedDate,
-            onValueChange = { },
+            onValueChange = onValueChange,
             label = { Text(stringResource(R.string.date_of_realisation)) },
             readOnly = true,
             trailingIcon = {
@@ -286,5 +289,66 @@ fun LabelItem(text: String, icon: ImageVector) { // Change icon type to ImageVec
             color = Color.Black,
             fontSize = 12.sp
         )
+    }
+}
+
+// Added from: https://gist.github.com/kirmartuk/a93fb5519ac44bb6170ce800d3b76ef8
+@Composable
+fun SingleChoiceDialog(
+    title: String,
+    radioOptions: List<String>,
+    indexOfDefault: Int,
+    isDialogVisible: (Boolean) -> Unit = {},
+    onSelectedItem: (String) -> Unit = {},
+    onSelectedItemIndex: (Int) -> Unit = {}
+) {
+    val (selectedItemIndex, setSelectedItemIndex) = remember {
+        mutableStateOf(indexOfDefault)
+    }
+    AlertDialog(
+        title = { Text(text = title) },
+        text = {
+            RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex)
+        },
+        onDismissRequest = {
+            isDialogVisible(false)
+        },
+        dismissButton = {
+            TextButton(onClick = { isDialogVisible(false) }) {
+                Text(text = "Cancelar")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                isDialogVisible(false)
+                onSelectedItem(radioOptions[selectedItemIndex])
+                onSelectedItemIndex(selectedItemIndex)
+            }) {
+                Text(text = "OK")
+            }
+        }
+    )
+}
+
+@Composable
+fun RadioItem(items: List<String>, selectedItemIndex: Int, setIndexOfSelected: (Int) -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        items.forEachIndexed { index, text ->
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    setIndexOfSelected(index)
+                }) {
+                RadioButton(
+                    selected = (index == selectedItemIndex),
+                    onClick = {
+                        setIndexOfSelected(index)
+                    }
+                )
+                Text(
+                    text = text
+                )
+            }
+        }
     }
 }

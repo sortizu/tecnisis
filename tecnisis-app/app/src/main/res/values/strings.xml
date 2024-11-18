@@ -28,4 +28,7 @@
     <string name="artistic_evaluation">Evaluación artística</string>
     <string name="economic_evaluation">Evaluación económica</string>
     <string name="finished">Finalizado</string>
+    <string name="artwork_title">Título de obra</string>
+    <string name="width">Ancho</string>
+    <string name="height">Alto</string>
 </resources>
