@@ -5,34 +5,51 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.ui.components.CustomNumberField
+import com.example.tecnisis.ui.components.CustomSingleChoiceSegmentedButton
+import com.example.tecnisis.ui.components.DatePickerDocked
+import com.example.tecnisis.ui.components.HighlightButton
+import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SelectableListItem
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtisticRequestReviewScreen(
-    currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestReview,
+    currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestEvaluation,
+    viewModel: ArtisticRequestEvaluationViewModel = ArtisticRequestEvaluationViewModel(),
     modifier: Modifier = Modifier
 ){
+    val context = LocalContext.current
+    val rating by viewModel.rating.observeAsState(0.0f)
+    val result by viewModel.result.observeAsState("")
+    val reviewDocument by viewModel.reviewDocument.observeAsState("")
+    val date by viewModel.date.observeAsState("")
+    val message by viewModel.message.observeAsState("")
+    val options = listOf("Aprobar", "Desaprobar")
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -44,40 +61,38 @@ fun ArtisticRequestReviewScreen(
         val context = LocalContext.current
         ScreenTitle(text = context.getString(currentScreen.title))
         // Image upload area
-        ImageUploadSection()
-
-        // Input fields
+        ImageCard(
+            imageResource = R.drawable.media,
+            title = "Artwork Title",
+            date = "dd/MM/YYYY",
+            dimensions = "ww x hh"
+        )
         SelectableListItem(
-            text = "Artista: User 1",
+            text = "Artist: Artist 1",
             icon = Icons.Default.Person,
-            iconDescription = ""
+            iconDescription = "Artist"
         )
-        SelectableListItem(
-            text = "Técnica: Tecnica 1",
-            icon = Icons.Default.ContentCut,
-            iconDescription = ""
+        CustomSingleChoiceSegmentedButton(
+            options = options,
+            onSelectionChanged = {
+                viewModel.updateResult(options[it])
+            }
         )
+        // Input fields
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {  },
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFFE2DD),
-                contentColor = Color(0xFFA50007)
-            ),
-        ) {
-            Text(text = "Aceptar")
-        }
-        Button(
-            onClick = { },
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color(0xFFA50007)
-            ),
-        ) {
-            Text(text = "Rechazar")
-        }
+        CustomNumberField(
+            label = "Calificación (N/100)",
+            value = "0.0",
+            onValueChange = {
+                viewModel.updateRating(it.toFloat())
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+        DatePickerDocked()
+        HighlightButton(
+            text = stringResource(R.string.attach_review_document),
+            onClick = {}
+        )
     }
 }
 
@@ -111,4 +126,10 @@ fun ImageUploadSection(
             Text(text = "Inspeccionar foto")
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ArtisticRequestReviewScreenPreview() {
+    ArtisticRequestReviewScreen()
 }

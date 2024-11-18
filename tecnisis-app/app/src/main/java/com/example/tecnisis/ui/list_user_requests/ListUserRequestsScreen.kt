@@ -114,7 +114,7 @@ fun ListUserRequestsScreen(
                         RequestCard(index + 1, requests[index], onCardClick = {
                             when {
                                 role == "art-specialist" -> {
-                                    navController.navigate(TecnisisScreen.ArtisticRequestReview.name + "/${requests[index].idRequest}")
+                                    navController.navigate(TecnisisScreen.ArtisticRequestEvaluation.name + "/${requests[index].idRequest}")
                                 }
                                 role == "economic-specialist" -> {
                                     navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].idRequest}")

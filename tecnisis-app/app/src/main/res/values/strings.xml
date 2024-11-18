@@ -19,7 +19,7 @@
     <string name="dni">DNI</string>
     <string name="phone">Teléfono</string>
     <string name="address">Dirección</string>
-    <string name="artistic_request_review">Revisar solicitud</string>
+    <string name="artistic_request_evaluation">Evaluación artística de solicitud</string>
     <string name="view_request">Ver solicitud</string>
     <string name="inspect_image">Inspeccionar imagen</string>
     <string name="technique">Técnica</string>
@@ -31,4 +31,5 @@
     <string name="artwork_title">Título de obra</string>
     <string name="width">Ancho</string>
     <string name="height">Alto</string>
+    <string name="attach_review_document">Adjuntar documento de revisión</string>
 </resources>

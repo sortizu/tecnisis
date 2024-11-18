@@ -24,7 +24,7 @@ import com.example.tecnisis.ui.theme.TecnisisTheme
 
 @Composable
 fun ViewRequestScreen(
-    currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestReview,
+    currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestEvaluation,
     viewModel: ViewRequestViewModel = ViewRequestViewModel(),
     requestId: Int,
     modifier: Modifier = Modifier

@@ -41,7 +41,7 @@ enum class TecnisisScreen(@StringRes val title: Int) {
     SignUp(title = R.string.crear_cuenta),
     ListRequests(title = R.string.lista_de_solicitudes),
     StartRequest(title = R.string.iniciar_solicitud),
-    ArtisticRequestReview(title = R.string.artistic_request_review),
+    ArtisticRequestEvaluation(title = R.string.artistic_request_evaluation),
     ViewRequest(title = R.string.view_request)
 }
 
@@ -115,7 +115,7 @@ fun TecnisisApp() {
                     TecnisisScreen.SignUp -> Icons.Default.ArrowForward
                     TecnisisScreen.ListRequests -> Icons.Default.Add
                     TecnisisScreen.StartRequest -> Icons.Default.Save
-                    TecnisisScreen.ArtisticRequestReview -> Icons.Default.Save
+                    TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
                     TecnisisScreen.ViewRequest -> Icons.Default.Save
                 }
                 CustomFloatingButton(
@@ -160,7 +160,7 @@ fun TecnisisApp() {
             composable(route = TecnisisScreen.StartRequest.name) {
                 StartRequestScreen()
             }
-            composable(route = TecnisisScreen.ArtisticRequestReview.name) {
+            composable(route = TecnisisScreen.ArtisticRequestEvaluation.name) {
                 ArtisticRequestReviewScreen()
             }
             composable(route = TecnisisScreen.ViewRequest.name) {
@@ -186,7 +186,7 @@ fun TecnisisFloatingActionButton(
         TecnisisScreen.SignUp -> Icons.Default.ArrowForward
         TecnisisScreen.ListRequests -> Icons.Default.Add
         TecnisisScreen.StartRequest -> Icons.Default.Save
-        TecnisisScreen.ArtisticRequestReview -> Icons.Default.Save
+        TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
         TecnisisScreen.ViewRequest -> Icons.Default.Save
     }
     FloatingActionButton(

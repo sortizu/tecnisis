@@ -1,5 +1,6 @@
 package com.example.tecnisis.config.retrofit
 
+import com.example.tecnisis.data.evaluations.EvaluationService
 import com.example.tecnisis.data.technique.TechniquesService
 import com.example.tecnisis.ui.list_user_requests.data.ListUserRequestsService
 import com.example.tecnisis.ui.login.data.LoginService
@@ -53,5 +54,8 @@ object TecnisisApi {
     }
     val TechniquesService: TechniquesService by lazy {
         retrofit.create(TechniquesService::class.java)
+    }
+    val evaluationService: EvaluationService by lazy {
+        retrofit.create(EvaluationService::class.java)
     }
 }
