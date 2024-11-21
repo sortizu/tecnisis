@@ -1,6 +1,5 @@
 package com.example.tecnisis
 
-import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,37 +14,35 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.tecnisis.data.AppDatabase
-import com.example.tecnisis.data.UserRepository
-import com.example.tecnisis.data.Usuario
-import com.example.tecnisis.data.Persona
-import com.example.tecnisis.data.PersonaDao
-import com.example.tecnisis.data.UsuarioDao
-import com.example.tecnisis.ui.ListRequestsScreen
-import com.example.tecnisis.ui.LoginScreen
-import com.example.tecnisis.ui.SignUpScreen
-import com.example.tecnisis.ui.StartRequestScreen
+import com.example.tecnisis.ui.artistic_request_evaluation.ArtisticRequestReviewScreen
+import com.example.tecnisis.ui.list_user_requests.ListUserRequestsScreen
+import com.example.tecnisis.ui.login.LoginScreen
+import com.example.tecnisis.ui.sign_up.SignUpScreen
+import com.example.tecnisis.ui.start_request.StartRequestScreen
 import com.example.tecnisis.ui.components.BottomPattern
-import com.example.tecnisis.ui.theme.TecnisisTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.example.tecnisis.ui.components.CustomFloatingButton
+import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
+import com.example.tecnisis.ui.login.LoginViewModel
+import com.example.tecnisis.ui.sign_up.SignUpViewModel
+import com.example.tecnisis.ui.view_request.ViewRequestScreen
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
     SignUp(title = R.string.crear_cuenta),
     ListRequests(title = R.string.lista_de_solicitudes),
-    StartRequest(title = R.string.iniciar_solicitud)
+    StartRequest(title = R.string.iniciar_solicitud),
+    ArtisticRequestEvaluation(title = R.string.artistic_request_evaluation),
+    ViewRequest(title = R.string.view_request)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,25 +83,17 @@ fun TecnisisTopAppBar(onProfileClick: () -> Unit) {
 }
 
 @Composable
-fun TecnisisApp(userRepository: UserRepository) {
+fun TecnisisApp() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = TecnisisScreen.valueOf(
         backStackEntry?.destination?.route ?: TecnisisScreen.ListRequests.name
     )
 
-    val nombre = remember { mutableStateOf("") }
-    val apellidos = remember { mutableStateOf("") }
-    val correo = remember { mutableStateOf("") }
-    val contrasena = remember { mutableStateOf("") }
-    val repetirContrasena = remember { mutableStateOf("") }
-    val dni = remember { mutableStateOf("") }
-    val telefono = remember { mutableStateOf("") }
-    val direccion = remember { mutableStateOf("") }
+    val enableFloatingActionButton = remember { mutableStateOf(true) }
+    val floatingButtonPressed = remember { mutableStateOf({}) }
     val errorMessage = remember { mutableStateOf("") }
-
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -112,23 +101,29 @@ fun TecnisisApp(userRepository: UserRepository) {
                 TecnisisTopAppBar(onProfileClick = {})
             }
         },
-        floatingActionButton = {
-            TecnisisFloatingActionButton(
-                currentScreen = currentScreen,
-                navController = navController,
-                snackbarHostState = snackbarHostState,
-                coroutineScope = coroutineScope,
-                userRepository = userRepository,
-                nombre = nombre,
-                apellidos = apellidos,
-                correo = correo,
-                contrasena = contrasena,
-                repetirContrasena = repetirContrasena,
-                dni = dni,
-                telefono = telefono,
-                direccion = direccion,
-                errorMessage = errorMessage
-            )
+        floatingActionButton =
+        {
+            if (enableFloatingActionButton.value){
+                /*TecnisisFloatingActionButton(
+                    currentScreen = currentScreen,
+                    snackbarHostState = snackbarHostState,
+                    onFloatingButtonClick = floatingButtonPressed,
+                    errorMessage = errorMessage
+                )*/
+                val icon = when (currentScreen) {
+                    TecnisisScreen.Login -> Icons.AutoMirrored.Filled.ArrowForward
+                    TecnisisScreen.SignUp -> Icons.Default.ArrowForward
+                    TecnisisScreen.ListRequests -> Icons.Default.Add
+                    TecnisisScreen.StartRequest -> Icons.Default.Save
+                    TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
+                    TecnisisScreen.ViewRequest -> Icons.Default.Save
+                }
+                CustomFloatingButton(
+                    onClick = floatingButtonPressed.value,
+                    icon = icon,
+                    modifier = Modifier.size(75.dp)
+                )
+            }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
@@ -141,43 +136,38 @@ fun TecnisisApp(userRepository: UserRepository) {
         ) {
             composable(route = TecnisisScreen.Login.name) {
                 LoginScreen(
-                    onSignUp = { navController.navigate(TecnisisScreen.SignUp.name) },
-                    onEmailChange = { correo.value = it },
-                    onPasswordChange = { contrasena.value = it }
+                    viewModel = viewModel(modelClass = LoginViewModel::class.java),
+                    navController = navController,
+                    onLogin = floatingButtonPressed,
+
                 )
             }
             composable(route = TecnisisScreen.SignUp.name) {
                 SignUpScreen(
+                    viewModel = viewModel(modelClass = SignUpViewModel::class.java),
                     navController = navController,
-                    userRepository = userRepository,
-                    onSignUp = { usuario, persona ->
-                        coroutineScope.launch {
-                            try {
-                                userRepository.registerUserWithPersona(usuario, persona)
-                                errorMessage.value = ""
-                                snackbarHostState.showSnackbar("Registro exitoso")
-                                navController.navigate(TecnisisScreen.Login.name)
-                            } catch (e: Exception) {
-                                snackbarHostState.showSnackbar("Error al registrar: ${e.message}")
-                            }
-                        }
-                    },
-                    nombre = nombre,
-                    apellidos = apellidos,
-                    correo = correo,
-                    contrasena = contrasena,
-                    repetirContrasena = repetirContrasena,
-                    dni = dni,
-                    telefono = telefono,
-                    direccion = direccion,
-                    errorMessage = errorMessage
+                    onSignUp = floatingButtonPressed
                 )
             }
             composable(route = TecnisisScreen.ListRequests.name) {
-                ListRequestsScreen()
+                ListUserRequestsScreen(
+                    viewModel = viewModel(modelClass = ListUserRequestsViewModel::class.java),
+                    enableFloatingActionButton = enableFloatingActionButton,
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed
+                )
             }
             composable(route = TecnisisScreen.StartRequest.name) {
                 StartRequestScreen()
+            }
+            composable(route = TecnisisScreen.ArtisticRequestEvaluation.name) {
+                ArtisticRequestReviewScreen()
+            }
+            composable(route = TecnisisScreen.ViewRequest.name) {
+                val requestId = it.arguments?.getString("requestId")?.toInt()
+                if (requestId != null) {
+                    ViewRequestScreen(requestId = requestId)
+                }
             }
         }
         BottomPattern()
@@ -187,18 +177,8 @@ fun TecnisisApp(userRepository: UserRepository) {
 @Composable
 fun TecnisisFloatingActionButton(
     currentScreen: TecnisisScreen,
-    navController: NavController,
     snackbarHostState: SnackbarHostState,
-    coroutineScope: CoroutineScope,
-    userRepository: UserRepository,
-    nombre: MutableState<String>,
-    apellidos: MutableState<String>,
-    correo: MutableState<String>,
-    contrasena: MutableState<String>,
-    repetirContrasena: MutableState<String>,
-    dni: MutableState<String>,
-    telefono: MutableState<String>,
-    direccion: MutableState<String>,
+    onFloatingButtonClick: MutableState<() -> Unit>,
     errorMessage: MutableState<String>
 ) {
     val icon = when (currentScreen) {
@@ -206,114 +186,26 @@ fun TecnisisFloatingActionButton(
         TecnisisScreen.SignUp -> Icons.Default.ArrowForward
         TecnisisScreen.ListRequests -> Icons.Default.Add
         TecnisisScreen.StartRequest -> Icons.Default.Save
+        TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
+        TecnisisScreen.ViewRequest -> Icons.Default.Save
     }
-
     FloatingActionButton(
-        onClick = {
-            when (currentScreen) {
-                TecnisisScreen.Login -> {
-                    coroutineScope.launch {
-                        if (correo.value.isNotBlank() && contrasena.value.isNotBlank()) {
-                            val userExists = userRepository.validateUser(correo.value, contrasena.value)
-                            if (userExists) {
-                                navController.navigate(TecnisisScreen.ListRequests.name)
-                            } else {
-                                snackbarHostState.showSnackbar("Usuario o contraseña incorrectos")
-                            }
-                        } else {
-                            snackbarHostState.showSnackbar("Por favor, complete todos los campos")
-                        }
-                    }
-                }
-                TecnisisScreen.SignUp -> {
-                    // Validar que todos los campos estén completos
-                    if (nombre.value.isBlank() || apellidos.value.isBlank() || correo.value.isBlank() ||
-                        contrasena.value.isBlank() || repetirContrasena.value.isBlank() || dni.value.isBlank() ||
-                        telefono.value.isBlank() || direccion.value.isBlank()
-                    ) {
-                        errorMessage.value = "Por favor, complete todos los campos"
-                    } else if (contrasena.value != repetirContrasena.value) {
-                        errorMessage.value = "Las contraseñas no coinciden"
-                    } else {
-                        // Campos completos y contraseñas coinciden
-                        val usuario = Usuario(0, correo.value, contrasena.value)
-                        val persona = Persona(
-                            idPersona = 0,
-                            nombre = nombre.value,
-                            apellido = apellidos.value,
-                            telefono = telefono.value,
-                            direccion = direccion.value,
-                            dni = dni.value,
-                            sexo = "Otro",
-                            tipo = 1,
-                            idUsuario = 0
-                        )
-                        coroutineScope.launch {
-                            try {
-                                userRepository.registerUserWithPersona(usuario, persona)
-                                errorMessage.value = ""
-                                snackbarHostState.showSnackbar("Registro correcto")
-                                navController.navigate(TecnisisScreen.Login.name)
-                            } catch (e: Exception) {
-                                snackbarHostState.showSnackbar("Error al registrar usuario: ${e.message}")
-                            }
-                        }
-                    }
-                }
-                TecnisisScreen.ListRequests -> {
-                    navController.navigate(TecnisisScreen.StartRequest.name)
-                }
-                TecnisisScreen.StartRequest -> {
-                    navController.navigate(TecnisisScreen.ListRequests.name)
-                }
-            }
-        },
+        onClick = onFloatingButtonClick.value,
         containerColor = Color.Red,
         modifier = Modifier.size(60.dp)
     ) {
         Icon(imageVector = icon, contentDescription = null, tint = Color.White)
     }
-
-    // Mostrar mensaje de error, si existe
     if (errorMessage.value.isNotEmpty()) {
         LaunchedEffect(errorMessage.value) {
             snackbarHostState.showSnackbar(errorMessage.value)
-            errorMessage.value = "" // Limpiar el mensaje después de mostrarlo
+            errorMessage.value = ""
         }
     }
-}
-
-@Composable
-fun provideUsuarioRepository(context: Context): UserRepository {
-    val database = AppDatabase.getDatabase(context)
-    return UserRepository(database.usuarioDao(), database.personaDao())
 }
 
 @Preview(showBackground = true)
 @Composable
 fun TecnisisAppPreview() {
-    val fakeUsuarioDao = object : UsuarioDao {
-        override suspend fun validateUser(email: String, password: String): Usuario? {
-            return if (email == "preview@example.com" && password == "preview") Usuario(1, email, password) else null
-        }
 
-        override suspend fun insert(usuario: Usuario): Long {
-            return 1L
-        }
-    }
-
-    val fakePersonaDao = object : PersonaDao {
-        override suspend fun insert(persona: Persona) { }
-        override suspend fun update(persona: Persona) { }
-        override suspend fun getAllPersonas(): List<Persona> = emptyList()
-        override suspend fun getPersonaById(idPersona: Int): Persona? = null
-        override suspend fun getPersonasByUsuarioId(idUsuario: Int): List<Persona> = emptyList()
-        override suspend fun deletePersonaById(idPersona: Int) { }
-    }
-
-    val fakeRepository = UserRepository(fakeUsuarioDao, fakePersonaDao)
-
-    TecnisisTheme {
-        TecnisisApp(userRepository = fakeRepository)
-    }
 }

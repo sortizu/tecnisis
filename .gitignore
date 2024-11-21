@@ -22,3 +22,5 @@ local.properties
 # Directorios para compilación nativa
 .externalNativeBuild
 .cxx
+tecnisis-app/app/src/main/java/com/example/tecnisis/config/retrofit/ApiRetrofit.kt
+tecnisis-app/app/src/main/res/xml/network_security_config.xml

@@ -3,6 +3,7 @@ package com.example.tecnisis.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -19,9 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -34,23 +32,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Card
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.input.TextFieldValue
 import com.example.tecnisis.R
 import androidx.compose.material3.*
 import androidx.compose.ui.layout.ContentScale
-import com.example.tecnisis.data.Solicitud
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.SquareFoot
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,36 +51,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Popup
-import androidx.compose.ui.zIndex
-import com.example.tecnisis.data.Obra
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@Composable
-fun FloatingButton(
-    onClick: () -> Unit,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-){
-    FloatingActionButton(
-        onClick = onClick,
-        containerColor = Color.White,
-        contentColor = Color.Red,
-        modifier = modifier
-            .size(75.dp)
-//            .offset(x = screenWidth - 100.dp, y = screenHeight - 150.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = "Add Request",
-            modifier = Modifier.size(32.dp)
-        )
-    }
-}
 
 // Patron de la parte inferior de la pantalla
 @Composable
@@ -120,64 +88,17 @@ fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
         modifier = modifier
     ) {
         HorizontalDivider(thickness = 1.dp)
-        Text(text = text, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray))
+        SectionHeader(text = text)
     }
 }
 
 @Composable
-fun RequestList(solicitudes: Map<Solicitud, Obra>) {
-    LazyColumn {
-        items(solicitudes.size) { orden ->
-            val solicitud = solicitudes.keys.elementAt(orden)
-            val obra = solicitudes.values.elementAt(orden)
-            RequestCard(orden + 1, solicitud, obra)
-        }
-    }
+fun SectionHeader(text: String, modifier: Modifier = Modifier){
+    Text(text = text,
+        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray),
+        modifier = modifier)
 }
 
-@Composable
-fun RequestCard(orden: Int, solicitud: Solicitud, obra: Obra) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Row(
-            // Aplica padding horizontal solo a la izquierda
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 0.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Priority Circle
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color.Red),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = orden.toString(), color = Color.White)
-            }
-
-            // Detalles de la solicitud
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 16.dp)
-            ) {
-                Text(text = obra.titulo , fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = solicitud.estado , fontSize = 14.sp, color = Color.Gray)
-            }
-            // Imagen de la obra
-            Image(
-                painter = painterResource(id = R.drawable.media),
-                contentDescription = "Obra",
-                modifier = Modifier.size(100.dp)
-            )
-        }
-    }
-}
 
 @Composable
 fun InfoBox(
@@ -187,12 +108,12 @@ fun InfoBox(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp)
+            //.padding(horizontal = 20.dp, vertical = 10.dp)
             .background(
                 color = Color(0xFFFFA726),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
             )
-            .padding(vertical = 2.dp, horizontal = 12.dp),
+            .padding(vertical = 8.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -205,7 +126,9 @@ fun InfoBox(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDocked() {
+fun DatePickerDocked(
+    onValueChange: (String) -> Unit = {}
+) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
@@ -217,7 +140,7 @@ fun DatePickerDocked() {
     ) {
         OutlinedTextField(
             value = selectedDate,
-            onValueChange = { },
+            onValueChange = onValueChange,
             label = { Text(stringResource(R.string.date_of_realisation)) },
             readOnly = true,
             trailingIcon = {
@@ -299,27 +222,133 @@ fun convertMillisToDate(millis: Long): String {
 }
 
 @Composable
-fun SelectableListItem(
-    text: String,
-    icon: ImageVector,
-    iconDescription: String
+fun ImageCard(
+    imageResource: Int,  // Replace with actual image resource ID
+    title: String,
+    date: String,
+    dimensions: String
 ) {
-    Column {
-        ListItem(
-            headlineContent = { Text(text) },
-            leadingContent = {
-                Icon(
-                    icon,
-                    contentDescription = iconDescription,
+    Surface(
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .height(250.dp),
+        color = Color.LightGray
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Background image with scaling
+            Image(
+                painter = painterResource(id = imageResource),
+                contentDescription = title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            // Bottom-left title text
+            Text(
+                text = title,
+                color = Color.Black,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
+            )
+
+            // Top-right date and dimensions labels
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+            ) {
+                LabelItem(text = date, icon = Icons.Filled.CalendarToday)
+                Spacer(modifier = Modifier.height(4.dp))
+                LabelItem(text = dimensions, icon = Icons.Filled.SquareFoot)
+            }
+        }
+    }
+}
+
+@Composable
+fun LabelItem(text: String, icon: ImageVector) { // Change icon type to ImageVector
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0xFFEFEFEF))
+            .padding(horizontal = 4.dp, vertical = 2.dp)
+    ) {
+        Icon( // Use Icon composable instead of Image
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            color = Color.Black,
+            fontSize = 12.sp
+        )
+    }
+}
+
+// Added from: https://gist.github.com/kirmartuk/a93fb5519ac44bb6170ce800d3b76ef8
+@Composable
+fun SingleChoiceDialog(
+    title: String,
+    radioOptions: List<String>,
+    indexOfDefault: Int,
+    isDialogVisible: (Boolean) -> Unit = {},
+    onSelectedItem: (String) -> Unit = {},
+    onSelectedItemIndex: (Int) -> Unit = {}
+) {
+    val (selectedItemIndex, setSelectedItemIndex) = remember {
+        mutableStateOf(indexOfDefault)
+    }
+    AlertDialog(
+        title = { Text(text = title) },
+        text = {
+            RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex)
+        },
+        onDismissRequest = {
+            isDialogVisible(false)
+        },
+        dismissButton = {
+            TextButton(onClick = { isDialogVisible(false) }) {
+                Text(text = "Cancelar")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                isDialogVisible(false)
+                onSelectedItem(radioOptions[selectedItemIndex])
+                onSelectedItemIndex(selectedItemIndex)
+            }) {
+                Text(text = "OK")
+            }
+        }
+    )
+}
+
+@Composable
+fun RadioItem(items: List<String>, selectedItemIndex: Int, setIndexOfSelected: (Int) -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        items.forEachIndexed { index, text ->
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    setIndexOfSelected(index)
+                }) {
+                RadioButton(
+                    selected = (index == selectedItemIndex),
+                    onClick = {
+                        setIndexOfSelected(index)
+                    }
                 )
-            },
-            trailingContent = {
-                Icon(
-                    Icons.Default.ArrowRight,
-                    contentDescription = "Open Modal"
+                Text(
+                    text = text
                 )
             }
-        )
-        HorizontalDivider()
+        }
     }
 }

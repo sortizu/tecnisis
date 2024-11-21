@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/tecnisis
+      SPRING_DATASOURCE_USERNAME: tecnisis_user
+      SPRING_DATASOURCE_PASSWORD: tecnisis_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:latest
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: tecnisis
+      POSTGRES_USER: tecnisis_user
+      POSTGRES_PASSWORD: tecnisis_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tecnisis_user -d tecnisis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@tecnisis.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+
