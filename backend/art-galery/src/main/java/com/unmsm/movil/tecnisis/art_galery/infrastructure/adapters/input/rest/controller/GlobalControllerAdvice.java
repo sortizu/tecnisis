@@ -96,6 +96,16 @@ public class GlobalControllerAdvice {
                 .build();
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(EconomicEvaluationNotFoundException.class)
+    public ErrorResponse handleEconomicEvaluationNotFoundException(){
+        return ErrorResponse.builder()
+                .code(ECONOMIC_EVALUATION_NOT_FOUND.getCode())
+                .message(ECONOMIC_EVALUATION_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleMethodArgumentNotValidException(

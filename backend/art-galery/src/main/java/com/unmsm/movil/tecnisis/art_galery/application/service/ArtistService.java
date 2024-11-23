@@ -6,6 +6,7 @@ import com.unmsm.movil.tecnisis.art_galery.application.ports.output.PersonPersis
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtistNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Artist;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -28,6 +29,13 @@ public class ArtistService implements ArtistServicePort {
     @Override
     public List<Artist> findAll() {
         return artistPersistencePort.findAll();
+    }
+
+    @Override
+    public List<Request> findRequestsById(Long id) {
+        return artistPersistencePort.findById(id)
+                .map(a -> artistPersistencePort.findRequestsByArtistId(a.getId()))
+                .orElseThrow(ArtistNotFoundException::new);
     }
 
     @Override

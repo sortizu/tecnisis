@@ -23,7 +23,7 @@ public class EconomicEvaluationEntity {
     private BigDecimal salesPrice;
 
     @Column(name = "gallery_percentage")
-    private BigDecimal percentage;
+    private BigDecimal galleryPercentage;
 
     @ManyToOne
     @JoinColumn(name = "id_specialist", nullable = false)
@@ -34,6 +34,11 @@ public class EconomicEvaluationEntity {
     private RequestEntity request;
 
     @ManyToOne
-    @JoinColumn(name = "id_document", nullable = false)
+    @JoinColumn(name = "id_document")
     private DocumentEntity document;
+
+    @PrePersist
+    public void prePersist() {
+        this.evaluationDate = LocalDate.now();
+    }
 }

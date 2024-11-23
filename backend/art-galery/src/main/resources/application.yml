@@ -14,6 +14,9 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
 
 springdoc:
   api-docs:
@@ -29,3 +32,11 @@ springdoc:
 mapstruct:
   default:
     unmappedTargetPolicy: IGNORE # Avoid properties didn't mapped
+
+logging:
+  level:
+    root: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+    org.springframework: debug
+
