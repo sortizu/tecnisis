@@ -87,7 +87,7 @@ public class GlobalControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ArtisticEvaluationNotFundException.class)
+    @ExceptionHandler(ArtisticEvaluationNotFoundException.class)
     public ErrorResponse handleArtisticEvaluationNotFoundException() {
         return ErrorResponse.builder()
                 .code(ARTISTIC_EVALUATION_NOT_FOUND.getCode())
