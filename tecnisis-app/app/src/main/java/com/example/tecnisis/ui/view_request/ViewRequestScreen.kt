@@ -5,6 +5,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,14 +27,15 @@ import com.example.tecnisis.ui.theme.TecnisisTheme
 @Composable
 fun ViewRequestScreen(
     currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestEvaluation,
-    viewModel: ViewRequestViewModel = ViewRequestViewModel(),
-    requestId: Int,
+    viewModel: ViewRequestViewModel,
     modifier: Modifier = Modifier
 ){
-    val request = viewModel.request.observeAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val message = viewModel.message.observeAsState()
-    val isLoading = viewModel.isLoading.observeAsState()
-    viewModel.getRequest(requestId)
+    val request = uiState.request
+    val artisticEvaluation = uiState.artisticEvaluation
+    val economicEvaluation = uiState.economicEvaluation
+
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -44,15 +47,15 @@ fun ViewRequestScreen(
     ) {
         ScreenTitle(text = context.getString(currentScreen.title))
         when {
-            isLoading.value == true -> {
+            uiState.isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
             else -> {
                 ImageCard(
-                    imageResource = R.drawable.media,
-                    title = "Artwork Title",
-                    date = "dd/MM/YYYY",
-                    dimensions = "ww x hh"
+                    image = request?.artWork?.image ?: "",
+                    title = request?.artWork?.title ?: "",
+                    date = request?.date ?: "",
+                    dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString()
                 )
                 HighlightButton(
                     onClick = { },
@@ -68,26 +71,26 @@ fun ViewRequestScreen(
                         .align(Alignment.Start)
                         .padding(vertical = 8.dp)
                 )
-                request.value?.let {
+                request?.let {
                     ProgressCard(
                         order = 1,
-                        status = it.request.status,
+                        status = it.status,
                         stepName = stringResource(R.string.specialist_selection)
                     )
-                    if (it.artisticEvaluation != null){
+                    if (artisticEvaluation != null){
                         ProgressCard(
                             order = 2,
-                            status = it.artisticEvaluation.result,
+                            status = artisticEvaluation.result,
                             stepName = stringResource(R.string.artistic_evaluation)
                         )
-                    }else if(it.request.status == "Aprobada"){
+                    }else if(request.status == "Approved"){
                         ProgressCard(
                             order = 2,
-                            status = "Pendiente",
+                            status = "Pending",
                             stepName = stringResource(R.string.artistic_evaluation)
                         )
                     }
-                    if(it.economicEvaluation != null){
+                    if(economicEvaluation != null){
                         ProgressCard(
                             order = 3,
                             status = stringResource(R.string.finished),
@@ -104,6 +107,5 @@ fun ViewRequestScreen(
 @Composable
 fun ViewRequestScreenPreview() {
     TecnisisTheme {
-        ViewRequestScreen(requestId = 1)
     }
 }

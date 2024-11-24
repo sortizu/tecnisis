@@ -4,7 +4,8 @@ data class ArtworkRequest(
     val title: String,
     val creationDate: String,
     val image: String,
-    val width: Double,
     val height: Double,
+    val width: Double,
+    val artistId: Long,
     val techniqueId: Long
 )

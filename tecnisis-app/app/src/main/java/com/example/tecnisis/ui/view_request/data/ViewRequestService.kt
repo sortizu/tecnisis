@@ -6,6 +6,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface ViewRequestService {
-    @GET("requests")
-    suspend fun getGeneralRequestInfo(@Query("requestId") requestId: Int): Response<GeneralRequestInfoResponse>
+    @GET("requests/v1/api")
+    suspend fun getGeneralRequestInfo(@Query("id") requestId: Int): Response<GeneralRequestInfoResponse>
 }

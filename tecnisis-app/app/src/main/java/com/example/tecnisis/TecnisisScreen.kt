@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +25,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.tecnisis.config.datastore.DataStoreManager
+import com.example.tecnisis.ui.artistic_request_evaluation.ArtisticRequestEvaluationViewModel
 import com.example.tecnisis.ui.artistic_request_evaluation.ArtisticRequestReviewScreen
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsScreen
 import com.example.tecnisis.ui.login.LoginScreen
@@ -34,7 +37,9 @@ import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
 import com.example.tecnisis.ui.login.LoginViewModel
 import com.example.tecnisis.ui.sign_up.SignUpViewModel
+import com.example.tecnisis.ui.start_request.StartRequestViewModel
 import com.example.tecnisis.ui.view_request.ViewRequestScreen
+import com.example.tecnisis.ui.view_request.ViewRequestViewModel
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
@@ -139,14 +144,15 @@ fun TecnisisApp() {
                     viewModel = viewModel(modelClass = LoginViewModel::class.java),
                     navController = navController,
                     onLogin = floatingButtonPressed,
-
+                    snackbarHostState = snackbarHostState
                 )
             }
             composable(route = TecnisisScreen.SignUp.name) {
                 SignUpScreen(
                     viewModel = viewModel(modelClass = SignUpViewModel::class.java),
                     navController = navController,
-                    onSignUp = floatingButtonPressed
+                    onSignUp = floatingButtonPressed,
+                    snackbarHostState = snackbarHostState
                 )
             }
             composable(route = TecnisisScreen.ListRequests.name) {
@@ -158,15 +164,28 @@ fun TecnisisApp() {
                 )
             }
             composable(route = TecnisisScreen.StartRequest.name) {
-                StartRequestScreen()
+                StartRequestScreen(
+                    viewModel = viewModel(modelClass = StartRequestViewModel::class.java),
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    onStartRequest = floatingButtonPressed
+                )
             }
             composable(route = TecnisisScreen.ArtisticRequestEvaluation.name) {
-                ArtisticRequestReviewScreen()
+                val requestId = it.arguments?.getString("requestId")?.toLong()
+                val context = LocalContext.current
+                val dataStoreManager = remember { DataStoreManager(context) }
+                ArtisticRequestReviewScreen(
+                    viewModel = ArtisticRequestEvaluationViewModel(requestId!!,dataStoreManager),
+                    navController = navController
+                )
             }
             composable(route = TecnisisScreen.ViewRequest.name) {
-                val requestId = it.arguments?.getString("requestId")?.toInt()
+                val requestId = it.arguments?.getString("requestId")?.toLong()
                 if (requestId != null) {
-                    ViewRequestScreen(requestId = requestId)
+                    ViewRequestScreen(
+                        viewModel = ViewRequestViewModel(requestId),
+                    )
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.example.tecnisis.ui.list_user_requests
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,11 +49,10 @@ fun ListUserRequestsScreen(
     val context = LocalContext.current
     val dataStoreManager = remember { DataStoreManager(context) }
 
-    val role by viewModel.role.collectAsState()
+    Log.i("loadArtistRequests", uiState.isLoading.toString())
+
     viewModel.loadRole(dataStoreManager)
     viewModel.loadArtistRequests(dataStoreManager)
-
-
 
     Column(
         modifier = Modifier
@@ -77,7 +78,7 @@ fun ListUserRequestsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (role == "specialist") {
+        if (uiState.role == "specialist") {
             // hiding the floating action button
             enableFloatingActionButton.value = false
             // Showing the request filter
@@ -93,14 +94,15 @@ fun ListUserRequestsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        val requests = uiState.requests
         when {
             uiState.isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
 
-            uiState.errorMessage != null -> {
+            requests == null || requests.isEmpty() -> {
                 Text(
-                    text = uiState.errorMessage!!,
+                    text = "No se encontraron solicitudes",
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -108,19 +110,18 @@ fun ListUserRequestsScreen(
 
             else -> {
                 // Display the list of requests if data is loaded successfully
-                val requests = uiState.requests
                 LazyColumn {
                     items(requests.size) { index ->
                         RequestCard(index + 1, requests[index], onCardClick = {
                             when {
-                                role == "art-specialist" -> {
-                                    navController.navigate(TecnisisScreen.ArtisticRequestEvaluation.name + "/${requests[index].idRequest}")
+                                uiState.role == "art-specialist" -> {
+                                    navController.navigate(TecnisisScreen.ArtisticRequestEvaluation.name + "/${requests[index].id}")
                                 }
-                                role == "economic-specialist" -> {
-                                    navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].idRequest}")
+                                uiState.role == "economic-specialist" -> {
+                                    navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].id}")
                                 }
                                 else -> {
-                                    navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].idRequest}")
+                                    navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].id}")
                                 }
                             }
                         }

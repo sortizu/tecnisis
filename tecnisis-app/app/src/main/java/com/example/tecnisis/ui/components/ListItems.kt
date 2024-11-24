@@ -74,7 +74,7 @@ fun RequestCard(order: Int, request: RequestResponse, onCardClick: (Int) -> Unit
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCardClick(request.idRequest.toInt()) }
+            .clickable { onCardClick(request.id.toInt()) }
     ) {
         Row(
             modifier = Modifier
@@ -100,7 +100,7 @@ fun RequestCard(order: Int, request: RequestResponse, onCardClick: (Int) -> Unit
                     .weight(1f)
                     .padding(start = 16.dp)
             ) {
-                Text(text = request.artwork.title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = request.artWork.title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Text(text = request.status, fontSize = 14.sp, color = Color.Gray)
             }
             // Imagen de la obra

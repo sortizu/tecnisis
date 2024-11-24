@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
 import com.example.tecnisis.ui.artistic_request_evaluation.ArtisticRequestEvaluationViewModel
+import com.example.tecnisis.ui.components.CustomDatePickerField
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.CustomSingleChoiceSegmentedButton
-import com.example.tecnisis.ui.components.DatePickerDocked
 import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
@@ -80,7 +80,12 @@ fun ArtisticRequestReviewScreen(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        DatePickerDocked()
+        CustomDatePickerField(
+            defaultDate = "",
+            onDateSelected = {
+                viewModel.updateDate(it.toString())
+            }
+        )
         HighlightButton(
             text = stringResource(R.string.attach_review_document),
             onClick = {}

@@ -7,74 +7,73 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.ui.sign_up.data.SignUpRequest
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
+data class SignUpUiState(
+    val isLoading: Boolean = false,
+    val name: String = "",
+    val surnames: String = "",
+    val email: String = "",
+    val pass: String = "",
+    val repeatedPass: String = "",
+    val dni: String = "",
+    val phone: String = "",
+    val address: String = "",
+    val registrationSuccessful: Boolean = false
+)
+
 class SignUpViewModel () : ViewModel() {
-
-
-
-    // Variables to store user input
-
-    private val _name = MutableLiveData("")
-    val name: LiveData<String> = _name
-    private val _surnames = MutableLiveData("")
-    val surnames: LiveData<String> = _surnames
-    private val _email = MutableLiveData("")
-    val email: LiveData<String> = _email
-    private val _pass = MutableLiveData("")
-    val pass: LiveData<String> = _pass
-    private val _repeatedPass = MutableLiveData("")
-    val repeatedPass: LiveData<String> = _repeatedPass
-    private val _dni = MutableLiveData("")
-    val dni: LiveData<String> = _dni
-    private val _phone = MutableLiveData("")
-    val phone: LiveData<String> = _phone
-    private val _address = MutableLiveData("")
-    val address: LiveData<String> = _address
-
-
-    private val _signUpSuccess = MutableLiveData(false)
-    val signUpSuccess: LiveData<Boolean> = _signUpSuccess
+    private val _uiState = MutableStateFlow(SignUpUiState())
+    val uiState: StateFlow<SignUpUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData("")
     val message: LiveData<String> = _message
 
-    init {
-
-    }
-
-    // Methods to handle value changes
-
     fun updateName(newName: String) {
-        _name.value = newName
+        _uiState.value = _uiState.value.copy(name = newName)
     }
 
     fun updateSurnames(newSurnames: String) {
-        _surnames.value = newSurnames
+        _uiState.value = _uiState.value.copy(surnames = newSurnames)
     }
 
     fun updateEmail(newEmail: String) {
-        _email.value = newEmail
+        _uiState.value = _uiState.value.copy(email = newEmail)
     }
 
     fun updatePass(newPass: String) {
-        _pass.value = newPass
+        _uiState.value = _uiState.value.copy(pass = newPass)
     }
 
     fun updateRepeatedPass(newRepeatedPass: String) {
-        _repeatedPass.value = newRepeatedPass
+        _uiState.value = _uiState.value.copy(repeatedPass = newRepeatedPass)
     }
 
     fun updateDNI(newDNI: String) {
-        _dni.value = newDNI
+        _uiState.value = _uiState.value.copy(dni = newDNI)
     }
 
     fun updatePhone(newPhone: String) {
-        _phone.value = newPhone
+        _uiState.value = _uiState.value.copy(phone = newPhone)
     }
 
     fun updateAddress(newAddress: String) {
-        _address.value = newAddress
+        _uiState.value = _uiState.value.copy(address = newAddress)
+    }
+
+    fun updateRegistrationSuccessful(newRegistrationSuccessful: Boolean) {
+        _uiState.value = _uiState.value.copy(registrationSuccessful = newRegistrationSuccessful)
+    }
+
+    fun resetMessage() {
+        _message.value = ""
+    }
+
+    fun updateMessage(message: String) {
+        _message.value = message
     }
 
     // Methods to handle input events
@@ -83,33 +82,42 @@ class SignUpViewModel () : ViewModel() {
         //val context: Context = ContextAplication.applicationContext()
         viewModelScope.launch {
             try {
-                if (_name.value!!.isBlank() || _surnames.value!!.isBlank() || _email.value!!.isBlank() ||
-                    _pass.value!!.isBlank() || _repeatedPass.value!!.isBlank() || _dni.value!!.isBlank() ||
-                    _phone.value!!.isBlank() || _address.value!!.isBlank()
+                val _name = _uiState.value.name
+                val _surnames = _uiState.value.surnames
+                val _email = _uiState.value.email
+                val _pass = _uiState.value.pass
+                val _repeatedPass = _uiState.value.repeatedPass
+                val _dni = _uiState.value.dni
+                val _phone = _uiState.value.phone
+                val _address = _uiState.value.address
+
+                if (_name.isBlank() || _surnames.isBlank() || _email.isBlank() ||
+                    _pass.isBlank() || _repeatedPass.isBlank() || _dni.isBlank() ||
+                    _phone.isBlank() || _address.isBlank()
                 ) {
                     _message.value = "Por favor, complete todos los campos"
-                } else if (_pass.value != _repeatedPass.value) {
+                } else if (_pass != _repeatedPass) {
                     _message.value = "Las contraseñas no coinciden"
                 } else {
                     val signUpRequest = SignUpRequest(
-                        email = _email.value!!,
-                        password = _pass.value!!,
-                        name = _name.value!! + " " + _surnames.value!!,
-                        idNumber = _dni.value!!,
-                        address = _address.value!!,
+                        email = _email,
+                        password = _pass,
+                        name = "$_name $_surnames",
+                        idNumber = _dni,
+                        address = _address,
                         gender = "X",
-                        phone = _phone.value!!,
-                        userRole = "USER"
+                        phone = _phone,
+                        userRole = "ARTIST"
                     )
                     val response = TecnisisApi.signUpService.registerPerson(signUpRequest)
                     if (response.isSuccessful) {
                         response.body()?.let {
-                            //_message.value = it.message
-                            Log.i("Response", it.toString())
+                            _message.value = "Registro exitoso"
+                            updateRegistrationSuccessful(true)
                         }
                     } else {
                         val errorBody = JSONObject(response.errorBody()?.string()!!)
-                        _message.value = errorBody.getString("error")
+                        _message.value = "Error: " + errorBody.get("details").toString().replace(regex = "[\\[\\]]".toRegex(), replacement = "")
                     }
                 }
             } catch (e: Exception) {
@@ -118,9 +126,4 @@ class SignUpViewModel () : ViewModel() {
         }
 
     }
-
-    fun clearMessage() {
-        _message.value = ""
-    }
-
 }

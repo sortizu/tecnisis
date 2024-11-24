@@ -1,7 +1,6 @@
 package com.example.tecnisis.data.technique
 
-data class TechniqueResponse(
-    val id: Long,
+data class TechniqueRequest(
     val name: String,
     val description: String
 )

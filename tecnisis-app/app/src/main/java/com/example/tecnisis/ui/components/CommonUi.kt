@@ -1,6 +1,8 @@
 package com.example.tecnisis.ui.components
 
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +50,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -123,7 +126,7 @@ fun InfoBox(
         )
     }
 }
-
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDocked(
@@ -220,10 +223,10 @@ fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
 }
-
+*/
 @Composable
 fun ImageCard(
-    imageResource: Int,  // Replace with actual image resource ID
+    image: String,  // Replace with actual image resource ID
     title: String,
     date: String,
     dimensions: String
@@ -237,12 +240,25 @@ fun ImageCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background image with scaling
-            Image(
-                painter = painterResource(id = imageResource),
-                contentDescription = title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+
+            if (image.isNotEmpty()) {
+                val imageBytes = Base64.decode(image, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.media),
+                    contentDescription = "Placeholder Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
 
             // Bottom-left title text
             Text(

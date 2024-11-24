@@ -15,10 +15,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // Deshabilita CSRF solo si es necesario (e.g., en APIs REST)
+                .csrf().disable() // Disable CSRF only if necessary (e.g., in REST APIs)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // Permite acceso público a login y registro
-                        .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
+                        .anyRequest().permitAll() // Allow public access to all endpoints
                 );
         return http.build();
     }

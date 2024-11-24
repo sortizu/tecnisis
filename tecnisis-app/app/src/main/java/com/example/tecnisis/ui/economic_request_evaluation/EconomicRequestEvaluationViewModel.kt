@@ -16,6 +16,8 @@ class EconomicRequestEvaluationViewModel: ViewModel() {
     val galleryPercentage: LiveData<Double> = _galleryPercentage
     private val _document = MutableLiveData<String>()
     val document: LiveData<String> = _document
+    private val _date = MutableLiveData<String>()
+    val date: LiveData<String> = _date
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
     fun updateSalePrice(newSalePrice: Double) {
@@ -27,6 +29,11 @@ class EconomicRequestEvaluationViewModel: ViewModel() {
     fun updateDocument(newDocument: String) {
         _document.value = newDocument
     }
+
+    fun updateDate(newDate: String) {
+        _date.value = newDate
+    }
+
     fun updateMessage(newMessage: String) {
         _message.value = newMessage
 

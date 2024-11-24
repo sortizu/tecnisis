@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -26,11 +27,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.ui.components.CustomDatePickerField
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.CustomSingleChoiceSegmentedButton
-import com.example.tecnisis.ui.components.DatePickerDocked
+
 import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
@@ -40,14 +43,13 @@ import com.example.tecnisis.ui.components.SelectableListItem
 @Composable
 fun ArtisticRequestReviewScreen(
     currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestEvaluation,
-    viewModel: ArtisticRequestEvaluationViewModel = ArtisticRequestEvaluationViewModel(),
-    modifier: Modifier = Modifier
+    viewModel: ArtisticRequestEvaluationViewModel,
+    modifier: Modifier = Modifier,
+    navController: NavController
 ){
     val context = LocalContext.current
-    val rating by viewModel.rating.observeAsState(0.0f)
-    val result by viewModel.result.observeAsState("")
-    val reviewDocument by viewModel.reviewDocument.observeAsState("")
-    val date by viewModel.date.observeAsState("")
+    val uiState by viewModel.uiState.collectAsState()
+    val request = uiState.request
     val message by viewModel.message.observeAsState("")
     val options = listOf("Aprobar", "Desaprobar")
     Column(
@@ -62,13 +64,13 @@ fun ArtisticRequestReviewScreen(
         ScreenTitle(text = context.getString(currentScreen.title))
         // Image upload area
         ImageCard(
-            imageResource = R.drawable.media,
-            title = "Artwork Title",
-            date = "dd/MM/YYYY",
-            dimensions = "ww x hh"
+            image = request!!.artWork.image,
+            title = request.artWork.title,
+            date = request.artWork.creationDate,
+            dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString()
         )
         SelectableListItem(
-            text = "Artist: Artist 1",
+            text = request.artWork.artist.person.name,
             icon = Icons.Default.Person,
             iconDescription = "Artist"
         )
@@ -88,7 +90,12 @@ fun ArtisticRequestReviewScreen(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        DatePickerDocked()
+        CustomDatePickerField(
+            defaultDate = "",
+            onDateSelected = {
+                viewModel.updateDate(it.toString())
+            }
+        )
         HighlightButton(
             text = stringResource(R.string.attach_review_document),
             onClick = {}
@@ -96,40 +103,8 @@ fun ArtisticRequestReviewScreen(
     }
 }
 
-@Composable
-fun ImageUploadSection(
-    onAddImageButtonClick: () -> Unit = {}
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(150.dp)
-                .border(2.dp, Color.Gray, RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.media),
-                contentDescription = "Upload Placeholder",
-                modifier = Modifier.size(100.dp)
-            )
-        }
-        Button(
-            onClick = { onAddImageButtonClick },
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFFA643),
-                contentColor = Color.Black
-            ),
-        ) {
-            Text(text = "Inspeccionar foto")
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun ArtisticRequestReviewScreenPreview() {
-    ArtisticRequestReviewScreen()
+
 }
