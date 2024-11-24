@@ -95,6 +95,7 @@ fun ListUserRequestsScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         val requests = uiState.requests
+        Log.i("loadArtistRequests", requests.toString())
         when {
             uiState.isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -114,10 +115,10 @@ fun ListUserRequestsScreen(
                     items(requests.size) { index ->
                         RequestCard(index + 1, requests[index], onCardClick = {
                             when {
-                                uiState.role == "art-specialist" -> {
+                                uiState.role == "ART-EVALUATOR" -> {
                                     navController.navigate(TecnisisScreen.ArtisticRequestEvaluation.name + "/${requests[index].id}")
                                 }
-                                uiState.role == "economic-specialist" -> {
+                                uiState.role == "ECONOMIC-EVALUATOR" -> {
                                     navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].id}")
                                 }
                                 else -> {

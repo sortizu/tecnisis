@@ -49,7 +49,7 @@ fun ArtisticRequestReviewScreen(
     viewModel: ArtisticRequestEvaluationViewModel,
     modifier: Modifier = Modifier,
     navController: NavController,
-    floatingButtonPressed: MutableState<() -> Unit>,
+    floatingButtonPressed: MutableState<() -> Unit>
 ){
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()

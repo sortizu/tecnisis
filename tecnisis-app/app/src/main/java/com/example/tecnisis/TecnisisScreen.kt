@@ -38,6 +38,8 @@ import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvalua
 import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvaluationViewModel
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
 import com.example.tecnisis.ui.login.LoginViewModel
+import com.example.tecnisis.ui.profile.ProfileScreen
+import com.example.tecnisis.ui.profile.ProfileScreenViewModel
 import com.example.tecnisis.ui.sign_up.SignUpViewModel
 import com.example.tecnisis.ui.start_request.StartRequestViewModel
 import com.example.tecnisis.ui.view_request.ViewRequestScreen
@@ -50,7 +52,8 @@ enum class TecnisisScreen(@StringRes val title: Int) {
     StartRequest(title = R.string.iniciar_solicitud),
     ArtisticRequestEvaluation(title = R.string.artistic_request_evaluation),
     EconomicRequestEvaluation(title = R.string.economic_request_evaluation),
-    ViewRequest(title = R.string.view_request)
+    ViewRequest(title = R.string.view_request),
+    Profile(title = R.string.profile)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,6 +128,7 @@ fun TecnisisApp() {
                     TecnisisScreen.StartRequest -> Icons.Default.Save
                     TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
                     TecnisisScreen.EconomicRequestEvaluation -> Icons.Default.Save
+                    TecnisisScreen.Profile -> Icons.Default.Save
                     TecnisisScreen.ViewRequest -> Icons.Default.Save
                 }
                 CustomFloatingButton(
@@ -196,11 +200,15 @@ fun TecnisisApp() {
             }
             composable(route = TecnisisScreen.ViewRequest.name) {
                 val requestId = it.arguments?.getString("requestId")?.toLong()
-                if (requestId != null) {
-                    ViewRequestScreen(
-                        viewModel = ViewRequestViewModel(requestId),
-                    )
-                }
+                ViewRequestScreen(viewModel = ViewRequestViewModel(requestId!!))
+            }
+            composable(route = TecnisisScreen.Profile.name) {
+                val idPerson = it.arguments?.getString("idPerson")?.toLong()
+                ProfileScreen(
+                    viewModel = ProfileScreenViewModel(idPerson!!),
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed
+                )
             }
         }
         BottomPattern()
