@@ -16,6 +16,6 @@ public class LoginResponse {
     private String gender;
     private String phone;
     private String role;
-    //private String token;
+    private String token;
     private Long personId;
 }
