@@ -17,6 +17,7 @@ public interface UserRestMapper {
     @Mapping(source = "person.gender", target = "gender")
     @Mapping(source = "person.phone", target = "phone")
     @Mapping(source = "person.role", target = "role")
+    @Mapping(source = "person.id", target = "personId")
     LoginResponse toLoginResponse(User user);
 }
 
