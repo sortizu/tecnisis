@@ -16,6 +16,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -38,6 +40,7 @@ import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SelectableListItem
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,13 +48,26 @@ fun ArtisticRequestReviewScreen(
     currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestEvaluation,
     viewModel: ArtisticRequestEvaluationViewModel,
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    floatingButtonPressed: MutableState<() -> Unit>,
 ){
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val request = uiState.request
     val message by viewModel.message.observeAsState("")
     val options = listOf("Aprobar", "Desaprobar")
+
+    floatingButtonPressed.value = {
+        viewModel.saveReview()
+    }
+
+    LaunchedEffect(uiState.evaluationSaved) {
+        if (uiState.evaluationSaved) {
+            delay(500)
+            navController.navigate(TecnisisScreen.ListRequests.name)
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -93,7 +109,7 @@ fun ArtisticRequestReviewScreen(
         CustomDatePickerField(
             defaultDate = "",
             onDateSelected = {
-                viewModel.updateDate(it.toString())
+                viewModel.updateDate(it)
             }
         )
         HighlightButton(

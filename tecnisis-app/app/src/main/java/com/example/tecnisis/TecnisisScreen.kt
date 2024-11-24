@@ -34,6 +34,8 @@ import com.example.tecnisis.ui.sign_up.SignUpScreen
 import com.example.tecnisis.ui.start_request.StartRequestScreen
 import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomFloatingButton
+import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvaluationScreen
+import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvaluationViewModel
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
 import com.example.tecnisis.ui.login.LoginViewModel
 import com.example.tecnisis.ui.sign_up.SignUpViewModel
@@ -47,6 +49,7 @@ enum class TecnisisScreen(@StringRes val title: Int) {
     ListRequests(title = R.string.lista_de_solicitudes),
     StartRequest(title = R.string.iniciar_solicitud),
     ArtisticRequestEvaluation(title = R.string.artistic_request_evaluation),
+    EconomicRequestEvaluation(title = R.string.economic_request_evaluation),
     ViewRequest(title = R.string.view_request)
 }
 
@@ -121,6 +124,7 @@ fun TecnisisApp() {
                     TecnisisScreen.ListRequests -> Icons.Default.Add
                     TecnisisScreen.StartRequest -> Icons.Default.Save
                     TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
+                    TecnisisScreen.EconomicRequestEvaluation -> Icons.Default.Save
                     TecnisisScreen.ViewRequest -> Icons.Default.Save
                 }
                 CustomFloatingButton(
@@ -177,6 +181,16 @@ fun TecnisisApp() {
                 val dataStoreManager = remember { DataStoreManager(context) }
                 ArtisticRequestReviewScreen(
                     viewModel = ArtisticRequestEvaluationViewModel(requestId!!,dataStoreManager),
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed
+                )
+            }
+            composable(route = TecnisisScreen.EconomicRequestEvaluation.name) {
+                val requestId = it.arguments?.getString("requestId")?.toLong()
+                val context = LocalContext.current
+                val dataStoreManager = remember { DataStoreManager(context) }
+                EconomicRequestEvaluationScreen(
+                    viewModel = EconomicRequestEvaluationViewModel(requestId!!,dataStoreManager),
                     navController = navController
                 )
             }
@@ -193,35 +207,6 @@ fun TecnisisApp() {
     }
 }
 
-@Composable
-fun TecnisisFloatingActionButton(
-    currentScreen: TecnisisScreen,
-    snackbarHostState: SnackbarHostState,
-    onFloatingButtonClick: MutableState<() -> Unit>,
-    errorMessage: MutableState<String>
-) {
-    val icon = when (currentScreen) {
-        TecnisisScreen.Login -> Icons.AutoMirrored.Filled.ArrowForward
-        TecnisisScreen.SignUp -> Icons.Default.ArrowForward
-        TecnisisScreen.ListRequests -> Icons.Default.Add
-        TecnisisScreen.StartRequest -> Icons.Default.Save
-        TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
-        TecnisisScreen.ViewRequest -> Icons.Default.Save
-    }
-    FloatingActionButton(
-        onClick = onFloatingButtonClick.value,
-        containerColor = Color.Red,
-        modifier = Modifier.size(60.dp)
-    ) {
-        Icon(imageVector = icon, contentDescription = null, tint = Color.White)
-    }
-    if (errorMessage.value.isNotEmpty()) {
-        LaunchedEffect(errorMessage.value) {
-            snackbarHostState.showSnackbar(errorMessage.value)
-            errorMessage.value = ""
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

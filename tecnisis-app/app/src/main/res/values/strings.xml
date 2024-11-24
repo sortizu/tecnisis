@@ -33,4 +33,6 @@
     <string name="height">Alto</string>
     <string name="attach_review_document">Adjuntar documento de revisión</string>
     <string name="select_a_date">Seleccionar fecha</string>
+    <string name="economic_request_evaluation">Evaluación económica de solicitud</string>
+    <string name="fill_fields">Por favor, complete todos los campos</string>
 </resources>

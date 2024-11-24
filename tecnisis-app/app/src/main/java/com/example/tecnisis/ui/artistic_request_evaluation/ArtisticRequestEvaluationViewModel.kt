@@ -1,18 +1,22 @@
 package com.example.tecnisis.ui.artistic_request_evaluation
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tecnisis.R
 import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.evaluations.ArtisticEvaluationRequest
 import com.example.tecnisis.data.request.RequestResponse
+import com.example.tecnisis.ui.components.convertMillisToDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 data class ArtisticRequestEvaluationUiState(
     val rating: Float = 0.0f,
@@ -20,6 +24,7 @@ data class ArtisticRequestEvaluationUiState(
     val request: RequestResponse? = null,
     val reviewDocument: String = "",
     val specialistId: Long = -1L,
+    val evaluationSaved: Boolean = false,
     val date: String = ""
 )
 
@@ -32,6 +37,7 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     init {
         getRequest(idRequest)
         loadSpecialistId(dataStoreManager)
+        updateDate(System.currentTimeMillis())
     }
 
     fun updateRating(newRating: Float) {
@@ -40,8 +46,8 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     fun updateReviewDocument(newReviewDocument: String) {
         _uiState.value = _uiState.value.copy(reviewDocument = newReviewDocument)
     }
-    fun updateDate(newDate: String) {
-        _uiState.value = _uiState.value.copy(date = newDate)
+    fun updateDate(newDateInMillis: Long) {
+        _uiState.value = _uiState.value.copy(date = convertMillisToDate(newDateInMillis))
     }
     fun updateMessage(newMessage: String) {
         _message.value = newMessage
@@ -56,6 +62,10 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
 
     fun updateSpecialistId(newSpecialistId: Long) {
         _uiState.value = _uiState.value.copy(specialistId = newSpecialistId)
+    }
+
+    fun updateEvaluationSaved(newEvaluationSaved: Boolean) {
+        _uiState.value = _uiState.value.copy(evaluationSaved = newEvaluationSaved)
     }
 
     fun getRequest(id: Long) {
@@ -112,7 +122,7 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 val reviewDocument = _uiState.value.reviewDocument
                 val specialistId = _uiState.value.specialistId
                 if (date.isEmpty() || rating == 0.0f || result.isEmpty() || reviewDocument.isEmpty()){
-                    _message.value = "Por favor, complete todos los campos"
+                    updateMessage("Por favor, completa todos los campos")
                     return@launch
                 }
                 val response = TecnisisApi.evaluationService.saveArtisticEvaluation(
@@ -126,11 +136,13 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 )
                 if (response.isSuccessful){
                     response.body()?.let {
-                        _message.value = it
+                        updateEvaluationSaved(true)
+                        updateMessage("Evaluación guardada correctamente")
                     }
                 }
                 else{
-                    _message.value = response.message()
+                    val errorBody = JSONObject(response.errorBody()?.string()!!)
+                    updateMessage(errorBody.get("details").toString())
                 }
             }
             catch(e: Exception){

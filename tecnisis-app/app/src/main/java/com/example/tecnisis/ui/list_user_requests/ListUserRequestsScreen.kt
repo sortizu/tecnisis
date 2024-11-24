@@ -42,7 +42,7 @@ fun ListUserRequestsScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     enableFloatingActionButton: MutableState<Boolean>,
-    floatingButtonPressed: MutableState<() -> Unit>,
+    floatingButtonPressed: MutableState<() -> Unit>
 ) {
     // Collect the UI state from the ViewModel
     val uiState by viewModel.uiState.collectAsState()
