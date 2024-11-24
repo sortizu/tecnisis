@@ -5,6 +5,8 @@ import com.unmsm.movil.tecnisis.art_galery.domain.model.Person;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.User;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,22 +14,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RegisterService {
 
+    private static final Logger log = LoggerFactory.getLogger(RegisterService.class);
+
     private final LoginPersistencePort userPersistencePort;
     private final PasswordEncoder passwordEncoder;
 
     public User register(RegisterRequest request) {
-        // Verificar si el usuario ya existe
-        userPersistencePort.findByEmail(request.getEmail()) // Cambié registerRequest por request
-                .ifPresent(user -> {
-                    throw new IllegalStateException("El correo ya está registrado");
-                });
-
-        // Crear el usuario
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        // Crear la persona vinculada
         Person person = new Person();
         person.setName(request.getName());
         person.setDni(request.getIdNumber());
@@ -36,10 +28,27 @@ public class RegisterService {
         person.setPhone(request.getPhone());
         person.setRole(request.getUserRole());
 
-        // Asociar persona con usuario
-        user.setPerson(person);
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        // Guardar el usuario
-        return userPersistencePort.save(user);
+        user.setPerson(person);
+        person.setUser(user);
+
+        log.info("Before save - User entity: {}", user);
+        log.info("Before save - Person entity: {}", person);
+        log.info("Person's User: {}", person.getUser());
+        log.info("User's Person: {}", user.getPerson());
+
+        User savedUser = userPersistencePort.save(user);
+
+        log.info("After save - User entity: {}", savedUser);
+        log.info("After save - Person entity: {}", savedUser.getPerson());
+        log.info("Person's User after save: {}", savedUser.getPerson().getUser());
+
+        return savedUser;
     }
+
+
 }
+

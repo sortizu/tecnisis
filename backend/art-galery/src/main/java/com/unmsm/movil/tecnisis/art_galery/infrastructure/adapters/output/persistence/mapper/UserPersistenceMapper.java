@@ -7,20 +7,14 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserPersistenceMapper {
-
-    @Mapping(target = "person.role", source = "person.role") // Mapear el campo role
-    @Mapping(target = "person.name", source = "person.name")
-    @Mapping(target = "person.dni", source = "person.dni")
-    @Mapping(target = "person.address", source = "person.address")
-    @Mapping(target = "person.gender", source = "person.gender")
-    @Mapping(target = "person.phone", source = "person.phone")
+    @Mapping(target = "person.user", ignore = true)
     UserEntity toUserEntity(User user);
 
-    @Mapping(target = "person.role", source = "person.role")
-    @Mapping(target = "person.name", source = "person.name")
-    @Mapping(target = "person.dni", source = "person.dni")
-    @Mapping(target = "person.address", source = "person.address")
-    @Mapping(target = "person.gender", source = "person.gender")
-    @Mapping(target = "person.phone", source = "person.phone")
+    @Mapping(target = "person.user", ignore = true)
     User toUser(UserEntity userEntity);
 }
+
+
+
+
+

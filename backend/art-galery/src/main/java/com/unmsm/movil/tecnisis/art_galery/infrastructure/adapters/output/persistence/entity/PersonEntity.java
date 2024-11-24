@@ -1,12 +1,14 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
 @Table(name = "persons")
 public class PersonEntity {
     @Id
@@ -20,15 +22,17 @@ public class PersonEntity {
     private String dni;
 
     private String address;
-
     private String gender;
-
     private String phone;
 
     @Column(name = "user_role")
     private String role;
 
-    @OneToOne
-    @JoinColumn(name = "id_user", referencedColumnName = "id_user") // Relación con la tabla `users`
-    private UserEntity user; // Referencia al usuario asociado
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user", nullable = true)
+    @JsonManagedReference
+    private UserEntity user;
+
+
 }
+
