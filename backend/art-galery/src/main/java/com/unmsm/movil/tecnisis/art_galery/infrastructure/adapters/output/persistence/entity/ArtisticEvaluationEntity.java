@@ -1,9 +1,10 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -27,7 +28,8 @@ public class ArtisticEvaluationEntity {
     private SpecialistEntity specialist;
 
     @ManyToOne
-    @JoinColumn(name = "id_request", nullable = false)
+    @JoinColumn(name = "id_request", referencedColumnName = "id_request", nullable = false)
+    @JsonManagedReference
     private RequestEntity request;
 
     @ManyToOne

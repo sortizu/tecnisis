@@ -12,6 +12,7 @@ public interface SpecialistPersistencePort {
     List<Request> findArtisticRequestsBySpecialistId(Long id);
     List<Request> findEconomicRequestsBySpecialistId(Long id);
     Specialist save(Specialist specialist);
+    List<Specialist> findByRole(String role);
     void deleteById(Long id);
 
 }

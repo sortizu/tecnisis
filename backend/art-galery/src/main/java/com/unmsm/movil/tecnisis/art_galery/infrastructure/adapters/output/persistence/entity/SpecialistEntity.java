@@ -18,6 +18,4 @@ public class SpecialistEntity {
     @ManyToOne
     @JoinColumn(name = "id_person",  nullable = false)
     private PersonEntity person;
-
-
 }

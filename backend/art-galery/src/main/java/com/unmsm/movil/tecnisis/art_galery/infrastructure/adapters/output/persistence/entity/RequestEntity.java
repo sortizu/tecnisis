@@ -1,6 +1,8 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,11 +28,11 @@ public class RequestEntity {
     private ArtWorkEntity artWork;
 
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonBackReference
     private List<ArtisticEvaluationEntity> artisticEvaluations;
 
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonBackReference
     private List<EconomicEvaluationEntity> economicEvaluations;
 
     @PrePersist

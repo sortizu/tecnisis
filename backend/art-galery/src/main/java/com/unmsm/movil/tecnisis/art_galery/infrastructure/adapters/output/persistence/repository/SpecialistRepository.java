@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SpecialistRepository extends JpaRepository<SpecialistEntity, Long>{
 
@@ -25,4 +26,12 @@ public interface SpecialistRepository extends JpaRepository<SpecialistEntity, Lo
         WHERE ee.specialist.id = :id
     """)
     List<RequestEntity> findEconomicRequestsById(@Param("id") Long id);
+
+    @Query(value = """
+        SELECT s
+        FROM SpecialistEntity s
+        JOIN s.person p
+        WHERE p.role = :role AND s.isAvailable = true
+    """)
+    List<SpecialistEntity> findSpecialistByRole(@Param("role") String role);
 }

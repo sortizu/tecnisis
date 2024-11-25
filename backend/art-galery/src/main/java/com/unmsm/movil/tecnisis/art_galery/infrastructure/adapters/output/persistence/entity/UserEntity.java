@@ -20,7 +20,7 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private PersonEntity person;
 }
