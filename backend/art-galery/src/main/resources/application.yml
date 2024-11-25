@@ -33,6 +33,8 @@ logging:
     org.hibernate: DEBUG
     org.springframework.web: DEBUG
     org.springframework.http.converter.json: DEBUG
+jwt:
+  secret: "4cV46DQzRFn4vcz/3KylvV9aZ+5PQ7ZmzE+wWf+ofhc="
 
 mapstruct:
   default:

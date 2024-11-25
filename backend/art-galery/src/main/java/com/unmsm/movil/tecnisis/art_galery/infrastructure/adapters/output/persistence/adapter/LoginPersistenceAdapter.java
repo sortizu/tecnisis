@@ -1,4 +1,4 @@
-package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence;
+package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.adapter;
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.LoginPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.User;
@@ -26,6 +26,11 @@ public class LoginPersistenceAdapter implements LoginPersistencePort {
     @Override
     public User save(User user) {
         UserEntity userEntity = userPersistenceMapper.toUserEntity(user);
+
+        if (userEntity.getPerson() != null) {
+            userEntity.getPerson().setUser(userEntity);
+        }
         return userPersistenceMapper.toUser(userRepository.save(userEntity));
     }
+
 }

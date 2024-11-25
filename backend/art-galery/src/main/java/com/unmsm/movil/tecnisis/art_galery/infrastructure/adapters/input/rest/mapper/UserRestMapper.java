@@ -8,16 +8,16 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserRestMapper {
-
-    // Mapeo de LoginRequest a User (puede ser útil en otras partes del proyecto)
+    @Mapping(target = "person.user", ignore = true)
     User toUser(LoginRequest loginRequest);
 
-    // Mapeo de User (con Person incluida) a LoginResponse
     @Mapping(source = "person.dni", target = "dni")
     @Mapping(source = "person.name", target = "name")
     @Mapping(source = "person.address", target = "address")
     @Mapping(source = "person.gender", target = "gender")
     @Mapping(source = "person.phone", target = "phone")
     @Mapping(source = "person.role", target = "role")
+    @Mapping(source = "person.id", target = "personId")
     LoginResponse toLoginResponse(User user);
 }
+

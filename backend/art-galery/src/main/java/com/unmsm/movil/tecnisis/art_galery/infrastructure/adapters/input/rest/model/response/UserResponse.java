@@ -9,13 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonResponse {
+public class UserResponse {
     private Long id;
-    private String name;
-    private String dni;
-    private String address;
-    private String gender;
-    private String phone;
-    private String role;
-    private UserResponse user; // Relación con el usuario
+    private String email;
 }
