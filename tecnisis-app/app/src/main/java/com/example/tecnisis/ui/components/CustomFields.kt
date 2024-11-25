@@ -127,6 +127,7 @@ fun CustomPhoneNumberField(label: String, value: String, modifier: Modifier = Mo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDatePickerField(
+    label: String = stringResource(R.string.date_of_realisation),
     defaultDate: String? = null,
     onDateSelected: (Long) -> Unit,
     modifier: Modifier = Modifier
@@ -143,7 +144,7 @@ fun CustomDatePickerField(
     OutlinedTextField(
         value = selectedDate ?: "",
         onValueChange = { },
-        label = { Text(stringResource(R.string.date_of_realisation)) },
+        label = { Text(label) },
         readOnly = true,
         trailingIcon = {
             IconButton(onClick = { showDatePickerDialog = true }) {

@@ -56,7 +56,11 @@ class ViewRequestViewModel (requestId: Long): ViewModel()  {
                 val response = TecnisisApi.requestService.getRequest(id)
                 if (response.isSuccessful){
                     response.body()?.let {
-                        updateRequest(it[0])
+                        for (request in it){
+                            if (request.id == id){
+                                updateRequest(request)
+                            }
+                        }
                     }
                 }
 

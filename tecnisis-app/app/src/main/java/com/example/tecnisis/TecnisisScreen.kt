@@ -9,6 +9,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,6 +36,8 @@ import com.example.tecnisis.ui.sign_up.SignUpScreen
 import com.example.tecnisis.ui.start_request.StartRequestScreen
 import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomFloatingButton
+import com.example.tecnisis.ui.dashboard.DashboardScreen
+import com.example.tecnisis.ui.dashboard.DashboardViewModel
 import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvaluationScreen
 import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvaluationViewModel
 import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
@@ -54,12 +57,16 @@ enum class TecnisisScreen(@StringRes val title: Int) {
     ArtisticRequestEvaluation(title = R.string.artistic_request_evaluation),
     EconomicRequestEvaluation(title = R.string.economic_request_evaluation),
     ViewRequest(title = R.string.view_request),
-    Profile(title = R.string.profile)
+    Profile(title = R.string.profile),
+    Dashboard(title = R.string.dashboard)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TecnisisTopAppBar(onProfileClick: () -> Unit) {
+fun TecnisisTopAppBar(
+    onProfileClick: () -> Unit,
+    onLogoutClick: () -> Unit = {}
+) {
     TopAppBar(
         title = {
             Row(
@@ -89,6 +96,17 @@ fun TecnisisTopAppBar(onProfileClick: () -> Unit) {
                     modifier = Modifier.size(32.dp)
                 )
             }
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButton(onClick = onLogoutClick)
+            {
+                Icon(
+                    imageVector = Icons.Default.Logout,
+                    contentDescription = "Logo",
+                    tint = Color.Black,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+
         },
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
     )
@@ -118,7 +136,9 @@ fun TecnisisApp() {
     Scaffold(
         topBar = {
             if (currentScreen != TecnisisScreen.Login) {
-                TecnisisTopAppBar(onProfileClick = {})
+                TecnisisTopAppBar(
+                    onProfileClick = { navController.navigate(TecnisisScreen.Profile.name) },
+                    onLogoutClick = { navController.navigate(TecnisisScreen.Login.name) })
             }
         },
         floatingActionButton =
@@ -133,6 +153,7 @@ fun TecnisisApp() {
                     TecnisisScreen.EconomicRequestEvaluation -> Icons.Default.Save
                     TecnisisScreen.Profile -> Icons.Default.Save
                     TecnisisScreen.ViewRequest -> Icons.Default.Save
+                    TecnisisScreen.Dashboard -> Icons.Default.Save
                 }
                 CustomFloatingButton(
                     onClick = floatingButtonPressed.value,
@@ -151,6 +172,7 @@ fun TecnisisApp() {
                 .background(color = Color.Transparent)
         ) {
             composable(route = TecnisisScreen.Login.name) {
+                enableFloatingActionButton.value = true
                 LoginScreen(
                     viewModel = viewModel(modelClass = LoginViewModel::class.java),
                     navController = navController,
@@ -205,12 +227,21 @@ fun TecnisisApp() {
                     snackbarHostState = snackbarHostState
                 )
             }
-            composable(route = TecnisisScreen.Profile.name) {
+            composable(route = TecnisisScreen.Profile.name + "/{idPerson}") {
                 val idPerson = it.arguments?.getString("idPerson")?.toLong()
                 ProfileScreen(
                     viewModel = ProfileScreenViewModel(idPerson!!),
                     navController = navController,
                     floatingButtonPressed = floatingButtonPressed
+                )
+            }
+            composable(route = TecnisisScreen.Dashboard.name) {
+                enableFloatingActionButton.value = false
+                DashboardScreen(
+                    viewModel = DashboardViewModel(dataStoreManager),
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed,
+                    enableFloatingActionButton = enableFloatingActionButton
                 )
             }
         }
