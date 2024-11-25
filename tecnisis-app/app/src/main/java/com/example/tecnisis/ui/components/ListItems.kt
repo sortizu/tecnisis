@@ -1,5 +1,7 @@
 package com.example.tecnisis.ui.components
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,14 +37,14 @@ import com.example.tecnisis.R
 import com.example.tecnisis.data.request.RequestResponse
 
 @Composable
-fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> Unit = { }) {
+fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> Unit = { }, clickable: Boolean = true) {
     Column (
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClicked() }
     ){
         ListItem(
-            headlineContent = {
+            leadingContent = {
                 Box(
                     modifier = Modifier
                         .size(32.dp)
@@ -50,14 +55,14 @@ fun ProgressCard(order: Int, status: String, stepName: String, onClicked: () -> 
                     Text(text = order.toString(), color = Color.White)
                 }
             },
-            leadingContent = {
+            headlineContent = {
                 Column {
                     Text(text = status, fontSize = 14.sp, color = Color.Gray)
                     Text(text = stepName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             },
             trailingContent = {
-                if (onClicked != { }){
+                if (clickable){
                     Icon(
                         Icons.Default.ArrowRight,
                         contentDescription = "View Details"
@@ -103,12 +108,25 @@ fun RequestCard(order: Int, request: RequestResponse, onCardClick: (Int) -> Unit
                 Text(text = request.artWork.title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Text(text = request.status, fontSize = 14.sp, color = Color.Gray)
             }
-            // Imagen de la obra
-            Image(
-                painter = painterResource(id = R.drawable.media),
-                contentDescription = "Obra",
-                modifier = Modifier.size(100.dp)
-            )
+
+
+            val image = request.artWork.image
+            if (image.isNotEmpty()) {
+                val imageBytes = Base64.decode(image, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = request.artWork.title,
+                    modifier = Modifier.size(100.dp)
+                )
+
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.media),
+                    contentDescription = "Artwork Image Placeholder",
+                    modifier = Modifier.size(100.dp)
+                )
+            }
         }
     }
 }
@@ -118,7 +136,8 @@ fun SelectableListItem(
     text: String,
     icon: ImageVector,
     iconDescription: String,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    clickable: Boolean = true
 ) {
     Column (
         modifier = Modifier
@@ -134,10 +153,12 @@ fun SelectableListItem(
                 )
             },
             trailingContent = {
-                Icon(
-                    Icons.Default.ArrowRight,
-                    contentDescription = "Open Modal"
-                )
+                if (clickable){
+                    Icon(
+                        Icons.Default.ArrowRight,
+                        contentDescription = "Open Modal"
+                    )
+                }
             }
         )
         HorizontalDivider()

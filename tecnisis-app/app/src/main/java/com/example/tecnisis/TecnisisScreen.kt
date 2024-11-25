@@ -1,5 +1,6 @@
 package com.example.tecnisis
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -96,11 +97,19 @@ fun TecnisisTopAppBar(onProfileClick: () -> Unit) {
 @Composable
 fun TecnisisApp() {
     val navController = rememberNavController()
+    val context = LocalContext.current
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = TecnisisScreen.valueOf(
-        backStackEntry?.destination?.route ?: TecnisisScreen.ListRequests.name
-    )
-
+    var currentRoute = backStackEntry?.destination?.route
+    if (currentRoute != null){
+        val splittedStr = currentRoute.split("/")
+        if (splittedStr.size > 1){
+            currentRoute = splittedStr[0]
+        }
+    }else{
+        currentRoute = TecnisisScreen.Login.name
+    }
+    val currentScreen = TecnisisScreen.valueOf(currentRoute)
+    val dataStoreManager = remember { DataStoreManager(context) }
     val enableFloatingActionButton = remember { mutableStateOf(true) }
     val floatingButtonPressed = remember { mutableStateOf({}) }
     val errorMessage = remember { mutableStateOf("") }
@@ -115,12 +124,6 @@ fun TecnisisApp() {
         floatingActionButton =
         {
             if (enableFloatingActionButton.value){
-                /*TecnisisFloatingActionButton(
-                    currentScreen = currentScreen,
-                    snackbarHostState = snackbarHostState,
-                    onFloatingButtonClick = floatingButtonPressed,
-                    errorMessage = errorMessage
-                )*/
                 val icon = when (currentScreen) {
                     TecnisisScreen.Login -> Icons.AutoMirrored.Filled.ArrowForward
                     TecnisisScreen.SignUp -> Icons.Default.ArrowForward
@@ -165,7 +168,7 @@ fun TecnisisApp() {
             }
             composable(route = TecnisisScreen.ListRequests.name) {
                 ListUserRequestsScreen(
-                    viewModel = viewModel(modelClass = ListUserRequestsViewModel::class.java),
+                    viewModel = ListUserRequestsViewModel(dataStoreManager),
                     enableFloatingActionButton = enableFloatingActionButton,
                     navController = navController,
                     floatingButtonPressed = floatingButtonPressed
@@ -181,8 +184,6 @@ fun TecnisisApp() {
             }
             composable(route = TecnisisScreen.ArtisticRequestEvaluation.name) {
                 val requestId = it.arguments?.getString("requestId")?.toLong()
-                val context = LocalContext.current
-                val dataStoreManager = remember { DataStoreManager(context) }
                 ArtisticRequestReviewScreen(
                     viewModel = ArtisticRequestEvaluationViewModel(requestId!!,dataStoreManager),
                     navController = navController,
@@ -191,16 +192,18 @@ fun TecnisisApp() {
             }
             composable(route = TecnisisScreen.EconomicRequestEvaluation.name) {
                 val requestId = it.arguments?.getString("requestId")?.toLong()
-                val context = LocalContext.current
-                val dataStoreManager = remember { DataStoreManager(context) }
                 EconomicRequestEvaluationScreen(
                     viewModel = EconomicRequestEvaluationViewModel(requestId!!,dataStoreManager),
                     navController = navController
                 )
             }
-            composable(route = TecnisisScreen.ViewRequest.name) {
+            composable(route = TecnisisScreen.ViewRequest.name + "/{requestId}") {
+                enableFloatingActionButton.value = false
                 val requestId = it.arguments?.getString("requestId")?.toLong()
-                ViewRequestScreen(viewModel = ViewRequestViewModel(requestId!!))
+                ViewRequestScreen(
+                    viewModel = ViewRequestViewModel(requestId!!),
+                    snackbarHostState = snackbarHostState
+                )
             }
             composable(route = TecnisisScreen.Profile.name) {
                 val idPerson = it.arguments?.getString("idPerson")?.toLong()

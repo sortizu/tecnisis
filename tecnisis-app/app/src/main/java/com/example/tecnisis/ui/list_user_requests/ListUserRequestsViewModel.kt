@@ -18,17 +18,31 @@ import kotlinx.coroutines.launch
 data class ListUserRequestUiState(
     val isLoading: Boolean = false,
     val requests: List<RequestResponse> = emptyList(),
+    val filter: String = "",
     val message: String = "",
     val role: String = ""
 )
 
-class ListUserRequestsViewModel(): ViewModel() {
+class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     private val _uiState = MutableStateFlow(ListUserRequestUiState())
     val uiState: StateFlow<ListUserRequestUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
 
-
+    init {
+        var userId = ""
+        var role = ""
+        viewModelScope.launch {
+            dataStoreManager.id.let {
+                userId = it.first()!!
+            }
+            dataStoreManager.role.let {
+                role = it.first()!!
+            }
+        }
+        updateRole(role)
+        loadArtistRequests(userId.toLong())
+    }
 
     fun resetMessage() {
         //_uiState.value = _uiState.value.copy(message = "")
@@ -38,26 +52,22 @@ class ListUserRequestsViewModel(): ViewModel() {
     fun updateMessage(message: String) {
         _uiState.value = _uiState.value.copy(message = message)
     }
-
-    fun loadRole(dataStoreManager: DataStoreManager) {
-        viewModelScope.launch {
-            dataStoreManager.role.first()?.let {
-                _uiState.value = _uiState.value.copy(role = it)
-            }
+    fun updateRole(role: String) {
+        _uiState.value = _uiState.value.copy(role = role)
+    }
+    fun updateFilter(filter: String) {
+        _uiState.value = _uiState.value.copy(filter = filter)
+    }
+    fun getFilteredRequests(query: String) : List<RequestResponse> {
+        val filteredRequests = _uiState.value.requests.filter { request ->
+            request.artWork.title.contains(query, ignoreCase = true)
         }
+        return filteredRequests
     }
 
     // Updates the UI state with a new list of requests
-    fun loadArtistRequests(dataStoreManager: DataStoreManager) {
-
+    fun loadArtistRequests(id: Long){
         viewModelScope.launch {
-            var id = -1
-            dataStoreManager.id.first()?.let {
-                id = it.toInt()
-            }
-            if (id == -1) {
-                return@launch
-            }
             _uiState.value = _uiState.value.copy(isLoading = true)
             /*
             First version

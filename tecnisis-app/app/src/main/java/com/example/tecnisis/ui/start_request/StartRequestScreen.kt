@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -70,7 +71,7 @@ fun StartRequestScreen(
     LaunchedEffect(uiState.creationSuccessful) {
         if (uiState.creationSuccessful) {
             // Waits half a second before navigating to the ListRequests screen
-            delay(500)
+            delay(100)
             navController.navigate(TecnisisScreen.ListRequests.name)
         }
     }

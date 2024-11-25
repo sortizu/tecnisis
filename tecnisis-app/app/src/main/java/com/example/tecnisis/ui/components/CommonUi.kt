@@ -229,10 +229,11 @@ fun ImageCard(
     image: String,  // Replace with actual image resource ID
     title: String,
     date: String,
-    dimensions: String
+    dimensions: String,
+    modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .fillMaxWidth()
             .height(250.dp),

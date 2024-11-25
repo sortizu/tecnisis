@@ -65,7 +65,7 @@ class EconomicRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 val response = TecnisisApi.requestService.getRequest(id)
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        updateRequest(it)
+                        updateRequest(it[0])
                     }
                 } else {
                     _message.value = response.message()

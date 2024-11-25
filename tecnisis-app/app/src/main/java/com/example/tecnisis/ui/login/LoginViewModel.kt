@@ -22,7 +22,9 @@ data class LoginUiState(
     val isLoading: Boolean = false,
     val isLoginSuccessful: Boolean = false,
     val email: String = "",
-    val password: String = ""
+    val password: String = "",
+    val userId: Long = 0,
+    val role: String = "",
 )
 
 class LoginViewModel : ViewModel() {
@@ -32,6 +34,12 @@ class LoginViewModel : ViewModel() {
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
 
+    init {
+        updateIsLoginSuccessful(false)
+        updateMessage("")
+        updateRole("")
+        updateUserId(-1)
+    }
 
     fun emailUpdate(updatedEmail: String) {
         _uiState.value = _uiState.value.copy(email = updatedEmail)
@@ -43,6 +51,14 @@ class LoginViewModel : ViewModel() {
 
     fun updateIsLoginSuccessful(value: Boolean) {
         _uiState.value = _uiState.value.copy(isLoginSuccessful = value)
+    }
+
+    fun updateRole(value: String) {
+        _uiState.value = _uiState.value.copy(role = value)
+    }
+
+    fun updateUserId(value: Long) {
+        _uiState.value = _uiState.value.copy(userId = value)
     }
 
     fun resetMessage() {
@@ -65,7 +81,9 @@ class LoginViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.let {
                         dataStoreManager.saveId(it.id.toString())
+                        updateUserId(it.id)
                         dataStoreManager.saveRole(it.role)
+                        updateRole(it.role)
                         updateIsLoginSuccessful(true)
                         updateMessage("Se ha iniciado sesión correctamente id:{${it.id}} role:{${it.role}}")
                     }

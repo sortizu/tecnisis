@@ -1,15 +1,13 @@
 package com.example.tecnisis.ui.view_request
 
-import androidx.compose.runtime.collectAsState
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.evaluations.ArtisticEvaluationResponse
 import com.example.tecnisis.data.evaluations.EconomicEvaluationResponse
-import com.example.tecnisis.data.request.GeneralRequestInfoResponse
 import com.example.tecnisis.data.request.RequestResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +42,8 @@ class ViewRequestViewModel (requestId: Long): ViewModel()  {
         _uiState.value = _uiState.value.copy(economicEvaluation = evaluation)
     }
     fun updateMessage(message: String){
-        _uiState.value = _uiState.value.copy(message = message)
+        //_uiState.value = _uiState.value.copy(message = message)
+        _message.value = message
     }
     fun updateIsLoading(isLoading: Boolean){
         _uiState.value = _uiState.value.copy(isLoading = isLoading)
@@ -57,14 +56,14 @@ class ViewRequestViewModel (requestId: Long): ViewModel()  {
                 val response = TecnisisApi.requestService.getRequest(id)
                 if (response.isSuccessful){
                     response.body()?.let {
-                        updateRequest(it)
+                        updateRequest(it[0])
                     }
                 }
+
                 else{
-                    _message.value = response.message()
                     updateIsLoading(false)
                     return@launch
-                }
+                }/*
                 val artisticResponse = TecnisisApi.evaluationService.getArtisticEvaluation(id)
                 if (artisticResponse.isSuccessful){
                     artisticResponse.body()?.let {
@@ -76,10 +75,12 @@ class ViewRequestViewModel (requestId: Long): ViewModel()  {
                     economicResponse.body()?.let {
                         updateEconomicEvaluation(it)
                     }
-                }
+                }*/
+                updateIsLoading(false)
             }
             catch(e: Exception){
-                _message.value = e.message
+
+                updateMessage("Error: ${e.message}")
             }
         }
     }

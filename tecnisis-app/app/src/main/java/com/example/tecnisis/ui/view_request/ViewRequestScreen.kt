@@ -1,15 +1,19 @@
 package com.example.tecnisis.ui.view_request
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +30,10 @@ import com.example.tecnisis.ui.theme.TecnisisTheme
 
 @Composable
 fun ViewRequestScreen(
-    currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestEvaluation,
+    currentScreen: TecnisisScreen = TecnisisScreen.ViewRequest,
     viewModel: ViewRequestViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
 ){
     val uiState by viewModel.uiState.collectAsState()
     val message = viewModel.message.observeAsState()
@@ -37,6 +42,13 @@ fun ViewRequestScreen(
     val economicEvaluation = uiState.economicEvaluation
 
     val context = LocalContext.current
+
+    LaunchedEffect(message.value){
+        message.value?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -55,16 +67,21 @@ fun ViewRequestScreen(
                     image = request?.artWork?.image ?: "",
                     title = request?.artWork?.title ?: "",
                     date = request?.date ?: "",
-                    dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString()
+                    dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(10.dp))
                 )
                 HighlightButton(
                     onClick = { },
                     text = stringResource(R.string.inspect_image)
                 )
                 SelectableListItem(
-                    text = stringResource(R.string.technique),
+                    text = stringResource(R.string.technique) + ": " + request?.artWork?.technique?.name,
                     icon = Icons.Filled.ContentCut,
-                    iconDescription = stringResource(R.string.technique)
+                    iconDescription = stringResource(R.string.technique),
+                    clickable = false
                 )
                 SectionHeader(text = stringResource(R.string.request_progress),
                     Modifier
@@ -75,7 +92,8 @@ fun ViewRequestScreen(
                     ProgressCard(
                         order = 1,
                         status = it.status,
-                        stepName = stringResource(R.string.specialist_selection)
+                        stepName = stringResource(R.string.specialist_selection),
+                        clickable = false
                     )
                     if (artisticEvaluation != null){
                         ProgressCard(

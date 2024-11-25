@@ -141,7 +141,7 @@ class StartRequestViewModel: ViewModel() {
                     return@launch
                 }
                 val request = CreateRequest(
-                    "Pendiente",
+                    "Pending",
                     _artworkId
                 )
                 val _requestResponse = TecnisisApi.requestService.createRequest(request)

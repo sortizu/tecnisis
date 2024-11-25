@@ -35,6 +35,7 @@ import com.example.tecnisis.ui.components.CustomEmailField
 import com.example.tecnisis.ui.components.CustomPasswordField
 import com.example.tecnisis.ui.components.InfoBox
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

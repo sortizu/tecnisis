@@ -2,6 +2,7 @@ package com.example.tecnisis.ui.list_user_requests
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,12 +48,8 @@ fun ListUserRequestsScreen(
     // Collect the UI state from the ViewModel
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val requests = viewModel.getFilteredRequests(uiState.filter)
     val dataStoreManager = remember { DataStoreManager(context) }
-
-    Log.i("loadArtistRequests", uiState.isLoading.toString())
-
-    viewModel.loadRole(dataStoreManager)
-    viewModel.loadArtistRequests(dataStoreManager)
 
     Column(
         modifier = Modifier
@@ -61,15 +58,12 @@ fun ListUserRequestsScreen(
             .background(color = Color.Transparent)
     ) {
         // Search bar at the top
-        var searchQuery by remember { mutableStateOf("") }
         ScreenTitle(text = context.getString(currentScreen.title))
         Spacer(modifier = Modifier.height(8.dp))
         SearchBar(
-            query = searchQuery,
-            onQueryChange = { searchQuery = it },
-            onSearch = {
-                //viewModel.filterRequests(searchQuery)  // Optional: Implement search/filter in ViewModel
-            },
+            query = uiState.filter,
+            onQueryChange = { viewModel.updateFilter(it) },
+            onSearch = {},
             active = false,
             onActiveChange = { /* Handle focus changes if needed */ },
             placeholder = { Text("Buscar solicitudes") },
@@ -94,8 +88,6 @@ fun ListUserRequestsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        val requests = uiState.requests
-        Log.i("loadArtistRequests", requests.toString())
         when {
             uiState.isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -111,14 +103,16 @@ fun ListUserRequestsScreen(
 
             else -> {
                 // Display the list of requests if data is loaded successfully
-                LazyColumn {
+                LazyColumn (
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ){
                     items(requests.size) { index ->
                         RequestCard(index + 1, requests[index], onCardClick = {
-                            when {
-                                uiState.role == "ART-EVALUATOR" -> {
+                            when (uiState.role) {
+                                "ART-EVALUATOR" -> {
                                     navController.navigate(TecnisisScreen.ArtisticRequestEvaluation.name + "/${requests[index].id}")
                                 }
-                                uiState.role == "ECONOMIC-EVALUATOR" -> {
+                                "ECONOMIC-EVALUATOR" -> {
                                     navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].id}")
                                 }
                                 else -> {

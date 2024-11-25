@@ -52,7 +52,7 @@ fun SignUpScreen(
     LaunchedEffect(uiState.registrationSuccessful) {
         if (uiState.registrationSuccessful) {
             // Waits half a second before navigating to the ListRequests screen
-            delay(500)
+            delay(100)
             navController.navigate(TecnisisScreen.Login.name)
         }
     }

@@ -14,6 +14,6 @@ interface RequestService {
     @POST("requests/v1/api")
     suspend fun createRequest(@Body request: CreateRequest): Response<RequestResponse>
     @GET("requests/v1/api")
-    suspend fun getRequest(@Query("id") requestId: Long): Response<RequestResponse>
+    suspend fun getRequest(@Query("id") requestId: Long): Response<List<RequestResponse>>
 
 }
