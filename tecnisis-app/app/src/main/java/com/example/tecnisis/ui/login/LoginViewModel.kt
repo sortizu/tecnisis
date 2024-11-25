@@ -39,6 +39,8 @@ class LoginViewModel : ViewModel() {
         updateMessage("")
         updateRole("")
         updateUserId(-1)
+        emailUpdate("")
+        passwordUpdate("")
     }
 
     fun emailUpdate(updatedEmail: String) {
