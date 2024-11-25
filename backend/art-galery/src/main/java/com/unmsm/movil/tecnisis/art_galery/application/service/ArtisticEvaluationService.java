@@ -5,7 +5,7 @@ import com.unmsm.movil.tecnisis.art_galery.application.ports.output.ArtisticEval
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.DocumentPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.RequestPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
-import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtisticEvaluationNotFundException;
+import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtisticEvaluationNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.DocumentNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.RequestNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.SpecialistNotFoundException;

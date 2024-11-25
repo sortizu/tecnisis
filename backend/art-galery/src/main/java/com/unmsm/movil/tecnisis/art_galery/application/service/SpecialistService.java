@@ -5,6 +5,7 @@ import com.unmsm.movil.tecnisis.art_galery.application.ports.output.PersonPersis
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.SpecialistNotFoundException;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Specialist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,20 @@ public class SpecialistService implements SpecialistServicePort {
     @Override
     public List<Specialist> findAll() {
         return specialistPersistencePort.findAll();
+    }
+
+    @Override
+    public List<Request> findArtisticRequestsBySpecialistId(Long id) {
+        return specialistPersistencePort.findById(id)
+                .map(s -> specialistPersistencePort.findArtisticRequestsBySpecialistId(s.getId()))
+                .orElseThrow(SpecialistNotFoundException::new);
+    }
+
+    @Override
+    public List<Request> findEconomicRequestsBySpecialistId(Long id) {
+        return specialistPersistencePort.findById(id)
+                .map(s -> specialistPersistencePort.findEconomicRequestsBySpecialistId(s.getId()))
+                .orElseThrow(SpecialistNotFoundException::new);
     }
 
     @Override

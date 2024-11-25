@@ -2,7 +2,9 @@ package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persi
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.ArtistPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Artist;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.mapper.ArtistPersistenceMapper;
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.mapper.RequestPersistenceMapper;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.repository.ArtistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ public class ArtistPersistenceAdapter implements ArtistPersistencePort {
 
     private final ArtistRepository artistRepository;
     private final ArtistPersistenceMapper artistMapper;
+    private final RequestPersistenceMapper requestMapper;
 
     @Override
     public Optional<Artist> findById(Long id) {
@@ -25,6 +28,11 @@ public class ArtistPersistenceAdapter implements ArtistPersistencePort {
     @Override
     public List<Artist> findAll() {
         return artistMapper.toArtistList(artistRepository.findAll());
+    }
+
+    @Override
+    public List<Request> findRequestsByArtistId(Long artistId) {
+        return requestMapper.toRequestList(artistRepository.findRequestsById(artistId));
     }
 
     @Override

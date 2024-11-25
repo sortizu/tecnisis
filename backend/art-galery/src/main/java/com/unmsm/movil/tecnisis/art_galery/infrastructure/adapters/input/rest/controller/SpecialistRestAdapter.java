@@ -1,12 +1,10 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.controller;
 
-import com.unmsm.movil.tecnisis.art_galery.application.ports.input.ArtistServicePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.input.SpecialistServicePort;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.ArtistRestMapper;
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.RequestRestMapper;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.SpecialistRestMapper;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request.ArtistCreateRequest;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request.SpecialistCreateRequest;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.ArtistResponse;
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.RequestResponse;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.SpecialistResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,22 +22,39 @@ import java.util.List;
 public class SpecialistRestAdapter {
 
     private final SpecialistServicePort servicePort;
-    private final SpecialistRestMapper restMapper;
+    private final SpecialistRestMapper specialistMapper;
+    private final RequestRestMapper requestMapper;
 
     @GetMapping("/v1/api")
     public List<SpecialistResponse> findAll() {
-        return restMapper.toSpecialistResponseList(servicePort.findAll());
+        return specialistMapper.toSpecialistResponseList(servicePort.findAll());
     }
 
     @GetMapping("/v1/api/{id}")
     public SpecialistResponse findById(@PathVariable Long id) {
-        return restMapper.toSpecialistResponse(servicePort.findById(id));
+        return specialistMapper.toSpecialistResponse(servicePort.findById(id));
+    }
+
+    @GetMapping("/v1/api/artisticRequests/{id}")
+    public List<RequestResponse> findArtisticRequestsById(@PathVariable Long id) {
+        return requestMapper
+                .toRequestResponseList(
+                        servicePort.findArtisticRequestsBySpecialistId(id)
+                );
+    }
+
+    @GetMapping("/v1/api/economicRequests/{id}")
+    public List<RequestResponse> findEconomicRequestsById(@PathVariable Long id) {
+        return requestMapper
+                .toRequestResponseList(
+                        servicePort.findEconomicRequestsBySpecialistId(id)
+                );
     }
 
     @PostMapping("/v1/api")
     public ResponseEntity<SpecialistResponse> save(@Valid @RequestBody SpecialistCreateRequest request) {
-        SpecialistResponse response = restMapper.toSpecialistResponse(
-                servicePort.save(restMapper.toSpecialist(request)));
+        SpecialistResponse response = specialistMapper.toSpecialistResponse(
+                servicePort.save(specialistMapper.toSpecialist(request)));
         return ResponseEntity
                 .created(URI.create("/specialists/v1/api/" + response.getId()))
                 .body(response);
@@ -47,8 +62,8 @@ public class SpecialistRestAdapter {
 
     @PutMapping("/v1/api/{id}")
     public SpecialistResponse update(@Valid @RequestBody SpecialistCreateRequest request, @PathVariable Long id) {
-        return restMapper.toSpecialistResponse(
-                servicePort.update(id, restMapper.toSpecialist(request))
+        return specialistMapper.toSpecialistResponse(
+                servicePort.update(id, specialistMapper.toSpecialist(request))
         );
     }
 

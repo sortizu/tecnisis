@@ -14,11 +14,10 @@ public enum ErrorCatalog {
     SPECIALIST_NOT_FOUND("ERR_SPE_001", "Specialist not found"),
     DOCUMENT_NOT_FOUND("ERR_DOC_001", "Document not found"),
     ARTISTIC_EVALUATION_NOT_FOUND("ERR_AVA_001", "Artistic evaluation not found"),
+    ECONOMIC_EVALUATION_NOT_FOUND("ERR_EVA_001", "Economic evaluation not found"),
+    USER_NOT_FOUND("ERR_USR_001", "User not found"),
     INVALID_PARAMETER("ERR_GEN_001", "Invalid parameter"),
-    GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred"),
-    ACCOUNT_LOCKED("ERR_ACC_001", "Account is locked due to too many failed login attempts"),
-    INVALID_CREDENTIALS("ERR_ACC_002", "Invalid credentials"),
-    INVALID_ROLE("ERR_ACC_003","Invalid role");
+    GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred");
 
     private final String code;
     private final String message;
