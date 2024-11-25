@@ -15,6 +15,7 @@ public enum ErrorCatalog {
     DOCUMENT_NOT_FOUND("ERR_DOC_001", "Document not found"),
     ARTISTIC_EVALUATION_NOT_FOUND("ERR_AVA_001", "Artistic evaluation not found"),
     ECONOMIC_EVALUATION_NOT_FOUND("ERR_EVA_001", "Economic evaluation not found"),
+    USER_NOT_FOUND("ERR_USR_001", "User not found"),
     INVALID_PARAMETER("ERR_GEN_001", "Invalid parameter"),
     GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred");
 

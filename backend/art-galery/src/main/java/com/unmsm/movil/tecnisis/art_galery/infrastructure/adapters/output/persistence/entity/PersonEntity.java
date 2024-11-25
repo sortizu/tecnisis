@@ -1,5 +1,6 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,4 +26,10 @@ public class PersonEntity {
 
     @Column(name = "user_role")
     private String role;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user", nullable = true)
+    @JsonManagedReference
+    private UserEntity user;
+
 }

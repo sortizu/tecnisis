@@ -98,10 +98,20 @@ public class GlobalControllerAdvice {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EconomicEvaluationNotFoundException.class)
-    public ErrorResponse handleEconomicEvaluationNotFoundException(){
+    public ErrorResponse handleEconomicEvaluationNotFoundException() {
         return ErrorResponse.builder()
                 .code(ECONOMIC_EVALUATION_NOT_FOUND.getCode())
                 .message(ECONOMIC_EVALUATION_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UserNotFoundException.class)
+    public ErrorResponse handleUserNotFoundException() {
+        return ErrorResponse.builder()
+                .code(USER_NOT_FOUND.getCode())
+                .message(USER_NOT_FOUND.getMessage())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }
