@@ -17,7 +17,8 @@ public enum ErrorCatalog {
     INVALID_PARAMETER("ERR_GEN_001", "Invalid parameter"),
     GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred"),
     ACCOUNT_LOCKED("ERR_ACC_001", "Account is locked due to too many failed login attempts"),
-    INVALID_CREDENTIALS("ERR_ACC_002", "Invalid credentials");
+    INVALID_CREDENTIALS("ERR_ACC_002", "Invalid credentials"),
+    INVALID_ROLE("ERR_ACC_003","Invalid role");
 
     private final String code;
     private final String message;

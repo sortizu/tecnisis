@@ -1,8 +1,11 @@
 package com.unmsm.movil.tecnisis.art_galery.application.service;
 
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.ArtistPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.LoginPersistencePort;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.Person;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.User;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.ManagerPersistencePort;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
+import com.unmsm.movil.tecnisis.art_galery.domain.exception.InvalidRoleException;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.*;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -14,9 +17,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RegisterService {
 
-    private static final Logger log = LoggerFactory.getLogger(RegisterService.class);
-
     private final LoginPersistencePort userPersistencePort;
+    private final ArtistPersistencePort artistPersistencePort;
+    private final ManagerPersistencePort managerPersistencePort;
+    private final SpecialistPersistencePort specialistPersistencePort;
     private final PasswordEncoder passwordEncoder;
 
     public User register(RegisterRequest request) {
@@ -31,24 +35,33 @@ public class RegisterService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
         user.setPerson(person);
-        person.setUser(user);
-
-        log.info("Before save - User entity: {}", user);
-        log.info("Before save - Person entity: {}", person);
-        log.info("Person's User: {}", person.getUser());
-        log.info("User's Person: {}", user.getPerson());
 
         User savedUser = userPersistencePort.save(user);
 
-        log.info("After save - User entity: {}", savedUser);
-        log.info("After save - Person entity: {}", savedUser.getPerson());
-        log.info("Person's User after save: {}", savedUser.getPerson().getUser());
+        switch (request.getUserRole().toLowerCase()) {
+            case "artist":
+                Artist artist = new Artist();
+                artist.setPerson(savedUser.getPerson());
+                artistPersistencePort.save(artist);
+                break;
+            case "manager":
+                Manager manager = new Manager();
+                manager.setPerson(savedUser.getPerson());
+                managerPersistencePort.save(manager);
+                break;
+            case "specialist":
+                Specialist specialist = new Specialist();
+                specialist.setPerson(savedUser.getPerson());
+                specialist.setIsAvailable(true);
+                specialistPersistencePort.save(specialist);
+                break;
+            default:
+                throw new InvalidRoleException("Invalid role: " + request.getUserRole());
+        }
 
         return savedUser;
     }
-
-
 }
+
 
