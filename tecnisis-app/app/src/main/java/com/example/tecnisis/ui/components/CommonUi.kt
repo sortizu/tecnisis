@@ -1,8 +1,11 @@
 package com.example.tecnisis.ui.components
 
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -32,53 +34,32 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.Card
 import androidx.compose.ui.draw.clip
 import com.example.tecnisis.R
 import androidx.compose.material3.*
 import androidx.compose.ui.layout.ContentScale
-import com.example.tecnisis.data.solicitud.Solicitud
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.SquareFoot
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Popup
-import com.example.tecnisis.data.obra.Obra
-import com.example.tecnisis.ui.list_artist_requests.data.GeneralUserRequestInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@Composable
-fun FloatingButton(
-    onClick: () -> Unit,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-){
-    FloatingActionButton(
-        onClick = onClick,
-        containerColor = Color.White,
-        contentColor = Color.Red,
-        modifier = modifier
-            .size(75.dp)
-//            .offset(x = screenWidth - 100.dp, y = screenHeight - 150.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = "Add Request",
-            modifier = Modifier.size(32.dp)
-        )
-    }
-}
 
 // Patron de la parte inferior de la pantalla
 @Composable
@@ -110,61 +91,17 @@ fun ScreenTitle(modifier: Modifier = Modifier, text: String) {
         modifier = modifier
     ) {
         HorizontalDivider(thickness = 1.dp)
-        Text(text = text, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray))
+        SectionHeader(text = text)
     }
 }
 
 @Composable
-fun RequestList(requests: List<GeneralUserRequestInfo>) {
-    LazyColumn {
-        items(requests.size) { index ->
-            RequestCard(index + 1, requests[index])
-        }
-    }
+fun SectionHeader(text: String, modifier: Modifier = Modifier){
+    Text(text = text,
+        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.Gray),
+        modifier = modifier)
 }
 
-@Composable
-fun RequestCard(orden: Int, request: GeneralUserRequestInfo) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 0.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Priority Circle
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color.Red),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = orden.toString(), color = Color.White)
-            }
-
-            // Request details
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 16.dp)
-            ) {
-                Text(text = request.artworkTitle , fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = request.status , fontSize = 14.sp, color = Color.Gray)
-            }
-            // Imagen de la obra
-            Image(
-                painter = painterResource(id = R.drawable.media),
-                contentDescription = "Obra",
-                modifier = Modifier.size(100.dp)
-            )
-        }
-    }
-}
 
 @Composable
 fun InfoBox(
@@ -189,10 +126,12 @@ fun InfoBox(
         )
     }
 }
-
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDocked() {
+fun DatePickerDocked(
+    onValueChange: (String) -> Unit = {}
+) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
@@ -204,7 +143,7 @@ fun DatePickerDocked() {
     ) {
         OutlinedTextField(
             value = selectedDate,
-            onValueChange = { },
+            onValueChange = onValueChange,
             label = { Text(stringResource(R.string.date_of_realisation)) },
             readOnly = true,
             trailingIcon = {
@@ -284,29 +223,149 @@ fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
 }
-
+*/
 @Composable
-fun SelectableListItem(
-    text: String,
-    icon: ImageVector,
-    iconDescription: String
+fun ImageCard(
+    image: String,  // Replace with actual image resource ID
+    title: String,
+    date: String,
+    dimensions: String,
+    modifier: Modifier = Modifier
 ) {
-    Column {
-        ListItem(
-            headlineContent = { Text(text) },
-            leadingContent = {
-                Icon(
-                    icon,
-                    contentDescription = iconDescription,
+    Surface(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .fillMaxWidth()
+            .height(250.dp),
+        color = Color.LightGray
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Background image with scaling
+
+            if (image.isNotEmpty()) {
+                val imageBytes = Base64.decode(image, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-            },
-            trailingContent = {
-                Icon(
-                    Icons.Default.ArrowRight,
-                    contentDescription = "Open Modal"
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.media),
+                    contentDescription = "Placeholder Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
+
+
+            // Bottom-left title text
+            Text(
+                text = title,
+                color = Color.Black,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
+            )
+
+            // Top-right date and dimensions labels
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+            ) {
+                LabelItem(text = date, icon = Icons.Filled.CalendarToday)
+                Spacer(modifier = Modifier.height(4.dp))
+                LabelItem(text = dimensions, icon = Icons.Filled.SquareFoot)
+            }
+        }
+    }
+}
+
+@Composable
+fun LabelItem(text: String, icon: ImageVector) { // Change icon type to ImageVector
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0xFFEFEFEF))
+            .padding(horizontal = 4.dp, vertical = 2.dp)
+    ) {
+        Icon( // Use Icon composable instead of Image
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp)
         )
-        HorizontalDivider()
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            color = Color.Black,
+            fontSize = 12.sp
+        )
+    }
+}
+
+// Added from: https://gist.github.com/kirmartuk/a93fb5519ac44bb6170ce800d3b76ef8
+@Composable
+fun SingleChoiceDialog(
+    title: String,
+    radioOptions: List<String>,
+    indexOfDefault: Int,
+    isDialogVisible: (Boolean) -> Unit = {},
+    onSelectedItem: (String) -> Unit = {},
+    onSelectedItemIndex: (Int) -> Unit = {}
+) {
+    val (selectedItemIndex, setSelectedItemIndex) = remember {
+        mutableStateOf(indexOfDefault)
+    }
+    AlertDialog(
+        title = { Text(text = title) },
+        text = {
+            RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex)
+        },
+        onDismissRequest = {
+            isDialogVisible(false)
+        },
+        dismissButton = {
+            TextButton(onClick = { isDialogVisible(false) }) {
+                Text(text = "Cancelar")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                isDialogVisible(false)
+                onSelectedItem(radioOptions[selectedItemIndex])
+                onSelectedItemIndex(selectedItemIndex)
+            }) {
+                Text(text = "OK")
+            }
+        }
+    )
+}
+
+@Composable
+fun RadioItem(items: List<String>, selectedItemIndex: Int, setIndexOfSelected: (Int) -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        items.forEachIndexed { index, text ->
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    setIndexOfSelected(index)
+                }) {
+                RadioButton(
+                    selected = (index == selectedItemIndex),
+                    onClick = {
+                        setIndexOfSelected(index)
+                    }
+                )
+                Text(
+                    text = text
+                )
+            }
+        }
     }
 }

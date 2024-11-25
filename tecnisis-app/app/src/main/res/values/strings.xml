@@ -19,4 +19,21 @@
     <string name="dni">DNI</string>
     <string name="phone">Teléfono</string>
     <string name="address">Dirección</string>
+    <string name="artistic_request_evaluation">Evaluación artística de solicitud</string>
+    <string name="view_request">Ver solicitud</string>
+    <string name="inspect_image">Inspeccionar imagen</string>
+    <string name="technique">Técnica</string>
+    <string name="request_progress">Progreso de solicitud</string>
+    <string name="specialist_selection">Selección de especialista</string>
+    <string name="artistic_evaluation">Evaluación artística</string>
+    <string name="economic_evaluation">Evaluación económica</string>
+    <string name="finished">Finalizado</string>
+    <string name="artwork_title">Título de obra</string>
+    <string name="width">Ancho</string>
+    <string name="height">Alto</string>
+    <string name="attach_review_document">Adjuntar documento de revisión</string>
+    <string name="select_a_date">Seleccionar fecha</string>
+    <string name="economic_request_evaluation">Evaluación económica de solicitud</string>
+    <string name="fill_fields">Por favor, complete todos los campos</string>
+    <string name="profile">Perfil</string>
 </resources>

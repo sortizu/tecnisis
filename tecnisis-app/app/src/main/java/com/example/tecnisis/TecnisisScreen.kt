@@ -1,5 +1,6 @@
 package com.example.tecnisis
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,33 +15,46 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.tecnisis.data.user.UserRepository
-import com.example.tecnisis.ui.list_artist_requests.ListRequestsScreen
+import com.example.tecnisis.config.datastore.DataStoreManager
+import com.example.tecnisis.ui.artistic_request_evaluation.ArtisticRequestEvaluationViewModel
+import com.example.tecnisis.ui.artistic_request_evaluation.ArtisticRequestReviewScreen
+import com.example.tecnisis.ui.list_user_requests.ListUserRequestsScreen
 import com.example.tecnisis.ui.login.LoginScreen
 import com.example.tecnisis.ui.sign_up.SignUpScreen
 import com.example.tecnisis.ui.start_request.StartRequestScreen
 import com.example.tecnisis.ui.components.BottomPattern
-import com.example.tecnisis.ui.list_artist_requests.ListArtistRequestsViewModel
+import com.example.tecnisis.ui.components.CustomFloatingButton
+import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvaluationScreen
+import com.example.tecnisis.ui.economic_request_evaluation.EconomicRequestEvaluationViewModel
+import com.example.tecnisis.ui.list_user_requests.ListUserRequestsViewModel
 import com.example.tecnisis.ui.login.LoginViewModel
+import com.example.tecnisis.ui.profile.ProfileScreen
+import com.example.tecnisis.ui.profile.ProfileScreenViewModel
 import com.example.tecnisis.ui.sign_up.SignUpViewModel
-import kotlinx.coroutines.CoroutineScope
+import com.example.tecnisis.ui.start_request.StartRequestViewModel
+import com.example.tecnisis.ui.view_request.ViewRequestScreen
+import com.example.tecnisis.ui.view_request.ViewRequestViewModel
 
 enum class TecnisisScreen(@StringRes val title: Int) {
     Login(title = R.string.iniciar_sesion),
     SignUp(title = R.string.crear_cuenta),
     ListRequests(title = R.string.lista_de_solicitudes),
-    StartRequest(title = R.string.iniciar_solicitud)
+    StartRequest(title = R.string.iniciar_solicitud),
+    ArtisticRequestEvaluation(title = R.string.artistic_request_evaluation),
+    EconomicRequestEvaluation(title = R.string.economic_request_evaluation),
+    ViewRequest(title = R.string.view_request),
+    Profile(title = R.string.profile)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,14 +95,22 @@ fun TecnisisTopAppBar(onProfileClick: () -> Unit) {
 }
 
 @Composable
-fun TecnisisApp(userRepository: UserRepository) {
+fun TecnisisApp() {
     val navController = rememberNavController()
+    val context = LocalContext.current
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = TecnisisScreen.valueOf(
-        backStackEntry?.destination?.route ?: TecnisisScreen.ListRequests.name
-    )
-
-    val userId = remember { mutableStateOf(0) }
+    var currentRoute = backStackEntry?.destination?.route
+    if (currentRoute != null){
+        val splittedStr = currentRoute.split("/")
+        if (splittedStr.size > 1){
+            currentRoute = splittedStr[0]
+        }
+    }else{
+        currentRoute = TecnisisScreen.Login.name
+    }
+    val currentScreen = TecnisisScreen.valueOf(currentRoute)
+    val dataStoreManager = remember { DataStoreManager(context) }
+    val enableFloatingActionButton = remember { mutableStateOf(true) }
     val floatingButtonPressed = remember { mutableStateOf({}) }
     val errorMessage = remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -99,13 +121,25 @@ fun TecnisisApp(userRepository: UserRepository) {
                 TecnisisTopAppBar(onProfileClick = {})
             }
         },
-        floatingActionButton = {
-            TecnisisFloatingActionButton(
-                currentScreen = currentScreen,
-                snackbarHostState = snackbarHostState,
-                onFloatingButtonClick = floatingButtonPressed,
-                errorMessage = errorMessage
-            )
+        floatingActionButton =
+        {
+            if (enableFloatingActionButton.value){
+                val icon = when (currentScreen) {
+                    TecnisisScreen.Login -> Icons.AutoMirrored.Filled.ArrowForward
+                    TecnisisScreen.SignUp -> Icons.Default.ArrowForward
+                    TecnisisScreen.ListRequests -> Icons.Default.Add
+                    TecnisisScreen.StartRequest -> Icons.Default.Save
+                    TecnisisScreen.ArtisticRequestEvaluation -> Icons.Default.Save
+                    TecnisisScreen.EconomicRequestEvaluation -> Icons.Default.Save
+                    TecnisisScreen.Profile -> Icons.Default.Save
+                    TecnisisScreen.ViewRequest -> Icons.Default.Save
+                }
+                CustomFloatingButton(
+                    onClick = floatingButtonPressed.value,
+                    icon = icon,
+                    modifier = Modifier.size(75.dp)
+                )
+            }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
@@ -121,56 +155,69 @@ fun TecnisisApp(userRepository: UserRepository) {
                     viewModel = viewModel(modelClass = LoginViewModel::class.java),
                     navController = navController,
                     onLogin = floatingButtonPressed,
-
+                    snackbarHostState = snackbarHostState
                 )
             }
             composable(route = TecnisisScreen.SignUp.name) {
                 SignUpScreen(
                     viewModel = viewModel(modelClass = SignUpViewModel::class.java),
                     navController = navController,
-                    onSignUp = floatingButtonPressed
+                    onSignUp = floatingButtonPressed,
+                    snackbarHostState = snackbarHostState
                 )
             }
             composable(route = TecnisisScreen.ListRequests.name) {
-                ListRequestsScreen(
-                    viewModel = viewModel(modelClass = ListArtistRequestsViewModel::class.java),
+                ListUserRequestsScreen(
+                    viewModel = ListUserRequestsViewModel(dataStoreManager),
+                    enableFloatingActionButton = enableFloatingActionButton,
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed
                 )
             }
             composable(route = TecnisisScreen.StartRequest.name) {
-                StartRequestScreen()
+                StartRequestScreen(
+                    viewModel = viewModel(modelClass = StartRequestViewModel::class.java),
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    onStartRequest = floatingButtonPressed
+                )
+            }
+            composable(route = TecnisisScreen.ArtisticRequestEvaluation.name) {
+                val requestId = it.arguments?.getString("requestId")?.toLong()
+                ArtisticRequestReviewScreen(
+                    viewModel = ArtisticRequestEvaluationViewModel(requestId!!,dataStoreManager),
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed
+                )
+            }
+            composable(route = TecnisisScreen.EconomicRequestEvaluation.name) {
+                val requestId = it.arguments?.getString("requestId")?.toLong()
+                EconomicRequestEvaluationScreen(
+                    viewModel = EconomicRequestEvaluationViewModel(requestId!!,dataStoreManager),
+                    navController = navController
+                )
+            }
+            composable(route = TecnisisScreen.ViewRequest.name + "/{requestId}") {
+                enableFloatingActionButton.value = false
+                val requestId = it.arguments?.getString("requestId")?.toLong()
+                ViewRequestScreen(
+                    viewModel = ViewRequestViewModel(requestId!!),
+                    snackbarHostState = snackbarHostState
+                )
+            }
+            composable(route = TecnisisScreen.Profile.name) {
+                val idPerson = it.arguments?.getString("idPerson")?.toLong()
+                ProfileScreen(
+                    viewModel = ProfileScreenViewModel(idPerson!!),
+                    navController = navController,
+                    floatingButtonPressed = floatingButtonPressed
+                )
             }
         }
         BottomPattern()
     }
 }
 
-@Composable
-fun TecnisisFloatingActionButton(
-    currentScreen: TecnisisScreen,
-    snackbarHostState: SnackbarHostState,
-    onFloatingButtonClick: MutableState<() -> Unit>,
-    errorMessage: MutableState<String>
-) {
-    val icon = when (currentScreen) {
-        TecnisisScreen.Login -> Icons.AutoMirrored.Filled.ArrowForward
-        TecnisisScreen.SignUp -> Icons.Default.ArrowForward
-        TecnisisScreen.ListRequests -> Icons.Default.Add
-        TecnisisScreen.StartRequest -> Icons.Default.Save
-    }
-    FloatingActionButton(
-        onClick = onFloatingButtonClick.value,
-        containerColor = Color.Red,
-        modifier = Modifier.size(60.dp)
-    ) {
-        Icon(imageVector = icon, contentDescription = null, tint = Color.White)
-    }
-    if (errorMessage.value.isNotEmpty()) {
-        LaunchedEffect(errorMessage.value) {
-            snackbarHostState.showSnackbar(errorMessage.value)
-            errorMessage.value = ""
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
