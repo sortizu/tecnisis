@@ -1,39 +1,86 @@
 package com.example.tecnisis.ui.view_request
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
-import com.example.tecnisis.data.request.GeneralRequestInfoResponse
+import com.example.tecnisis.data.evaluations.ArtisticEvaluationResponse
+import com.example.tecnisis.data.evaluations.EconomicEvaluationResponse
+import com.example.tecnisis.data.request.RequestResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ViewRequestViewModel: ViewModel()  {
-    private val _request = MutableLiveData<GeneralRequestInfoResponse>()
-    val request: LiveData<GeneralRequestInfoResponse> = _request
+data class ViewRequestUiState(
+    val request: RequestResponse? = null,
+    val artisticEvaluation: ArtisticEvaluationResponse? = null,
+    val economicEvaluation: EconomicEvaluationResponse? = null,
+    val message: String = "",
+    val isLoading: Boolean = false
+)
+
+class ViewRequestViewModel (requestId: Long): ViewModel()  {
+    private val _uiState = MutableStateFlow(ViewRequestUiState())
+    val uiState: StateFlow<ViewRequestUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
 
-    fun getRequest(id: Int){
-        _isLoading.value = true
+    init{
+        getRequest(requestId)
+    }
+
+    fun updateRequest(request: RequestResponse){
+        _uiState.value = _uiState.value.copy(request = request)
+    }
+    fun updateArtisticEvaluation(evaluation: ArtisticEvaluationResponse){
+        _uiState.value = _uiState.value.copy(artisticEvaluation = evaluation)
+    }
+    fun updateEconomicEvaluation(evaluation: EconomicEvaluationResponse){
+        _uiState.value = _uiState.value.copy(economicEvaluation = evaluation)
+    }
+    fun updateMessage(message: String){
+        //_uiState.value = _uiState.value.copy(message = message)
+        _message.value = message
+    }
+    fun updateIsLoading(isLoading: Boolean){
+        _uiState.value = _uiState.value.copy(isLoading = isLoading)
+    }
+
+    fun getRequest(id: Long){
+        updateIsLoading(true)
         viewModelScope.launch {
             try{
-                val response = TecnisisApi.viewRequestService.getGeneralRequestInfo(id)
+                val response = TecnisisApi.requestService.getRequest(id)
                 if (response.isSuccessful){
                     response.body()?.let {
-                        _request.value = it
-                        _isLoading.value = false
+                        updateRequest(it[0])
                     }
                 }
+
                 else{
-                    _message.value = response.message()
+                    updateIsLoading(false)
+                    return@launch
+                }/*
+                val artisticResponse = TecnisisApi.evaluationService.getArtisticEvaluation(id)
+                if (artisticResponse.isSuccessful){
+                    artisticResponse.body()?.let {
+                        updateArtisticEvaluation(it)
+                    }
                 }
+                val economicResponse = TecnisisApi.evaluationService.getEconomicEvaluation(id)
+                if (economicResponse.isSuccessful) {
+                    economicResponse.body()?.let {
+                        updateEconomicEvaluation(it)
+                    }
+                }*/
+                updateIsLoading(false)
             }
             catch(e: Exception){
-                _message.value = e.message
+
+                updateMessage("Error: ${e.message}")
             }
         }
     }

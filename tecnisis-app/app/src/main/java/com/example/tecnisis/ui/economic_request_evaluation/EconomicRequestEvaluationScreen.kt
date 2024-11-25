@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -17,27 +17,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
-import com.example.tecnisis.ui.artistic_request_evaluation.ArtisticRequestEvaluationViewModel
+import com.example.tecnisis.ui.components.CustomDatePickerField
 import com.example.tecnisis.ui.components.CustomNumberField
-import com.example.tecnisis.ui.components.CustomSingleChoiceSegmentedButton
-import com.example.tecnisis.ui.components.DatePickerDocked
 import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SelectableListItem
 
 @Composable
-fun ArtisticRequestReviewScreen(
-    currentScreen: TecnisisScreen = TecnisisScreen.ArtisticRequestEvaluation,
-    viewModel: EconomicRequestEvaluationViewModel = EconomicRequestEvaluationViewModel(),
-    modifier: Modifier = Modifier
+fun EconomicRequestEvaluationScreen(
+    currentScreen: TecnisisScreen = TecnisisScreen.EconomicRequestEvaluation,
+    viewModel: EconomicRequestEvaluationViewModel,
+    modifier: Modifier = Modifier,
+    navController: NavController
 ){
     val context = LocalContext.current
-    val salePrice by viewModel.salePrice.observeAsState(0.0)
-    val galleryPercentage by viewModel.galleryPercentage.observeAsState(0.0)
-    val document by viewModel.document.observeAsState("")
+    val uiState by viewModel.uiState.collectAsState()
+    val request = uiState.request
     val message by viewModel.message.observeAsState("")
 
     Column(
@@ -52,10 +51,10 @@ fun ArtisticRequestReviewScreen(
         ScreenTitle(text = context.getString(currentScreen.title))
         // Image upload area
         ImageCard(
-            imageResource = R.drawable.media,
-            title = "Artwork Title",
-            date = "dd/MM/YYYY",
-            dimensions = "ww x hh"
+            image = request!!.artWork.image,
+            title = request.artWork.title,
+            date = request.artWork.creationDate,
+            dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString()
         )
         SelectableListItem(
             text = "Resultados de evaluacion artística",
@@ -80,7 +79,12 @@ fun ArtisticRequestReviewScreen(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        DatePickerDocked()
+        CustomDatePickerField(
+            defaultDate = "",
+            onDateSelected = {
+                viewModel.updateDate(it.toString())
+            }
+        )
         HighlightButton(
             text = stringResource(R.string.attach_review_document),
             onClick = {}
@@ -91,5 +95,4 @@ fun ArtisticRequestReviewScreen(
 @Preview(showBackground = true)
 @Composable
 fun ArtisticRequestReviewScreenPreview() {
-    ArtisticRequestReviewScreen()
 }

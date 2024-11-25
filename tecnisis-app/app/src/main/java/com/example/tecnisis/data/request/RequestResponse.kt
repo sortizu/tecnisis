@@ -1,10 +1,12 @@
 package com.example.tecnisis.data.request
 
 import com.example.tecnisis.data.artwork.ArtworkResponse
+import com.google.gson.annotations.SerializedName
 
 data class RequestResponse(
-    val idRequest: Long,
-    val request_date: String,
+    val id: Long,
+    val date: String,
     val status: String,
-    val artwork: ArtworkResponse
+    @SerializedName("art_work")
+    val artWork: ArtworkResponse
 )

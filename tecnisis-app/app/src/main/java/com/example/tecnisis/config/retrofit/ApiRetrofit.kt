@@ -1,8 +1,11 @@
 package com.example.tecnisis.config.retrofit
 
+import com.example.tecnisis.data.artwork.ArtworkService
 import com.example.tecnisis.data.evaluations.EvaluationService
+import com.example.tecnisis.data.person.PersonService
+import com.example.tecnisis.data.request.RequestService
+import com.example.tecnisis.data.specialist.SpecialistService
 import com.example.tecnisis.data.technique.TechniquesService
-import com.example.tecnisis.ui.list_user_requests.data.ListUserRequestsService
 import com.example.tecnisis.ui.login.data.LoginService
 import com.example.tecnisis.ui.sign_up.data.SignUpService
 import com.example.tecnisis.ui.start_request.data.StartRequestService
@@ -12,7 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val BASE_URL = "http://192.168.18.13:8080/api/auth/"
+private const val BASE_URL = "http://192.168.18.13:8080/"
 
 // Configura el interceptor para los logs de Retrofit
 private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -43,19 +46,22 @@ object TecnisisApi {
     val loginService: LoginService by lazy {
         retrofit.create(LoginService::class.java)
     }
-    val listUserRequestsService: ListUserRequestsService by lazy {
-        retrofit.create(ListUserRequestsService::class.java)
+    val artworkService: ArtworkService by lazy {
+        retrofit.create(ArtworkService::class.java)
     }
-    val viewRequestService: ViewRequestService by lazy {
-        retrofit.create(ViewRequestService::class.java)
-    }
-    val startRequestService: StartRequestService by lazy {
-        retrofit.create(StartRequestService::class.java)
-    }
-    val TechniquesService: TechniquesService by lazy {
+    val techniquesService: TechniquesService by lazy {
         retrofit.create(TechniquesService::class.java)
     }
     val evaluationService: EvaluationService by lazy {
         retrofit.create(EvaluationService::class.java)
+    }
+    val specialistService: SpecialistService by lazy {
+        retrofit.create(SpecialistService::class.java)
+    }
+    val requestService: RequestService by lazy {
+        retrofit.create(RequestService::class.java)
+    }
+    val personService: PersonService by lazy {
+        retrofit.create(PersonService::class.java)
     }
 }

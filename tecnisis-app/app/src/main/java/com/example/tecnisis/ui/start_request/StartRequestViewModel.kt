@@ -1,73 +1,104 @@
 package com.example.tecnisis.ui.start_request
 
+import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.artwork.ArtworkRequest
+import com.example.tecnisis.data.request.CreateRequest
 import com.example.tecnisis.data.technique.TechniqueResponse
+import com.example.tecnisis.ui.components.convertMillisToDate
 import com.example.tecnisis.ui.login.data.LoginRequest
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
+data class StartRequestUiState(
+    val artworkTitle: String = "",
+    val image: String = "",
+    val height: Double = 0.0,
+    val width: Double = 0.0,
+    val date: String = "",
+    val techniqueIndex: Int = 0,
+    val creationSuccessful: Boolean = false,
+    val techniques: List<TechniqueResponse> = emptyList(),
+    val message: String = "",
+    val isDialogVisible: Boolean = false
+)
+
 class StartRequestViewModel: ViewModel() {
-    private val _artworkTitle = MutableLiveData("")
-    val artworkTitle: LiveData<String> = _artworkTitle
-    private val _image = MutableLiveData("")
-    val image: LiveData<String> = _image
-    private val _height = MutableLiveData(0.0)
-    val height: LiveData<Double> = _height
-    private val _width = MutableLiveData(0.0)
-    val width: LiveData<Double> = _width
-    private val _date = MutableLiveData("")
-    val date: LiveData<String> = _date
-    private val _techniqueId = MutableLiveData(-1L)
-    val techniqueId : LiveData<Long> = _techniqueId
-    private val _message = MutableLiveData<String>()
-    val message: LiveData<String> = _message
-    private val _techniqueResponses = MutableLiveData<List<TechniqueResponse>>()
-    val techniqueResponses: LiveData<List<TechniqueResponse>> = _techniqueResponses
-    private val _isDialogVisible = MutableLiveData(false)
-    val isDialogVisible: LiveData<Boolean> = _isDialogVisible
+    private val _uiState = MutableStateFlow(StartRequestUiState())
+    val uiState: StateFlow<StartRequestUiState> = _uiState.asStateFlow()
+
+    init {
+        loadTechniques()
+        // Sets the current day using the format dd/MM/yyyy
+        updateDate(System.currentTimeMillis())
+    }
 
     fun updateArtworkTitle(newTitle: String) {
-        _artworkTitle.value = newTitle
+        _uiState.value = _uiState.value.copy(artworkTitle = newTitle)
     }
     fun updateHeight(newHeight: Double) {
-        _height.value = newHeight
+        _uiState.value = _uiState.value.copy(height = newHeight)
     }
     fun updateWidth(newWidth: Double) {
-        _width.value = newWidth
+        _uiState.value = _uiState.value.copy(width = newWidth)
     }
-    fun updateDate(newDate: String) {
-        _date.value = newDate
+    fun updateDate(newDateInMillis: Long) {
+        _uiState.value = _uiState.value.copy(date = convertMillisToDate(newDateInMillis))
     }
-    fun updateTechniqueId(newTechniqueId: Long) {
-        _techniqueId.value = newTechniqueId
+    fun updateTechniqueId(newTechniqueIndex: Int) {
+        _uiState.value = _uiState.value.copy(techniqueIndex = newTechniqueIndex)
     }
-    fun updateImage(newImage: String) {
-        _image.value = newImage
-    }
+
     fun updateIsDialogVisible(newIsDialogVisible: Boolean) {
-        _isDialogVisible.value = newIsDialogVisible
+        //_isDialogVisible.value = newIsDialogVisible
+        _uiState.value = _uiState.value.copy(isDialogVisible = newIsDialogVisible)
+    }
+
+    fun updateImage(newImage: String) {
+        _uiState.value = _uiState.value.copy(image = newImage)
+    }
+
+    fun updateTechniques(newTechniques: List<TechniqueResponse>) {
+        _uiState.value = _uiState.value.copy(techniques = newTechniques)
+    }
+
+    fun updateCreationSuccessful(newCreationSuccessful: Boolean) {
+        _uiState.value = _uiState.value.copy(creationSuccessful = newCreationSuccessful)
+    }
+
+    fun resetMessage() {
+        _uiState.value = _uiState.value.copy(message = "")
+        //_message.value = ""
+    }
+
+    fun updateMessage(message: String) {
+        //_message.value = message
+        _uiState.value = _uiState.value.copy(message = message)
     }
 
     fun loadTechniques() {
         viewModelScope.launch {
             try {
-                val response = TecnisisApi.TechniquesService.getTechniques()
-
+                val response = TecnisisApi.techniquesService.getTechniques()
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        _techniqueResponses.value = it
+                        updateTechniques(it)
                     }
                 } else {
                     val errorBody = JSONObject(response.errorBody()?.string()!!)
-                    _message.value = errorBody.getString("error")
+                    updateMessage(errorBody.getString("error"))
                 }
             } catch (e: Exception) {
-                    _message.value = e.message
+                    //_message.value = e.message
+                e.message?.let { updateMessage(it) }
                 }
         }
     }
@@ -75,29 +106,56 @@ class StartRequestViewModel: ViewModel() {
     fun startRequest() {
         viewModelScope.launch {
             try {
-                if (_artworkTitle.value.isNullOrBlank() || _height.value == 0.0 || _width.value == 0.0 || _date.value.isNullOrBlank() || _techniqueId.value == -1L) {
-                    _message.value = "Por favor, completa todos los campos"
+                val _artworkTitle = _uiState.value.artworkTitle
+                val _image = _uiState.value.image
+                val _height = _uiState.value.height
+                val _width = _uiState.value.width
+                val _date = _uiState.value.date
+                val _techniqueId = _uiState.value.techniques[_uiState.value.techniqueIndex].id
+
+                // Obtain the artist ID
+                val _artistId = 3L
+
+                if (_image.isEmpty() || _artworkTitle.isBlank() || _height == 0.0 || _width == 0.0 || _date.isBlank() || _techniqueId == -1L) {
+                    updateMessage("Por favor, completa todos los campos")
                     return@launch
                 }
                 val artworkRequest = ArtworkRequest(
-                    _artworkTitle.value!!,
-                    _date.value!!,
-                    _image.value!!,
-                    _height.value!!,
-                    _width.value!!,
-                    _techniqueId.value!!,
+                    title = _artworkTitle,
+                    image = _image,
+                    creationDate = _date,
+                    height =  _height,
+                    width = _width,
+                    artistId = _artistId,
+                    techniqueId = _techniqueId
                 )
-                val response = TecnisisApi.startRequestService.startRequest(artworkRequest)
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        _message.value = it
+                // Save artwork
+                val artworkResponse = TecnisisApi.artworkService.saveArtwork(artworkRequest)
+                var _artworkId = -1L
+                if (artworkResponse.isSuccessful) {
+                    artworkResponse.body()?.let {
+                        _artworkId = it.id
+                    }
+                }else{
+                    updateMessage("Error al guardar la obra de arte")
+                    return@launch
+                }
+                val request = CreateRequest(
+                    "Pending",
+                    _artworkId
+                )
+                val _requestResponse = TecnisisApi.requestService.createRequest(request)
+                if (_requestResponse.isSuccessful) {
+                    _requestResponse.body()?.let {
+                        updateMessage("Solicitud enviada con éxito")
+                        updateCreationSuccessful(true)
                     }
                 } else {
-                    val errorBody = JSONObject(response.errorBody()?.string()!!)
-                    _message.value = errorBody.getString("error")
+                    val errorBody = JSONObject(_requestResponse.errorBody()?.string()!!)
+                    updateMessage(errorBody.get("details").toString())
                 }
             } catch (e: Exception) {
-                _message.value = e.message
+                e.message?.let { updateMessage(it) }
             }
         }
     }

@@ -1,10 +1,13 @@
 package com.example.tecnisis.ui.login
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -31,125 +34,123 @@ import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.ui.components.CustomEmailField
 import com.example.tecnisis.ui.components.CustomPasswordField
 import com.example.tecnisis.ui.components.InfoBox
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
     onLogin: MutableState<() -> Unit>,
-    navController: NavHostController
+    navController: NavHostController,
+    snackbarHostState: SnackbarHostState
 ) {
-    val email by viewModel.email.observeAsState("")
-    val password by viewModel.password.observeAsState("")
-    val loginError by viewModel.loginError.observeAsState("")
-    val isLoginSuccessful by viewModel.isLoginSuccessful.observeAsState(false)
+
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
     val dataStoreManager = remember { DataStoreManager(context) }
-    val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+    val message by viewModel.message.observeAsState("")
 
     onLogin.value = {
         viewModel.validateUser(dataStoreManager)
     }
 
-    LaunchedEffect(isLoginSuccessful) {
-        if (isLoginSuccessful) {
+    LaunchedEffect(uiState.isLoginSuccessful) {
+        if (uiState.isLoginSuccessful) {
+            // Waits half a second before navigating to the ListRequests screen
+            delay(500)
             navController.navigate(TecnisisScreen.ListRequests.name) {
                 popUpTo(TecnisisScreen.Login.name) { inclusive = true }
             }
         }
     }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.backgroundlogin),
-            contentDescription = stringResource(id = R.string.login_title),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(175.dp)
-        )
-
+    Scaffold {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Red)
-                .padding(vertical = 16.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            Image(
+                painter = painterResource(id = R.drawable.backgroundlogin),
+                contentDescription = stringResource(id = R.string.login_title),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(175.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red)
+                    .padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.login_title),
+                        style = TextStyle(
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        ),
+                        textAlign = TextAlign.Center
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.logo),
+                        tint = Color.White,
+                        contentDescription = stringResource(id = R.string.login_title),
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
                 Text(
-                    text = stringResource(id = R.string.login_title),
-                    style = TextStyle(
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    ),
+                    text = stringResource(id = R.string.login_subtitle),
+                    style = TextStyle(fontSize = 14.sp, color = Color.White),
                     textAlign = TextAlign.Center
                 )
-                Icon(
-                    painter = painterResource(id = R.drawable.logo),
-                    tint = Color.White,
-                    contentDescription = stringResource(id = R.string.login_title),
-                    modifier = Modifier.size(32.dp)
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                InfoBox(description = stringResource(id = R.string.login_instructions))
+                CustomEmailField(
+                    label = stringResource(id = R.string.email),
+                    value = uiState.email,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = { viewModel.emailUpdate(it) }
+                )
+                CustomPasswordField(
+                    label = stringResource(id = R.string.password),
+                    value = uiState.password,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = { viewModel.passwordUpdate(it) }
+                )
+                Text(
+                    text = stringResource(id = R.string.no_account),
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    modifier = Modifier.clickable { navController.navigate(TecnisisScreen.SignUp.name) }
                 )
             }
-            Text(
-                text = stringResource(id = R.string.login_subtitle),
-                style = TextStyle(fontSize = 14.sp, color = Color.White),
-                textAlign = TextAlign.Center
-            )
         }
+    }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            InfoBox(description = stringResource(id = R.string.login_instructions))
-            CustomEmailField(
-                label = stringResource(id = R.string.email),
-                value = email,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = { viewModel.emailUpdate(it) }
-            )
-            CustomPasswordField(
-                label = stringResource(id = R.string.password),
-                value = password,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = { viewModel.passwordUpdate(it) }
-            )
-            Text(
-                text = stringResource(id = R.string.no_account),
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    textDecoration = TextDecoration.Underline
-                ),
-                modifier = Modifier.clickable { navController.navigate(TecnisisScreen.SignUp.name) }
-            )
+    LaunchedEffect(message) {
+        if (message.isNotEmpty()){
+            snackbarHostState.showSnackbar(message)
+            viewModel.resetMessage()
         }
-
-        loginError?.let { error ->
-            if (error.isNotEmpty()) {
-                coroutineScope.launch {
-                    snackbarHostState.showSnackbar(error)
-                    viewModel.clearLoginError()
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SnackbarHost(hostState = snackbarHostState)
     }
 }
 
