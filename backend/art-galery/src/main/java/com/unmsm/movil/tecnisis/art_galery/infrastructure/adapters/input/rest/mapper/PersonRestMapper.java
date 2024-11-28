@@ -11,7 +11,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface PersonRestMapper {
-    //@Mapping(target = "id", source = "id")
     Person toPerson(PersonCreateRequest personCreateRequest);
     PersonResponse toPersonResponse(Person person);
     List<PersonResponse> toPersonResponseList(List<Person> personList);

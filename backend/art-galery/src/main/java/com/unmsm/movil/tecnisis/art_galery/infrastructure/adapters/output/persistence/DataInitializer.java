@@ -27,16 +27,16 @@ public class DataInitializer {
                         System.out.println("Usuario de prueba creado: " + user.getEmail());
 
                         // Crear una persona asociada al usuario
-                        PersonEntity person = new PersonEntity();
+                        /*PersonEntity person = new PersonEntity();
                         person.setName("Admin User");
                         person.setDni("12345678"); // Valor de ejemplo para `dni`
                         person.setAddress("123 Admin Street");
                         person.setGender("M");
                         person.setPhone("123456789");
-                        person.setRole("ADMIN");
+                        person.setRole("MANAGER");
                         person.setUser(user);
                         personRepository.save(person);
-                        System.out.println("Persona asociada creada: " + person.getName());
+                        System.out.println("Persona asociada creada: " + person.getName());*/
                     }
             );
         };

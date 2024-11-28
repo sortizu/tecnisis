@@ -24,7 +24,7 @@ CREATE TABLE users (
 -- Create documents table
 CREATE TABLE documents (
                            id_document BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                           document_path VARCHAR(255) NOT NULL
+                           document_path TEXT NOT NULL
 );
 
 -- Create techniques table

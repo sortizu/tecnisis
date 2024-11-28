@@ -1,12 +1,12 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginResponse {
     private Long id;
     private String email;
@@ -16,4 +16,6 @@ public class LoginResponse {
     private String gender;
     private String phone;
     private String role;
+    private String token;
+    private Long personId;
 }

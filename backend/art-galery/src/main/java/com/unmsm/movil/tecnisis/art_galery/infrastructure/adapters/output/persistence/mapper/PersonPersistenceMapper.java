@@ -7,9 +7,12 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserPersistenceMapper.class})
 public interface PersonPersistenceMapper {
+    @Mapping(target = "user", ignore = true)
     PersonEntity toPersonEntity(Person person);
+
+    @Mapping(target = "user", ignore = true)
     Person toPerson(PersonEntity personEntity);
     List<Person> toPersonList(List<PersonEntity> personEntityList);
 }

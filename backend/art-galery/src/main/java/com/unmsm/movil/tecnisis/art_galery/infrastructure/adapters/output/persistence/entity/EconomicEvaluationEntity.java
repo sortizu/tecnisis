@@ -1,10 +1,10 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -23,17 +23,23 @@ public class EconomicEvaluationEntity {
     private BigDecimal salesPrice;
 
     @Column(name = "gallery_percentage")
-    private BigDecimal percentage;
+    private BigDecimal galleryPercentage;
 
     @ManyToOne
     @JoinColumn(name = "id_specialist", nullable = false)
     private SpecialistEntity specialist;
 
-    @ManyToOne
-    @JoinColumn(name = "id_request", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_request", referencedColumnName = "id_request", nullable = false)
+    @JsonManagedReference
     private RequestEntity request;
 
     @ManyToOne
-    @JoinColumn(name = "id_document", nullable = false)
+    @JoinColumn(name = "id_document")
     private DocumentEntity document;
+
+    @PrePersist
+    public void prePersist() {
+        this.evaluationDate = LocalDate.now();
+    }
 }

@@ -5,8 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder @Getter
-@NoArgsConstructor @AllArgsConstructor
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PersonResponse {
     private Long id;
     private String name;
@@ -15,4 +17,5 @@ public class PersonResponse {
     private String gender;
     private String phone;
     private String role;
+    private UserResponse user; // Relación con el usuario
 }
