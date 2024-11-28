@@ -50,7 +50,8 @@ public class RegisterService {
                 manager.setPerson(savedUser.getPerson());
                 managerPersistencePort.save(manager);
                 break;
-            case "specialist":
+            case "art-evaluator":
+            case "economic-evaluator":
                 Specialist specialist = new Specialist();
                 specialist.setPerson(savedUser.getPerson());
                 specialist.setIsAvailable(true);

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class EconomicEvaluation {
     private Long id;
     private LocalDate evaluationDate;
-    private BigDecimal salePrice;
+    private BigDecimal salesPrice;
     private BigDecimal galleryPercentage;
     private Specialist specialist;
     private Request request;

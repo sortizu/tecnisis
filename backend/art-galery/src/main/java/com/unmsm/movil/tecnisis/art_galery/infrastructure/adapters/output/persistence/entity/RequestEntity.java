@@ -1,10 +1,14 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity @Getter @Setter
 @Table(name = "requests")
@@ -22,6 +26,14 @@ public class RequestEntity {
     @ManyToOne
     @JoinColumn(name = "id_artwork", nullable = false)
     private ArtWorkEntity artWork;
+
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ArtisticEvaluationEntity> artisticEvaluations;
+
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<EconomicEvaluationEntity> economicEvaluations;
 
     @PrePersist
     public void prePersist() {

@@ -1,12 +1,16 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.adapter;
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Specialist;
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.mapper.RequestPersistenceMapper;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.mapper.SpecialistPersistenceMapper;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.repository.SpecialistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,23 +19,42 @@ import java.util.Optional;
 public class SpecialistPersistenceAdapter implements SpecialistPersistencePort {
 
     private final SpecialistRepository specialistRepository;
-    private final SpecialistPersistenceMapper specialistPersistenceMapper;
+    private final SpecialistPersistenceMapper specialistMapper;
+    private final RequestPersistenceMapper  requestMapper;
 
     @Override
     public Optional<Specialist> findById(Long id) {
-        return specialistRepository.findById(id).map(specialistPersistenceMapper::toSpecialist);
+        return specialistRepository.findById(id).map(specialistMapper::toSpecialist);
     }
 
     @Override
     public List<Specialist> findAll() {
-        return specialistPersistenceMapper.toSpecialistList(specialistRepository.findAll());
+        return specialistMapper.toSpecialistList(specialistRepository.findAll());
+    }
+
+    @Override
+    public List<Request> findArtisticRequestsBySpecialistId(Long id) {
+        return requestMapper.toRequestList(specialistRepository.findArtisticRequestsById(id));
+    }
+
+    @Override
+    public List<Request> findEconomicRequestsBySpecialistId(Long id) {
+        return requestMapper.toRequestList(specialistRepository.findEconomicRequestsById(id));
     }
 
     @Override
     public Specialist save(Specialist specialist) {
-        return specialistPersistenceMapper.toSpecialist(
+        return specialistMapper.toSpecialist(
                 specialistRepository.save(
-                        specialistPersistenceMapper.toSpecialistEntity(specialist)));
+                        specialistMapper.toSpecialistEntity(specialist)));
+    }
+
+    @Override
+    public List<Specialist> findByRole(String role) {
+
+        return specialistMapper
+                .toSpecialistList(specialistRepository
+                        .findSpecialistByRole(role));
     }
 
     @Override

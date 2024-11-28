@@ -15,25 +15,6 @@ import static com.unmsm.movil.tecnisis.art_galery.utils.ErrorCatalog.*;
 
 @RestControllerAdvice
 public class GlobalControllerAdvice {
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(AccountLockedException.class)
-    public ErrorResponse handleAccountLockedException() {
-        return ErrorResponse.builder()
-                .code(ACCOUNT_LOCKED.getCode())
-                .message(ACCOUNT_LOCKED.getMessage())
-                .timeStamp(LocalDateTime.now())
-                .build();
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ErrorResponse handleInvalidCredentialsException() {
-        return ErrorResponse.builder()
-                .code(INVALID_CREDENTIALS.getCode())
-                .message(INVALID_CREDENTIALS.getMessage())
-                .timeStamp(LocalDateTime.now())
-                .build();
-    }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ArtistNotFoundException.class)
@@ -106,11 +87,31 @@ public class GlobalControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ArtisticEvaluationNotFundException.class)
+    @ExceptionHandler(ArtisticEvaluationNotFoundException.class)
     public ErrorResponse handleArtisticEvaluationNotFoundException() {
         return ErrorResponse.builder()
                 .code(ARTISTIC_EVALUATION_NOT_FOUND.getCode())
                 .message(ARTISTIC_EVALUATION_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(EconomicEvaluationNotFoundException.class)
+    public ErrorResponse handleEconomicEvaluationNotFoundException() {
+        return ErrorResponse.builder()
+                .code(ECONOMIC_EVALUATION_NOT_FOUND.getCode())
+                .message(ECONOMIC_EVALUATION_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(UserNotFoundException.class)
+    public ErrorResponse handleUserNotFoundException() {
+        return ErrorResponse.builder()
+                .code(USER_NOT_FOUND.getCode())
+                .message(USER_NOT_FOUND.getMessage())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }

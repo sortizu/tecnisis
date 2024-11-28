@@ -28,6 +28,7 @@ public class PersonCreateRequest {
     private String phone;
 
     @NotEmpty(message = "Rol is required")
+    @Pattern(regexp = "ARTIST|ART-EVALUATOR|ECONOMIC-EVALUATOR|MANAGER",  message = "Rol must be 'ARTIST', 'ART-EVALUATOR', 'ECONOMIC-EVALUATOR' or 'MANAGER'")
     @Size(max = 255, message = "Rol must be less than 255 characters")
     private String role;
 }
