@@ -31,7 +31,7 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
     public ArtisticEvaluation findById(Long id) {
         return artisticEvaluationPersistencePort
                 .findById(id)
-                .orElseThrow(ArtisticEvaluationNotFundException::new);
+                .orElseThrow(ArtisticEvaluationNotFoundException::new);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
     public ArtisticEvaluation update(Long id, ArtisticEvaluation artisticEvaluation) {
         ArtisticEvaluation evaluation = artisticEvaluationPersistencePort
                 .findById(id)
-                .orElseThrow(ArtisticEvaluationNotFundException::new);
+                .orElseThrow(ArtisticEvaluationNotFoundException::new);
 
         Specialist specialist = specialistPersistencePort
                 .findById(artisticEvaluation.getSpecialist().getId())
@@ -87,7 +87,7 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
 
     @Override
     public void delete(Long id) {
-        if (artisticEvaluationPersistencePort.findById(id).isEmpty()) throw new ArtisticEvaluationNotFundException();
+        if (artisticEvaluationPersistencePort.findById(id).isEmpty()) throw new ArtisticEvaluationNotFoundException();
         artisticEvaluationPersistencePort.deleteById(id);
     }
 }

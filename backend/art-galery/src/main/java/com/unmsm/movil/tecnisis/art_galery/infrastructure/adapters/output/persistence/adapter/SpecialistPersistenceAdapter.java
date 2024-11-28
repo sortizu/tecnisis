@@ -9,6 +9,8 @@ import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persis
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +47,14 @@ public class SpecialistPersistenceAdapter implements SpecialistPersistencePort {
         return specialistMapper.toSpecialist(
                 specialistRepository.save(
                         specialistMapper.toSpecialistEntity(specialist)));
+    }
+
+    @Override
+    public List<Specialist> findByRole(String role) {
+
+        return specialistMapper
+                .toSpecialistList(specialistRepository
+                        .findSpecialistByRole(role));
     }
 
     @Override

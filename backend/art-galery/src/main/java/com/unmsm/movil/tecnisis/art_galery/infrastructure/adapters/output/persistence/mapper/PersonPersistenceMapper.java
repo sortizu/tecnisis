@@ -7,17 +7,12 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserPersistenceMapper.class})
 public interface PersonPersistenceMapper {
-    @Mapping(target = "user.person", ignore = true) // Evitar referencias circulares
+    @Mapping(target = "user", ignore = true)
     PersonEntity toPersonEntity(Person person);
 
-    @Mapping(target = "user.person", ignore = true) // Evitar referencias circulares
+    @Mapping(target = "user", ignore = true)
     Person toPerson(PersonEntity personEntity);
-
-    // Este método convierte una lista de entidades a una lista de objetos de dominio
     List<Person> toPersonList(List<PersonEntity> personEntityList);
-
-    // Este método convierte una lista de objetos de dominio a una lista de entidades
-    List<PersonEntity> toPersonEntityList(List<Person> personList);
 }
