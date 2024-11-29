@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserRestMapper {
-    @Mapping(target = "person.user", ignore = true)
+    //@Mapping(target = "person.user", ignore = true)
     User toUser(LoginRequest loginRequest);
 
     @Mapping(source = "person.dni", target = "dni")

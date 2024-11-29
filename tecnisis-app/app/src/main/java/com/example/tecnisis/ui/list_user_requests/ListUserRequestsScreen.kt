@@ -49,7 +49,6 @@ fun ListUserRequestsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val requests = viewModel.getFilteredRequests(uiState.filter)
-    val dataStoreManager = remember { DataStoreManager(context) }
 
     Column(
         modifier = Modifier

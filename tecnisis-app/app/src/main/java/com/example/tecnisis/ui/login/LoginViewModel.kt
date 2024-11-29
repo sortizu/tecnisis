@@ -39,6 +39,8 @@ class LoginViewModel : ViewModel() {
         updateMessage("")
         updateRole("")
         updateUserId(-1)
+        emailUpdate("")
+        passwordUpdate("")
     }
 
     fun emailUpdate(updatedEmail: String) {
@@ -84,14 +86,28 @@ class LoginViewModel : ViewModel() {
                         updateUserId(it.id)
                         dataStoreManager.saveRole(it.role)
                         updateRole(it.role)
-                        updateIsLoginSuccessful(true)
-                        updateMessage("Se ha iniciado sesión correctamente id:{${it.id}} role:{${it.role}}")
+                        dataStoreManager.saveToken(it.token)
+                        dataStoreManager.saveIdPerson(it.personId.toString())
+
+                        //updateMessage("Se ha iniciado sesión correctamente token{${it.token}}")
                     }
                 } else {
                     val errorBody = JSONObject(response.errorBody()?.string()!!)
                     updateMessage(errorBody.getString("message"))
                     updateIsLoginSuccessful(false)
+                    return@launch
                 }
+                val roleResponse = TecnisisApi.userService.getUserRoleById(_uiState.value.userId)
+                if (roleResponse.isSuccessful) {
+                    roleResponse.body()?.let {
+                        dataStoreManager.saveIdRole(it.rolId.toString())
+                        Log.d("idRole", it.rolId.toString())
+                    }
+                }else{
+                    Log.d("error", roleResponse.errorBody()?.string()!!)
+                }
+                //updateMessage("Se ha iniciado sesión correctamente")
+                updateIsLoginSuccessful(true)
             } catch (e: Exception) {
                 updateMessage("Error de conexión: ${e.message}")
                 updateIsLoginSuccessful(false)

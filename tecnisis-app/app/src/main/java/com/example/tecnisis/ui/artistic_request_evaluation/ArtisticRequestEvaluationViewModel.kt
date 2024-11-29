@@ -23,7 +23,6 @@ data class ArtisticRequestEvaluationUiState(
     val result: String = "",
     val request: RequestResponse? = null,
     val reviewDocument: String = "",
-    val specialistId: Long = -1L,
     val evaluationSaved: Boolean = false,
     val date: String = ""
 )
@@ -33,10 +32,10 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     val uiState: StateFlow<ArtisticRequestEvaluationUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
+    private val dataStoreManager: DataStoreManager = dataStoreManager
 
     init {
         getRequest(idRequest)
-        loadSpecialistId(dataStoreManager)
         updateDate(System.currentTimeMillis())
     }
 
@@ -60,10 +59,6 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
         _uiState.value = _uiState.value.copy(request = newRequest)
     }
 
-    fun updateSpecialistId(newSpecialistId: Long) {
-        _uiState.value = _uiState.value.copy(specialistId = newSpecialistId)
-    }
-
     fun updateEvaluationSaved(newEvaluationSaved: Boolean) {
         _uiState.value = _uiState.value.copy(evaluationSaved = newEvaluationSaved)
     }
@@ -71,36 +66,14 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     fun getRequest(id: Long) {
         viewModelScope.launch {
             try {
-                val response = TecnisisApi.requestService.getRequest(id)
+                var token = ""
+                dataStoreManager.token.let {
+                    token = it.first()!!
+                }
+                val response = TecnisisApi.requestService.getRequest(token, id)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         updateRequest(it[0])
-                    }
-                } else {
-                    _message.value = response.message()
-                    return@launch
-                }
-            }
-            catch (e: Exception) {
-                _message.value = e.message
-            }
-        }
-    }
-
-    fun loadSpecialistId(dataStoreManager: DataStoreManager) {
-        viewModelScope.launch {
-            try {
-                var id = -1L
-                dataStoreManager.id.first()?.let {
-                    id = it.toLong()
-                }
-                if (id == -1L) {
-                    return@launch
-                }
-                val response = TecnisisApi.specialistService.getSpecialist(id)
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        updateSpecialistId(it.id)
                     }
                 } else {
                     _message.value = response.message()
@@ -120,17 +93,25 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 val rating = _uiState.value.rating
                 val result = _uiState.value.result
                 val reviewDocument = _uiState.value.reviewDocument
-                val specialistId = _uiState.value.specialistId
                 if (date.isEmpty() || rating == 0.0f || result.isEmpty() || reviewDocument.isEmpty()){
                     updateMessage("Por favor, completa todos los campos")
                     return@launch
                 }
+                var idRole = -1L
+                dataStoreManager.idRole.let {
+                    idRole = it.first()!!.toLong()
+                }
+                var token = ""
+                dataStoreManager.token.let {
+                    token = it.first()!!
+                }
                 val response = TecnisisApi.evaluationService.saveArtisticEvaluation(
+                    token,
                     ArtisticEvaluationRequest(
                         evaluationDate = date,
                         rating = rating.toInt(),
                         result = result,
-                        specialistId = specialistId,
+                        specialistId = idRole,
                         document = reviewDocument
                     )
                 )

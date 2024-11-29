@@ -1,5 +1,5 @@
 package com.unmsm.movil.tecnisis.art_galery.domain.model;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Builder @Getter @Setter
@@ -12,5 +12,6 @@ public class Person {
     private String gender;
     private String phone;
     private String role;
-    private User user;
+    //@JsonIgnore
+    //private User user;
 }

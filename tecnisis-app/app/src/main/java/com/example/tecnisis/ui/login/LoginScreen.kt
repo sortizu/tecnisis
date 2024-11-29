@@ -59,9 +59,19 @@ fun LoginScreen(
     LaunchedEffect(uiState.isLoginSuccessful) {
         if (uiState.isLoginSuccessful) {
             // Waits half a second before navigating to the ListRequests screen
-            delay(500)
-            navController.navigate(TecnisisScreen.ListRequests.name) {
-                popUpTo(TecnisisScreen.Login.name) { inclusive = true }
+            delay(100)
+            if (uiState.role != "MANAGER") {
+                navController.navigate(TecnisisScreen.ListRequests.name){
+                    popUpTo(TecnisisScreen.Login.name){
+                        inclusive = true
+                    }
+                }
+            }else{
+                navController.navigate(TecnisisScreen.Dashboard.name){
+                    popUpTo(TecnisisScreen.Login.name){
+                        inclusive = true
+                    }
+                }
             }
         }
     }

@@ -1,20 +1,17 @@
 package com.example.tecnisis.ui.start_request
 
-import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.artwork.ArtworkRequest
 import com.example.tecnisis.data.request.CreateRequest
 import com.example.tecnisis.data.technique.TechniqueResponse
 import com.example.tecnisis.ui.components.convertMillisToDate
-import com.example.tecnisis.ui.login.data.LoginRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -31,9 +28,10 @@ data class StartRequestUiState(
     val isDialogVisible: Boolean = false
 )
 
-class StartRequestViewModel: ViewModel() {
+class StartRequestViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     private val _uiState = MutableStateFlow(StartRequestUiState())
     val uiState: StateFlow<StartRequestUiState> = _uiState.asStateFlow()
+    private val _dataStoreManager = dataStoreManager
 
     init {
         loadTechniques()
@@ -87,6 +85,7 @@ class StartRequestViewModel: ViewModel() {
     fun loadTechniques() {
         viewModelScope.launch {
             try {
+
                 val response = TecnisisApi.techniquesService.getTechniques()
                 if (response.isSuccessful) {
                     response.body()?.let {
@@ -113,24 +112,31 @@ class StartRequestViewModel: ViewModel() {
                 val _date = _uiState.value.date
                 val _techniqueId = _uiState.value.techniques[_uiState.value.techniqueIndex].id
 
-                // Obtain the artist ID
-                val _artistId = 3L
-
                 if (_image.isEmpty() || _artworkTitle.isBlank() || _height == 0.0 || _width == 0.0 || _date.isBlank() || _techniqueId == -1L) {
                     updateMessage("Por favor, completa todos los campos")
                     return@launch
                 }
+
+                var token = ""
+                _dataStoreManager.token.let{
+                    token = it.first()!!
+                }
+                var artistId = -1L
+                _dataStoreManager.idRole.let{
+                    artistId = it.first()!!.toLong()
+                }
+
                 val artworkRequest = ArtworkRequest(
                     title = _artworkTitle,
                     image = _image,
                     creationDate = _date,
                     height =  _height,
                     width = _width,
-                    artistId = _artistId,
+                    artistId = artistId,
                     techniqueId = _techniqueId
                 )
                 // Save artwork
-                val artworkResponse = TecnisisApi.artworkService.saveArtwork(artworkRequest)
+                val artworkResponse = TecnisisApi.artworkService.saveArtwork(token, artworkRequest)
                 var _artworkId = -1L
                 if (artworkResponse.isSuccessful) {
                     artworkResponse.body()?.let {
@@ -144,7 +150,7 @@ class StartRequestViewModel: ViewModel() {
                     "Pending",
                     _artworkId
                 )
-                val _requestResponse = TecnisisApi.requestService.createRequest(request)
+                val _requestResponse = TecnisisApi.requestService.createRequest(token,request)
                 if (_requestResponse.isSuccessful) {
                     _requestResponse.body()?.let {
                         updateMessage("Solicitud enviada con éxito")

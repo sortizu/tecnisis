@@ -11,7 +11,7 @@ services:
       SPRING_DATASOURCE_USERNAME: tecnisis_user
       SPRING_DATASOURCE_PASSWORD: tecnisis_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
-      JWT_SECRET: s3cR3tK3yF0rJWTt0k3nG3n3r@t10n
+      JWT_SECRET: 4cV46DQzRFn4vcz/3KylvV9aZ+5PQ7ZmzE+wWf+ofhc=
     depends_on:
       db:
         condition: service_healthy
