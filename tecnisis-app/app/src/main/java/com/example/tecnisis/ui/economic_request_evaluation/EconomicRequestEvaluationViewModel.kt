@@ -1,12 +1,11 @@
 package com.example.tecnisis.ui.economic_request_evaluation
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
-import com.example.tecnisis.data.evaluations.ArtisticEvaluationRequest
 import com.example.tecnisis.data.evaluations.EconomicEvaluationRequest
 import com.example.tecnisis.data.request.RequestResponse
 import com.example.tecnisis.ui.components.convertMillisToDate
@@ -21,7 +20,6 @@ data class EconomicRequestReviewUiState(
     val galleryPercentage: Double = 0.0,
     val document: String = "",
     val request: RequestResponse? = null,
-    val specialistId: Long = -1L,
     val date: String = "",
 )
 
@@ -31,10 +29,10 @@ class EconomicRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     val uiState: StateFlow<EconomicRequestReviewUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
+    private val dataStoreManager: DataStoreManager = dataStoreManager
 
     init {
         getRequest(idRequest)
-        loadSpecialistId(dataStoreManager)
     }
 
     fun updateSalePrice(newSalePrice: Double) {
@@ -55,43 +53,18 @@ class EconomicRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     fun updateMessage(newMessage: String) {
         _message.value = newMessage
     }
-    fun updateSpecialistId(newSpecialistId: Long) {
-        _uiState.value = _uiState.value.copy(specialistId = newSpecialistId)
-    }
 
     fun getRequest(id: Long) {
         viewModelScope.launch {
             try {
-                val response = TecnisisApi.requestService.getRequest(id)
+                var token = ""
+                dataStoreManager.token.let {
+                    token = it.first()!!
+                }
+                val response = TecnisisApi.requestService.getRequest(token,id)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         updateRequest(it[0])
-                    }
-                } else {
-                    _message.value = response.message()
-                    return@launch
-                }
-            }
-            catch (e: Exception) {
-                _message.value = e.message
-            }
-        }
-    }
-
-    fun loadSpecialistId(dataStoreManager: DataStoreManager) {
-        viewModelScope.launch {
-            try {
-                var id = -1L
-                dataStoreManager.id.first()?.let {
-                    id = it.toLong()
-                }
-                if (id == -1L) {
-                    return@launch
-                }
-                val response = TecnisisApi.specialistService.getSpecialist(id)
-                if (response.isSuccessful) {
-                    response.body()?.let {
-                        updateSpecialistId(it.id)
                     }
                 } else {
                     _message.value = response.message()
@@ -111,15 +84,27 @@ class EconomicRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 val evaluationDate = convertMillisToDate(System.currentTimeMillis())
                 val salePrice = _uiState.value.salePrice
                 val galleryPercentage = _uiState.value.galleryPercentage
-                val specialistId = _uiState.value.specialistId
                 val document = _uiState.value.document
-
+                if (evaluationDate.isEmpty() || salePrice == 0.0 || galleryPercentage == 0.0 || document.isEmpty()){
+                    updateMessage("Por favor, completa todos los campos")
+                    return@launch
+                }
+                var token = ""
+                dataStoreManager.token.let {
+                    token = it.first()!!
+                }
+                var idRole = -1L
+                dataStoreManager.idRole.let {
+                    idRole = it.first()!!.toLong()
+                }
+                val specialistId = idRole
                 val response = TecnisisApi.evaluationService.saveEconomicEvaluation(
+                    token,
                     EconomicEvaluationRequest(
                         evaluationDate = evaluationDate,
                         salePrice = salePrice,
                         galleryPercentage = galleryPercentage,
-                        specialistId = specialistId,
+                        specialistId = idRole,
                         document = document
                     )
                 )

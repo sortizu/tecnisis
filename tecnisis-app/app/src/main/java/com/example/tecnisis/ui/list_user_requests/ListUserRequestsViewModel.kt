@@ -1,6 +1,5 @@
 package com.example.tecnisis.ui.list_user_requests
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 data class ListUserRequestUiState(
     val isLoading: Boolean = false,
@@ -28,20 +28,29 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
     val uiState: StateFlow<ListUserRequestUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
+    val dataStoreManager: DataStoreManager = dataStoreManager
 
     init {
-        var userId = ""
         var role = ""
+        var idRole = ""
         viewModelScope.launch {
-            dataStoreManager.id.let {
-                userId = it.first()!!
-            }
             dataStoreManager.role.let {
                 role = it.first()!!
             }
+            dataStoreManager.idRole.let {
+                idRole = it.first()!!
+            }
         }
         updateRole(role)
-        loadArtistRequests(userId.toLong())
+        loadRequests(idRole.toLong())
+    }
+
+    fun updateIsLoading(isLoading: Boolean) {
+        _uiState.value = _uiState.value.copy(isLoading = isLoading)
+    }
+
+    fun updateRequests(requests: List<RequestResponse>) {
+        _uiState.value = _uiState.value.copy(requests = requests)
     }
 
     fun resetMessage() {
@@ -66,32 +75,46 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
     }
 
     // Updates the UI state with a new list of requests
-    fun loadArtistRequests(id: Long){
+    fun loadRequests(id: Long){
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            /*
-            First version
-            TecnisisApi.requestService.getUserRequests(id).let {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    requests = it
-                )
-            }*/
+            try {
+                updateIsLoading(true)
+                var token = ""
+                viewModelScope.launch {
+                    dataStoreManager.token.let {
+                        token = it.first()!!
+                    }
+                }
 
-            val newState = try {
-                val response = TecnisisApi.requestService.getAllRequests()
+                val response = when (_uiState.value.role) {
+                    "ARTIST" -> {
+                        TecnisisApi.artistService.getArtistRequests(token,id)
+                    }
+
+                    "ART-EVALUATOR" -> {
+                        TecnisisApi.specialistService.getArtisticRequests(token,id)
+                    }
+
+                    else -> {
+                        TecnisisApi.specialistService.getEconomicRequests(token,id)
+                    }
+                }
                 if (response.isSuccessful) {
                     response.body()?.let { requests ->
-                        _uiState.value.copy(isLoading = false, requests = requests, message = "")
-                    } ?: _uiState.value.copy(isLoading = false, message = "No se pudo cargar las solicitudes")
+                        updateIsLoading(false)
+                        updateRequests(requests)
+                        resetMessage()
+                    }
                 } else {
-                    _uiState.value.copy(isLoading = false, message = "No se pudo cargar las solicitudes")
+                    updateIsLoading(false)
+                    val errorBody = JSONObject(response.errorBody()?.string()!!)
+                    updateMessage(errorBody.getString("message"))
                 }
-            } catch (e: Exception) {
-                _uiState.value.copy(isLoading = false, message = "Error de conexión: ${e.message}")
             }
-
-            _uiState.value = newState
+            catch (e: Exception) {
+                updateIsLoading(false)
+                updateMessage("Error: ${e.message}")
+            }
         }
     }
 }

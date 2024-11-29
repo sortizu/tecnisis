@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -33,14 +34,11 @@ class DashboardViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
+    private val _dataStoreManager: DataStoreManager = dataStoreManager
 
     init {
-        var userId = ""
         var role = ""
         viewModelScope.launch {
-            dataStoreManager.id.let {
-                userId = it.first()!!
-            }
             dataStoreManager.role.let {
                 role = it.first()!!
             }
@@ -56,6 +54,13 @@ class DashboardViewModel(dataStoreManager: DataStoreManager): ViewModel() {
         _message.value = ""
     }
 
+    fun updateRequests(requests: List<RequestResponse>) {
+        _uiState.value = _uiState.value.copy(requests = requests)
+    }
+
+    fun updateIsLoading(isLoading: Boolean) {
+        _uiState.value = _uiState.value.copy(isLoading = isLoading)
+    }
     fun updateMessage(message: String) {
         _uiState.value = _uiState.value.copy(message = message)
     }
@@ -72,30 +77,31 @@ class DashboardViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     // Updates the UI state with a new list of requests
     fun loadAllRequests(){
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            /*
-            First version
-            TecnisisApi.requestService.getUserRequests(id).let {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    requests = it
-                )
-            }*/
-
-            val newState = try {
-                val response = TecnisisApi.requestService.getAllRequests()
+            try{
+                var token = ""
+                viewModelScope.launch {
+                    _dataStoreManager.token.let {
+                        token = it.first()!!
+                    }
+                }
+                updateIsLoading(true)
+                val response = TecnisisApi.requestService.getAllRequests(token)
                 if (response.isSuccessful) {
                     response.body()?.let { requests ->
-                        _uiState.value.copy(isLoading = false, requests = requests, message = "")
-                    } ?: _uiState.value.copy(isLoading = false, message = "No se pudo cargar las solicitudes")
+                        updateIsLoading(false)
+                        updateRequests(requests)
+                        resetMessage()
+                    }
                 } else {
-                    _uiState.value.copy(isLoading = false, message = "No se pudo cargar las solicitudes")
+                    updateIsLoading(false)
+                    val errorBody = JSONObject(response.errorBody()?.string()!!)
+                    updateMessage(errorBody.getString("message"))
                 }
-            } catch (e: Exception) {
-                _uiState.value.copy(isLoading = false, message = "Error de conexión: ${e.message}")
             }
-
-            _uiState.value = newState
+            catch (e: Exception) {
+                updateIsLoading(false)
+                updateMessage("Error: ${e.message}")
+            }
         }
     }
 

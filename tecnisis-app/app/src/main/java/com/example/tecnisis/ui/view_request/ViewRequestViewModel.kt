@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.evaluations.ArtisticEvaluationResponse
 import com.example.tecnisis.data.evaluations.EconomicEvaluationResponse
@@ -12,6 +13,7 @@ import com.example.tecnisis.data.request.RequestResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 data class ViewRequestUiState(
@@ -22,11 +24,12 @@ data class ViewRequestUiState(
     val isLoading: Boolean = false
 )
 
-class ViewRequestViewModel (requestId: Long): ViewModel()  {
+class ViewRequestViewModel (requestId: Long, dataStoreManager: DataStoreManager): ViewModel()  {
     private val _uiState = MutableStateFlow(ViewRequestUiState())
     val uiState: StateFlow<ViewRequestUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
+    private val dataStoreManager: DataStoreManager = dataStoreManager
 
     init{
         getRequest(requestId)
@@ -53,7 +56,11 @@ class ViewRequestViewModel (requestId: Long): ViewModel()  {
         updateIsLoading(true)
         viewModelScope.launch {
             try{
-                val response = TecnisisApi.requestService.getRequest(id)
+                var token = ""
+                dataStoreManager.token.let {
+                    token = it.first()!!
+                }
+                val response = TecnisisApi.requestService.getRequest(token,id)
                 if (response.isSuccessful){
                     response.body()?.let {
                         for (request in it){

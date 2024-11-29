@@ -198,7 +198,7 @@ fun TecnisisApp() {
             }
             composable(route = TecnisisScreen.StartRequest.name) {
                 StartRequestScreen(
-                    viewModel = viewModel(modelClass = StartRequestViewModel::class.java),
+                    viewModel = StartRequestViewModel(dataStoreManager),
                     navController = navController,
                     snackbarHostState = snackbarHostState,
                     onStartRequest = floatingButtonPressed
@@ -223,7 +223,7 @@ fun TecnisisApp() {
                 enableFloatingActionButton.value = false
                 val requestId = it.arguments?.getString("requestId")?.toLong()
                 ViewRequestScreen(
-                    viewModel = ViewRequestViewModel(requestId!!),
+                    viewModel = ViewRequestViewModel(requestId!!, dataStoreManager),
                     snackbarHostState = snackbarHostState
                 )
             }
