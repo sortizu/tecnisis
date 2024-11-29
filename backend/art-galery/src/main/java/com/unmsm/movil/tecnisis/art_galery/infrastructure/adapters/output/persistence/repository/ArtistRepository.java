@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ArtistRepository extends JpaRepository<ArtistEntity, Long>{
+public interface ArtistRepository extends JpaRepository<ArtistEntity, Long> {
     @Query(value = """
         SELECT r
         FROM RequestEntity r
