@@ -12,6 +12,7 @@ public class EconomicEvaluation {
     private LocalDate evaluationDate;
     private BigDecimal salesPrice;
     private BigDecimal galleryPercentage;
+    private String status;
     private Specialist specialist;
     private Request request;
     private Document document;

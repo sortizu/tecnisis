@@ -1,7 +1,9 @@
 package com.unmsm.movil.tecnisis.art_galery.application.service;
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.input.PersonServicePort;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.ArtistPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.PersonPersistencePort;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Person;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +15,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PersonService implements PersonServicePort {
+
     private final PersonPersistencePort personPersistencePort;
+    private final ArtistPersistencePort artistPersistencePort;
+    private final SpecialistPersistencePort specialistPersistencePort;
 
     @Override
     public Person findById(Long id) {
@@ -29,8 +34,9 @@ public class PersonService implements PersonServicePort {
     }
 
     @Override
-    public Person save(Person artist) {
-        return personPersistencePort.save(artist);
+    public Person save(Person person) {
+        Person personToSave = personPersistencePort.save(person);
+        return personToSave;
     }
 
     @Override

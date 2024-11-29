@@ -12,7 +12,7 @@ public class ManagerEntity {
     @Column(name = "id_manager")
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_person",  nullable = false)
     private PersonEntity person;
 }

@@ -21,10 +21,13 @@ public class ArtisticEvaluationEntity {
 
     private BigDecimal rating;
 
+    private String status;
+
     private String result;
 
     @ManyToOne
-    @JoinColumn(name = "id_specialist", nullable = false)
+    @JoinColumn(name = "id_specialist", referencedColumnName = "id_specialist", nullable = false)
+    @JsonManagedReference
     private SpecialistEntity specialist;
 
     @ManyToOne
@@ -33,7 +36,7 @@ public class ArtisticEvaluationEntity {
     private RequestEntity request;
 
     @ManyToOne
-    @JoinColumn(name = "id_document", nullable = false)
+    @JoinColumn(name = "id_document", nullable = true)
     private DocumentEntity document;
 
     @PrePersist

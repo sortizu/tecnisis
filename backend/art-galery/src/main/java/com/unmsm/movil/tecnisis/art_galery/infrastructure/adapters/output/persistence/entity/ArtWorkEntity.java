@@ -1,5 +1,6 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +28,8 @@ public class ArtWorkEntity {
     private BigDecimal width;
 
     @ManyToOne
-    @JoinColumn(name = "id_artist", nullable = false)
+    @JoinColumn(name = "id_artist", referencedColumnName = "id_artist", nullable = false)
+    @JsonManagedReference
     private ArtistEntity artist;
 
     @ManyToOne
