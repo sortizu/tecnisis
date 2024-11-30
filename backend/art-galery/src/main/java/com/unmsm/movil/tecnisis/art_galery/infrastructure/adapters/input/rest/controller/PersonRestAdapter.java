@@ -1,6 +1,7 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.controller;
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.input.PersonServicePort;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.Person;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.PersonRestMapper;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request.PersonCreateRequest;
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.PersonResponse;
@@ -14,38 +15,39 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/persons")
+@RequestMapping("/persons/v1/api")
 @Tag(name = "Person Controller", description = "Endpoint to management persons")
 public class PersonRestAdapter {
+
     private final PersonServicePort servicePort;
     private final PersonRestMapper restMapper;
 
-    @GetMapping("/v1/api")
+    @GetMapping
     public List<PersonResponse> findAll() {
         return restMapper.toPersonResponseList(servicePort.findAll());
     }
 
-    @GetMapping("/v1/api/{id}")
+    @GetMapping("/{id}")
     public PersonResponse findById(@PathVariable Long id) {
         return restMapper.toPersonResponse(servicePort.findById(id));
     }
 
-    @PostMapping("/v1/api")
+    @PostMapping
     public ResponseEntity<PersonResponse> save(@Valid @RequestBody PersonCreateRequest request) {
-        PersonResponse response = restMapper.toPersonResponse(
-                servicePort.save(restMapper.toPerson(request)));
+        Person personSaved = servicePort.save(restMapper.toPerson(request));
+        PersonResponse response = restMapper.toPersonResponse(personSaved);
         return ResponseEntity
-                .created(URI.create("/persons/v1/api/" + response.getId()))
+                .created(URI.create(response.getRole() + "/" + personSaved.getRolId()))
                 .body(response);
     }
 
-    @PutMapping("/v1/api/{id}")
+    @PutMapping("/{id}")
     public PersonResponse update(@Valid @RequestBody PersonCreateRequest request, @PathVariable Long id) {
         return restMapper.toPersonResponse(
                 servicePort.update(id, restMapper.toPerson(request)));
     }
 
-    @DeleteMapping("/v1/api/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         servicePort.delete(id);
         return ResponseEntity.noContent().build();

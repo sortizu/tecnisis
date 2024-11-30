@@ -12,5 +12,6 @@ public class Person {
     private String gender;
     private String phone;
     private String role;
+    private Long rolId;
     private User user;
 }

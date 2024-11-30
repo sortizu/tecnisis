@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface ArtisticEvaluationPersistencePort {
     Optional<ArtisticEvaluation> findById(Long id);
+    Optional<ArtisticEvaluation> findByRequestId(Long id);
     List<ArtisticEvaluation> findAll();
     ArtisticEvaluation save(ArtisticEvaluation artisticEvaluation);
     void deleteById(Long id);

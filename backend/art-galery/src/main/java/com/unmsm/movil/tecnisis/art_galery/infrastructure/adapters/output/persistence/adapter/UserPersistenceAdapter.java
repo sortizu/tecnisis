@@ -14,7 +14,6 @@ import java.util.Optional;
 public class UserPersistenceAdapter implements UserPersistencePort {
 
     private final UserRepository userRepository;
-    private final UserPersistenceMapper userMapper;
 
     @Override
     public Optional<UserRole> findUserRolById(Long id) {

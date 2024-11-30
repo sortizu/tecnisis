@@ -1,20 +1,17 @@
 package com.unmsm.movil.tecnisis.art_galery.application.service;
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.input.ArtisticEvaluationServicePort;
-import com.unmsm.movil.tecnisis.art_galery.application.ports.output.ArtisticEvaluationPersistencePort;
-import com.unmsm.movil.tecnisis.art_galery.application.ports.output.DocumentPersistencePort;
-import com.unmsm.movil.tecnisis.art_galery.application.ports.output.RequestPersistencePort;
-import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.*;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtisticEvaluationNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.DocumentNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.RequestNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.SpecialistNotFoundException;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.ArtisticEvaluation;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.Document;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.Specialist;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 // implements the input port and use the output port
@@ -23,6 +20,7 @@ import java.util.List;
 public class ArtisticEvaluationService implements ArtisticEvaluationServicePort {
 
     private final ArtisticEvaluationPersistencePort artisticEvaluationPersistencePort;
+    private final EconomicEvaluationPersistencePort economicEvaluationPersistencePort;
     private final SpecialistPersistencePort specialistPersistencePort;
     private final RequestPersistencePort requestPersistencePort;
     private final DocumentPersistencePort  documentPersistencePort;
@@ -65,23 +63,42 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
                 .findById(id)
                 .orElseThrow(ArtisticEvaluationNotFoundException::new);
 
-        Specialist specialist = specialistPersistencePort
-                .findById(artisticEvaluation.getSpecialist().getId())
-                .orElseThrow(SpecialistNotFoundException::new);
+        Document document = null;
 
-        Request request = requestPersistencePort
-                .findById(artisticEvaluation.getRequest().getId())
-                .orElseThrow(RequestNotFoundException::new);
-
-        Document document = documentPersistencePort
-                .findById(artisticEvaluation.getDocument().getId())
-                .orElseThrow(DocumentNotFoundException::new);
+        if (artisticEvaluation.getDocument() != null){
+            document = documentPersistencePort
+                    .findById(artisticEvaluation.getDocument().getId())
+                    .orElseThrow(DocumentNotFoundException::new);
+        }
 
         evaluation.setRating(artisticEvaluation.getRating());
+        evaluation.setEvaluationDate(artisticEvaluation.getEvaluationDate());
         evaluation.setResult(artisticEvaluation.getResult());
-        evaluation.setSpecialist(specialist);
-        evaluation.setRequest(request);
         evaluation.setDocument(document);
+
+        if (evaluation.getRating().doubleValue() <= 0 || evaluation.isUpdated())
+            return artisticEvaluationPersistencePort.save(evaluation);
+
+
+        // Obtener el especialista
+        List<Specialist> specialists = specialistPersistencePort
+                .findByRole("ECONOMIC-EVALUATOR");
+
+        if (specialists.isEmpty()) throw new SpecialistNotFoundException();
+
+        Specialist specialist = specialists.get(0);
+
+        EconomicEvaluation economicEvaluation = EconomicEvaluation.builder()
+                .evaluationDate(LocalDate.now())
+                .salesPrice(new BigDecimal("0"))
+                .galleryPercentage(new BigDecimal("0"))
+                .specialist(specialist)
+                .request(evaluation.getRequest())
+                .status("PENDING")
+                .build();
+
+        economicEvaluationPersistencePort.save(economicEvaluation);
+        evaluation.setUpdated(true);
         return artisticEvaluationPersistencePort.save(evaluation);
     }
 

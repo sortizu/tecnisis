@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {PersonRestMapper.class})
+@Mapper(componentModel = "spring", uses = {PersonRestMapper.class, TechniqueRestMapper.class})
 public interface SpecialistRestMapper {
     @Mapping(target = "person", expression = "java(mapToPerson(specialistCreateRequest.getPersonId()))")
     Specialist toSpecialist(SpecialistCreateRequest specialistCreateRequest);

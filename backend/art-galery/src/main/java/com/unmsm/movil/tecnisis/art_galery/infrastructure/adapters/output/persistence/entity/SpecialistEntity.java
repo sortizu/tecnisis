@@ -17,7 +17,7 @@ public class SpecialistEntity {
     @Column(name = "availability")
     private Boolean isAvailable;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "specialist_techniques",
             joinColumns = @JoinColumn(name = "id_specialist"),

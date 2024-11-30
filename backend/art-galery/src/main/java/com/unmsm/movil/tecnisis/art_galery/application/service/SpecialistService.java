@@ -3,10 +3,13 @@ package com.unmsm.movil.tecnisis.art_galery.application.service;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.input.SpecialistServicePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.PersonPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.output.TechniquePersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.SpecialistNotFoundException;
+import com.unmsm.movil.tecnisis.art_galery.domain.exception.TechniqueNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Specialist;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.Technique;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ public class SpecialistService implements SpecialistServicePort {
 
     private final SpecialistPersistencePort  specialistPersistencePort;
     private final PersonPersistencePort personPersistencePort;
+    private final TechniquePersistencePort techniquePersistencePort;
 
     @Override
     public Specialist findById(Long id) {
@@ -75,5 +79,19 @@ public class SpecialistService implements SpecialistServicePort {
     public void delete(Long id) {
         if (specialistPersistencePort.findById(id).isEmpty()) throw new SpecialistNotFoundException();
         specialistPersistencePort.deleteById(id);
+    }
+
+    @Override
+    public void addTechnique(Long specialistId, Long techniqueId) {
+        Specialist specialist = specialistPersistencePort.findById(specialistId)
+                .orElseThrow(SpecialistNotFoundException::new);
+
+        Technique technique = techniquePersistencePort.findById(techniqueId)
+                .orElseThrow(TechniqueNotFoundException::new);
+
+        if (!specialist.getTechniques().contains(technique)) {
+            specialist.getTechniques().add(technique);
+            specialistPersistencePort.save(specialist);
+        }
     }
 }

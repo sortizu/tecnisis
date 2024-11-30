@@ -28,7 +28,7 @@ public class PersonEntity {
     private String role;
 
     @OneToOne
-    @JoinColumn(name = "id_user", referencedColumnName = "id_user", nullable = true)
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @JsonManagedReference
     private UserEntity user;
 }

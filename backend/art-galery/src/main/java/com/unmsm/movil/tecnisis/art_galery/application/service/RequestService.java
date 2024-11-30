@@ -7,15 +7,12 @@ import com.unmsm.movil.tecnisis.art_galery.application.ports.output.RequestPersi
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.ArtWorkNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.RequestNotFoundException;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.ArtWork;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.ArtisticEvaluation;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;
-import com.unmsm.movil.tecnisis.art_galery.domain.model.Specialist;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 
 // implements the input port and use the output port
@@ -42,6 +39,13 @@ public class RequestService implements RequestServicePort {
     }
 
     @Override
+    public ArtisticEvaluation findArtisticEvaluationByRequestId(Long requestId) {
+        return artisticEvaluationPersistencePort
+                .findByRequestId(requestId)
+                .orElseThrow(RequestNotFoundException::new);
+    }
+
+    @Override
     @Transactional
     public Request save(Request request) {
         // Obtener la obra de arte
@@ -49,12 +53,24 @@ public class RequestService implements RequestServicePort {
                 .findById(request.getArtWork().getId())
                 .orElseThrow(ArtWorkNotFoundException::new);
         request.setArtWork(artWork);
+        request.setStatus("PENDING");
 
         // Obtener el especialista
-        List<Specialist> specialists = specialistPersistencePort.findByRole("ART-EVALUATOR");
-        if (specialists == null || specialists.isEmpty()) {
-            throw new RuntimeException("No specialist found with role ART-EVALUATOR");
+        List<Specialist> specialists = specialistPersistencePort
+                .findByRole("ART-EVALUATOR")
+                .stream()
+                .filter(s -> {
+                    if (s.getTechniques().isEmpty()) return false;
+                    List<String> techniques = s.getTechniques().stream().map(Technique::getName).toList();
+                    return techniques.contains(artWork.getTechnique().getName());
+                })
+                .toList();
+
+        if (specialists.isEmpty()) {
+            return requestPersistencePort.save(request);
         }
+
+        request.setStatus("APPROVED");
         Specialist specialist = specialists.get(0);
 
         // Guardar el request
@@ -62,19 +78,23 @@ public class RequestService implements RequestServicePort {
 
         // Reanexar el request al contexto de persistencia
         Request managedRequest = requestPersistencePort.findById(requestToSave.getId())
-                .orElseThrow(() -> new RuntimeException("Request not found after save"));
+                .orElseThrow(RequestNotFoundException::new);
 
         // Crear la evaluación artística
         ArtisticEvaluation artisticEvaluation = ArtisticEvaluation
                 .builder()
-                .evaluationDate(LocalDate.now())
-                .result("A")
+                .rating(new BigDecimal("0"))
+                .status("APPROVED")
                 .specialist(specialist)
                 .request(managedRequest) // Usar el request gestionado
                 .build();
 
         // Guardar la evaluación artística
         artisticEvaluationPersistencePort.save(artisticEvaluation);
+
+        // set availability false in artist specialist
+        specialist.setIsAvailable(false);
+        specialistPersistencePort.save(specialist);
 
         return requestToSave;
     }

@@ -67,6 +67,13 @@ public class SpecialistRestAdapter {
         );
     }
 
+    @PatchMapping("/v1/api/{idSpecialist}/technique/{idTechnique}")
+    public ResponseEntity<Void> addTechnique(@PathVariable Long idSpecialist,
+                                             @PathVariable Long idTechnique) {
+        servicePort.addTechnique(idSpecialist, idTechnique);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/v1/api/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         servicePort.delete(id);

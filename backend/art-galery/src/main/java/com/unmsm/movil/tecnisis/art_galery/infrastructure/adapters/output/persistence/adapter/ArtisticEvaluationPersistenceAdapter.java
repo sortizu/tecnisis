@@ -24,6 +24,11 @@ public class ArtisticEvaluationPersistenceAdapter implements ArtisticEvaluationP
     }
 
     @Override
+    public Optional<ArtisticEvaluation> findByRequestId(Long id) {
+        return repository.findByRequestId(id).map(mapper::toArtisticEvaluation);
+    }
+
+    @Override
     public List<ArtisticEvaluation> findAll() {
         return mapper.toArtisticEvaluationList(repository.findAll());
     }

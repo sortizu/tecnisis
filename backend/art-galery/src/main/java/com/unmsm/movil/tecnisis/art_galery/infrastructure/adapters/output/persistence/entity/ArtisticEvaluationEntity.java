@@ -1,6 +1,5 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,6 +24,9 @@ public class ArtisticEvaluationEntity {
 
     private String result;
 
+    @Transient
+    private boolean isUpdated;
+
     @ManyToOne
     @JoinColumn(name = "id_specialist", referencedColumnName = "id_specialist", nullable = false)
     @JsonManagedReference
@@ -36,7 +38,7 @@ public class ArtisticEvaluationEntity {
     private RequestEntity request;
 
     @ManyToOne
-    @JoinColumn(name = "id_document", nullable = true)
+    @JoinColumn(name = "id_document")
     private DocumentEntity document;
 
     @PrePersist

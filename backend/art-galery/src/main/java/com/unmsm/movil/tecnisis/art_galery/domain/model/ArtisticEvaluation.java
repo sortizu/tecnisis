@@ -13,6 +13,7 @@ public class ArtisticEvaluation {
     private BigDecimal rating;
     private String status;
     private String result;
+    private boolean isUpdated;
     private Specialist specialist;
     private Request request;
     private Document document;
