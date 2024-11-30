@@ -7,7 +7,6 @@ import java.util.List;
 public interface ArtisticEvaluationServicePort {
     ArtisticEvaluation findById(Long id);
     List<ArtisticEvaluation> findAll();
-    ArtisticEvaluation save(ArtisticEvaluation artisticEvaluation);
     ArtisticEvaluation update(Long id, ArtisticEvaluation artisticEvaluation);
     void delete(Long id);
 }

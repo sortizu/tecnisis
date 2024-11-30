@@ -20,12 +20,8 @@ public class ArtisticEvaluationCreateRequest  {
     @Max(value = 10, message = "rating must be less than or equal to 10")
     private BigDecimal rating;
 
-    @NotNull(message = "result is required")
     @Pattern(regexp = "APPROVED|REJECTED", message = "result must be APPROVED or REJECTED")
     private String result;
 
     private Long documentId;
-
-    @Transient
-    private Boolean isUpdated;
 }

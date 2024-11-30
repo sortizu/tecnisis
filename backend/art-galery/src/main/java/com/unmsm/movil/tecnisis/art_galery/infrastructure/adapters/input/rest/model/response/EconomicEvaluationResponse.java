@@ -12,6 +12,7 @@ public class EconomicEvaluationResponse {
     private LocalDate evaluationDate;
     private BigDecimal salesPrice;
     private BigDecimal galleryPercentage;
+    private String status;
     private SpecialistResponse specialist;
     private RequestResponse request;
     private DocumentResponse document;

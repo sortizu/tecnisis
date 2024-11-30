@@ -83,7 +83,7 @@ public class RequestService implements RequestServicePort {
         // Crear la evaluación artística
         ArtisticEvaluation artisticEvaluation = ArtisticEvaluation
                 .builder()
-                .rating(new BigDecimal("0"))
+                .rating(BigDecimal.ZERO)
                 .status("APPROVED")
                 .specialist(specialist)
                 .request(managedRequest) // Usar el request gestionado

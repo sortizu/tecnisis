@@ -9,8 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -30,15 +28,6 @@ public class ArtisticEvaluationRestAdapter {
     @GetMapping("/v1/api/{id}")
     public ArtisticEvaluationResponse findById(@PathVariable Long id) {
         return restMapper.toArtisticEvaluationResponse(servicePort.findById(id));
-    }
-
-    @PostMapping("/v1/api")
-    public ResponseEntity<ArtisticEvaluationResponse> save(@Valid @RequestBody ArtisticEvaluationCreateRequest request) {
-        ArtisticEvaluationResponse response = restMapper.toArtisticEvaluationResponse(
-                servicePort.save(restMapper.toArtisticEvaluation(request)));
-        return ResponseEntity
-                .created(URI.create("/artistic-evaluations/v1/api/" + response.getId()))
-                .body(response);
     }
 
     @PutMapping("/v1/api/{id}")
