@@ -21,7 +21,7 @@ import java.util.List;
 public class SpecialistService implements SpecialistServicePort {
 
     private final SpecialistPersistencePort  specialistPersistencePort;
-    private final PersonPersistencePort personPersistencePort;
+    private final PersonService personService;
     private final TechniquePersistencePort techniquePersistencePort;
 
     @Override
@@ -51,27 +51,12 @@ public class SpecialistService implements SpecialistServicePort {
     }
 
     @Override
-    public Specialist save(Specialist specialist) {
-        return personPersistencePort.findById(specialist.getPerson().getId())
-                .map(person -> {
-                    specialist.setPerson(person);
-                    return specialistPersistencePort.save(specialist);
-                })
-                .orElseThrow(PersonNotFoundException::new);
-    }
-
-    @Override
     public Specialist update(Long id, Specialist request) {
         return specialistPersistencePort.findById(id)
-                .map(specialist -> personPersistencePort
-                        .findById(request.getPerson().getId())
-                        .map(person -> {
-                            specialist.setIsAvailable(request.getIsAvailable());
-                            specialist.setPerson(person);
-                            return specialistPersistencePort.save(specialist);
-                        })
-                        .orElseThrow(PersonNotFoundException::new)
-                )
+                .map(s -> {
+                    s.setPerson(personService.update(s.getPerson().getId(), request.getPerson()));
+                    return specialistPersistencePort.save(s);
+                })
                 .orElseThrow(SpecialistNotFoundException::new);
     }
 

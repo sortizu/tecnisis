@@ -11,7 +11,6 @@ public interface SpecialistServicePort {
     List<Specialist> findAll();
     List<Request> findArtisticRequestsBySpecialistId(Long id);
     List<Request> findEconomicRequestsBySpecialistId(Long id);
-    Specialist save(Specialist specialist);
     Specialist update(Long id, Specialist specialist);
     void delete(Long id);
     void addTechnique(Long specialistId, Long techniqueId);

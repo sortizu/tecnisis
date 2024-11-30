@@ -41,12 +41,6 @@ public class PersonRestAdapter {
                 .body(response);
     }
 
-    @PutMapping("/{id}")
-    public PersonResponse update(@Valid @RequestBody PersonCreateRequest request, @PathVariable Long id) {
-        return restMapper.toPersonResponse(
-                servicePort.update(id, restMapper.toPerson(request)));
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         servicePort.delete(id);

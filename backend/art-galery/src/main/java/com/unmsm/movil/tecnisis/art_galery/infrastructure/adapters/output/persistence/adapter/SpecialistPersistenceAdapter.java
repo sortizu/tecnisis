@@ -8,6 +8,7 @@ import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persis
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.repository.SpecialistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,11 +24,13 @@ public class SpecialistPersistenceAdapter implements SpecialistPersistencePort {
     private final RequestPersistenceMapper  requestMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Specialist> findById(Long id) {
         return specialistRepository.findById(id).map(specialistMapper::toSpecialist);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Specialist> findAll() {
         return specialistMapper.toSpecialistList(specialistRepository.findAll());
     }
