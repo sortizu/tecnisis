@@ -8,7 +8,6 @@ public interface ManagerServicePort {
 
     Manager findById(Long id);
     List<Manager> findAll();
-    Manager save(Manager manager);
     Manager update(Long id, Manager manager);
     void delete(Long id);
 }

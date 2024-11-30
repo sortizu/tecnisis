@@ -6,6 +6,7 @@ import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persis
 import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persistence.repository.ManagerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,16 +19,19 @@ public class ManagerPersistenceAdapter implements ManagerPersistencePort {
     private final ManagerPersistenceMapper managerMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Manager> findById(Long id) {
         return managerRepository.findById(id).map(managerMapper::toManager);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Manager> findAll() {
         return managerMapper.toManagerList(managerRepository.findAll());
     }
 
     @Override
+    @Transactional
     public Manager save(Manager manager) {
         return managerMapper.toManager(
                 managerRepository.save(
@@ -37,6 +41,7 @@ public class ManagerPersistenceAdapter implements ManagerPersistencePort {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         managerRepository.deleteById(id);
     }
