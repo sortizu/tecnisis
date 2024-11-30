@@ -79,24 +79,19 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
         viewModelScope.launch {
             try {
                 updateIsLoading(true)
-                var token = ""
-                viewModelScope.launch {
-                    dataStoreManager.token.let {
-                        token = it.first()!!
-                    }
-                }
+                val token = dataStoreManager.token.first() ?: ""
 
                 val response = when (_uiState.value.role) {
                     "ARTIST" -> {
-                        TecnisisApi.artistService.getArtistRequests(token,id)
+                        TecnisisApi.artistService.getArtistRequests("Bearer $token",id)
                     }
 
                     "ART-EVALUATOR" -> {
-                        TecnisisApi.specialistService.getArtisticRequests(token,id)
+                        TecnisisApi.specialistService.getArtisticRequests("Bearer $token",id)
                     }
 
                     else -> {
-                        TecnisisApi.specialistService.getEconomicRequests(token,id)
+                        TecnisisApi.specialistService.getEconomicRequests("Bearer $token",id)
                     }
                 }
                 if (response.isSuccessful) {
