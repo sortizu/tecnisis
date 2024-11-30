@@ -1,10 +1,8 @@
 package com.unmsm.movil.tecnisis.art_galery.application.service;
 
 import com.unmsm.movil.tecnisis.art_galery.application.ports.input.SpecialistServicePort;
-import com.unmsm.movil.tecnisis.art_galery.application.ports.output.PersonPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.SpecialistPersistencePort;
 import com.unmsm.movil.tecnisis.art_galery.application.ports.output.TechniquePersistencePort;
-import com.unmsm.movil.tecnisis.art_galery.domain.exception.PersonNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.SpecialistNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.exception.TechniqueNotFoundException;
 import com.unmsm.movil.tecnisis.art_galery.domain.model.Request;

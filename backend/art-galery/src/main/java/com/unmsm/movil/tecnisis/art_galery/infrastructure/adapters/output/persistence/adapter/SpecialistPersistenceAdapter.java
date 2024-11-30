@@ -9,9 +9,6 @@ import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.output.persis
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
