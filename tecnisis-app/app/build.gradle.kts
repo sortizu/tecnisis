@@ -84,4 +84,6 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    // Tehras: com.github.tehras:charts:$latest_release
+    implementation("com.github.tehras:charts:0.2.4-alpha")
 }

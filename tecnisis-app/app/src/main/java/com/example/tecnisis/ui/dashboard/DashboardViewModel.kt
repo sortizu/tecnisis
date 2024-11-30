@@ -9,7 +9,6 @@ import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.request.RequestResponse
 import com.example.tecnisis.ui.components.convertMillisToDate
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,7 +49,6 @@ class DashboardViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     }
 
     fun resetMessage() {
-        //_uiState.value = _uiState.value.copy(message = "")
         _message.value = ""
     }
 
@@ -61,31 +59,30 @@ class DashboardViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     fun updateIsLoading(isLoading: Boolean) {
         _uiState.value = _uiState.value.copy(isLoading = isLoading)
     }
+
     fun updateMessage(message: String) {
         _uiState.value = _uiState.value.copy(message = message)
     }
+
     fun updateRole(role: String) {
         _uiState.value = _uiState.value.copy(role = role)
     }
+
     fun updateInitialDate(date: Long) {
         _uiState.value = _uiState.value.copy(initalDate = convertMillisToDate(date))
     }
+
     fun updateFinalDate(date: Long) {
         _uiState.value = _uiState.value.copy(finalDate = convertMillisToDate(date))
     }
 
-    // Updates the UI state with a new list of requests
-    fun loadAllRequests(){
+    fun loadAllRequests() {
         viewModelScope.launch {
-            try{
-                var token = ""
-                viewModelScope.launch {
-                    _dataStoreManager.token.let {
-                        token = it.first()!!
-                    }
-                }
+            try {
                 updateIsLoading(true)
-                val response = TecnisisApi.requestService.getAllRequests(token)
+                val token = _dataStoreManager.token.first() ?: ""
+
+                val response = TecnisisApi.requestService.getAllRequests("Bearer $token")
                 if (response.isSuccessful) {
                     response.body()?.let { requests ->
                         updateIsLoading(false)
@@ -97,8 +94,7 @@ class DashboardViewModel(dataStoreManager: DataStoreManager): ViewModel() {
                     val errorBody = JSONObject(response.errorBody()?.string()!!)
                     updateMessage(errorBody.getString("message"))
                 }
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 updateIsLoading(false)
                 updateMessage("Error: ${e.message}")
             }
@@ -120,8 +116,14 @@ class DashboardViewModel(dataStoreManager: DataStoreManager): ViewModel() {
         val finalDate = rangeDateFormat.parse(_uiState.value.finalDate)
 
         return _uiState.value.requests.filter { request ->
-            val requestDate = requestDateFormat.parse(request.date) // Use requestDateFormat here
-            requestDate?.after(initialDate)!! && requestDate?.before(finalDate)!! // Add null check and non-null assertion
+            val requestDate = requestDateFormat.parse(request.date)
+            requestDate?.after(initialDate)!! && requestDate?.before(finalDate)!!
         }
+    }
+
+    fun getTechniqueDistribution(): Map<String, Int> {
+        return _uiState.value.requests.groupingBy { request ->
+            request.artWork.technique.name
+        }.eachCount()
     }
 }
