@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -22,12 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomBasicTextField
 import com.example.tecnisis.ui.components.CustomEmailField
+import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.CustomPasswordField
 import com.example.tecnisis.ui.components.CustomPhoneNumberField
 import com.example.tecnisis.ui.components.InfoBox
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
+import com.example.tecnisis.ui.components.TopBarState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -35,7 +41,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel,
-    onSignUp: MutableState<()->Unit>,
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState
 ) {
@@ -45,8 +52,17 @@ fun SignUpScreen(
     val coroutineScope = rememberCoroutineScope()
     val message by viewModel.message.observeAsState()
 
-    onSignUp.value = {
-        viewModel.registerUser()
+    topAppBar.value = {
+        TecnisisTopAppBar(
+            state = TopBarState.COLLAPSED
+        )
+    }
+
+    floatingButton.value = {
+        CustomFloatingButton(
+            onClick = { viewModel.registerUser() },
+            icon = Icons.Default.ArrowForward
+        )
     }
 
     LaunchedEffect(uiState.registrationSuccessful) {
@@ -76,7 +92,7 @@ fun SignUpScreen(
             CustomPhoneNumberField(stringResource(R.string.phone), uiState.phone, Modifier.weight(1f), onValueChange = { viewModel.updatePhone(it) })
         }
         CustomBasicTextField(stringResource(R.string.address), uiState.address, Modifier.fillMaxWidth(), onValueChange = { viewModel.updateAddress(it) })
-
+        BottomPattern()
         message?.let { msg ->
             if (msg.isNotEmpty()) {
                 coroutineScope.launch {

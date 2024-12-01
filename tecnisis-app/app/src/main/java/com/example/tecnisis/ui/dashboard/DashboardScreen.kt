@@ -2,48 +2,39 @@ package com.example.tecnisis.ui.dashboard
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.tecnisis.TecnisisScreen
 import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.data.request.RequestResponse
+import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomDatePickerField
-import com.example.tecnisis.ui.components.CustomSingleChoiceSegmentedButton
-import com.example.tecnisis.ui.components.RequestCard
 import com.example.tecnisis.ui.components.ScreenTitle
-import com.example.tecnisis.ui.dashboard.DashboardViewModel
+import com.example.tecnisis.ui.components.SectionHeader
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
+import com.example.tecnisis.ui.components.TopBarState
+import com.github.tehras.charts.bar.BarChart
+import com.github.tehras.charts.bar.BarChartData
+import com.github.tehras.charts.bar.BarChartData.Bar
+import com.github.tehras.charts.bar.renderer.label.SimpleValueDrawer
+import com.github.tehras.charts.bar.renderer.xaxis.SimpleXAxisDrawer
+import com.github.tehras.charts.bar.renderer.yaxis.SimpleYAxisDrawer
+import com.github.tehras.charts.piechart.PieChart
+import com.github.tehras.charts.piechart.PieChartData
+import com.github.tehras.charts.piechart.renderer.SimpleSliceDrawer
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,8 +43,8 @@ fun DashboardScreen(
     currentScreen: TecnisisScreen = TecnisisScreen.Dashboard,
     modifier: Modifier = Modifier,
     navController: NavController,
-    enableFloatingActionButton: MutableState<Boolean>,
-    floatingButtonPressed: MutableState<() -> Unit>
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>
 ) {
     // Collect the UI state from the ViewModel
     val uiState by viewModel.uiState.collectAsState()
@@ -61,70 +52,145 @@ fun DashboardScreen(
     val requests = uiState.requests
     val dataStoreManager = remember { DataStoreManager(context) }
 
+    topAppBar.value = {
+        TecnisisTopAppBar(
+            state = TopBarState.EXPANDED,
+            onLogoutClick = {
+                navController.navigate(TecnisisScreen.Login.name)
+            },
+            onProfileClick = {
+                navController.navigate(TecnisisScreen.Profile.name)
+            }
+        )
+    }
+    floatingButton.value = {}
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp)
+            .verticalScroll(rememberScrollState())
             .background(color = Color.Transparent)
     ) {
         // Search bar at the top
-        ScreenTitle(text = context.getString(currentScreen.title))
-        Spacer(modifier = Modifier.height(8.dp))
-        CustomDatePickerField(
-            label = "Fecha Inicial",
-            defaultDate = uiState.initalDate,
-            onDateSelected = { viewModel.updateInitialDate(it) }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        CustomDatePickerField(
-            label = "Fecha Final",
-            defaultDate = uiState.finalDate,
-            onDateSelected = { viewModel.updateFinalDate(it) }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        // Dashboard
-        BarGraph(requests = viewModel.getRequestBetweenDates())
+        Column(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+        ){
+            ScreenTitle(text = context.getString(currentScreen.title))
+            Spacer(modifier = Modifier.height(24.dp))
+            CustomDatePickerField(
+                label = "Fecha Inicial",
+                defaultDate = uiState.initalDate,
+                onDateSelected = { viewModel.updateInitialDate(it) }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomDatePickerField(
+                label = "Fecha Final",
+                defaultDate = uiState.finalDate,
+                onDateSelected = { viewModel.updateFinalDate(it) }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            // Dashboard
+            BarGraph(requests = viewModel.getRequestBetweenDates())
+            Spacer(modifier = Modifier.height(16.dp))
+            SectionHeader(text = "Distribucion de obras por técnica")
+            Spacer(modifier = Modifier.height(8.dp))
+            val techniqueDistribution = viewModel.getTechniqueDistribution()
+            val colors = techniqueDistribution.keys.map { Color(Random.nextInt(256), Random.nextInt(256), Random.nextInt(256)) }
+            TechniqueLegend(techniqueDistribution = techniqueDistribution, colors = colors)
+            Spacer(modifier = Modifier.height(16.dp))
+            TechniquePieChart(techniqueDistribution = techniqueDistribution, colors = colors)
+        }
+
+        BottomPattern()
     }
 }
 
 @Composable
 fun BarGraph(requests: List<RequestResponse>) {
     val requestsPerDay = requests.groupBy { it.date }.mapValues { it.value.size }
+    val bars = requestsPerDay.map { (date, count) ->
+        Bar(
+            label = date,
+            value = count.toFloat(),
+            color = Color.Red
+        )
+    }
 
-    Column(
+    val barChartData = BarChartData(
+        bars = bars,
+        padBy = 2f
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        requestsPerDay.forEach { (date, count) ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+        BarChart(
+            barChartData = barChartData,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            labelDrawer = SimpleValueDrawer(
+                drawLocation = SimpleValueDrawer.DrawLocation.XAxis,
+            ),
+            xAxisDrawer = SimpleXAxisDrawer(),
+            yAxisDrawer = SimpleYAxisDrawer(
+                labelValueFormatter = { value -> value.toInt().toString() }
+            )
+        )
+    }
+}
 
-            ) {
-                Text(
-                    text = date,
-                    fontSize = 14.sp,
-                    modifier = Modifier.width(80.dp)
-                )
+@Composable
+fun TechniqueLegend(techniqueDistribution: Map<String, Int>, colors: List<Color>) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        techniqueDistribution.keys.forEachIndexed { index, technique ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .height(20.dp)
-                        .weight(1f)
-                        .background(Color.Yellow, RoundedCornerShape(4.dp))
-                ){
-                    Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(count.toFloat() / requests.size)
-                        .background(Color.Red, RoundedCornerShape(4.dp)))
-                }
-                Text(
-                    text = count.toString(),
-                    fontSize = 14.sp,
-                    modifier = Modifier.width(40.dp)
+                        .size(16.dp)
+                        .background(colors[index])
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = technique)
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = "(" + techniqueDistribution[technique].toString() + ")", fontSize = 12.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                if (techniqueDistribution.size > 1) {
+                    val total = techniqueDistribution.values.sum().toFloat()
+                    val percentage = (techniqueDistribution[technique]!!.toFloat() / total) * 100
+                    Text(text = "%.2f%%".format(percentage), fontSize = 12.sp)
+                }
             }
+            Spacer(modifier = Modifier.height(4.dp))
         }
+    }
+}
+
+@Composable
+fun TechniquePieChart(techniqueDistribution: Map<String, Int>, colors: List<Color>) {
+    val slices = techniqueDistribution.entries.mapIndexed { index, entry ->
+        PieChartData.Slice(
+            value = entry.value.toFloat(),
+            color = colors[index],
+        )
+    }
+
+    val pieChartData = PieChartData(
+        slices = slices
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        PieChart(
+            pieChartData = pieChartData,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
     }
 }

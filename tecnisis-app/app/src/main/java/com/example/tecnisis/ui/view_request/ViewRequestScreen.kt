@@ -8,6 +8,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,12 +21,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ProgressCard
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SectionHeader
 import com.example.tecnisis.ui.components.SelectableListItem
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
+import com.example.tecnisis.ui.components.TopBarState
 import com.example.tecnisis.ui.theme.TecnisisTheme
 
 @Composable
@@ -34,6 +38,8 @@ fun ViewRequestScreen(
     viewModel: ViewRequestViewModel,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>
 ){
     val uiState by viewModel.uiState.collectAsState()
     val message = viewModel.message.observeAsState()
@@ -42,6 +48,14 @@ fun ViewRequestScreen(
     val economicEvaluation = uiState.economicEvaluation
 
     val context = LocalContext.current
+
+    topAppBar.value = {
+        TecnisisTopAppBar(
+            state = TopBarState.COLLAPSED
+        )
+    }
+
+    floatingButton.value = {}
 
     LaunchedEffect(message.value){
         message.value?.let {
@@ -118,6 +132,7 @@ fun ViewRequestScreen(
                 }
             }
         }
+        BottomPattern()
     }
 }
 

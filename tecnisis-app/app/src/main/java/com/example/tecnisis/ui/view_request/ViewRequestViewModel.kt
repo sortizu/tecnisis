@@ -60,7 +60,7 @@ class ViewRequestViewModel (requestId: Long, dataStoreManager: DataStoreManager)
                 dataStoreManager.token.let {
                     token = it.first()!!
                 }
-                val response = TecnisisApi.requestService.getRequest(token,id)
+                val response = TecnisisApi.requestService.getRequest("Bearer $token",id)
                 if (response.isSuccessful){
                     response.body()?.let {
                         for (request in it){

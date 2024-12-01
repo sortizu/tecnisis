@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,24 +23,52 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomDatePickerField
+import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SelectableListItem
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
+import com.example.tecnisis.ui.components.TopBarState
+import kotlinx.coroutines.delay
 
 @Composable
 fun EconomicRequestEvaluationScreen(
     currentScreen: TecnisisScreen = TecnisisScreen.EconomicRequestEvaluation,
     viewModel: EconomicRequestEvaluationViewModel,
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>
 ){
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val request = uiState.request
     val message by viewModel.message.observeAsState("")
+
+
+    topAppBar.value = {
+        TecnisisTopAppBar(
+            state = TopBarState.COLLAPSED
+        )
+    }
+
+    floatingButton.value = {
+        CustomFloatingButton(
+            onClick = { viewModel.saveReview() },
+            icon = Icons.Default.Add
+        )
+    }
+
+    LaunchedEffect(uiState.evaluationSaved) {
+        if (uiState.evaluationSaved) {
+            delay(100)
+            navController.navigate(TecnisisScreen.ListRequests.name)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -89,6 +120,7 @@ fun EconomicRequestEvaluationScreen(
             text = stringResource(R.string.attach_review_document),
             onClick = {}
         )
+        BottomPattern()
     }
 }
 

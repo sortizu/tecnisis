@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class ArtworkRequest(
     val title: String,
+    @SerializedName("creation_date")
     val creationDate: String,
     val image: String,
     val height: Double,

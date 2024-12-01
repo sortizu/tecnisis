@@ -18,7 +18,8 @@ import org.json.JSONObject
 data class ListUserRequestUiState(
     val isLoading: Boolean = false,
     val requests: List<RequestResponse> = emptyList(),
-    val filter: String = "",
+    val searchFilter: String = "",
+    val statusFilter: String = "",
     val message: String = "",
     val role: String = ""
 )
@@ -29,7 +30,7 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> = _message
     val dataStoreManager: DataStoreManager = dataStoreManager
-
+    var statusList: MutableList<String> = mutableListOf()
     init {
         var role = ""
         var idRole = ""
@@ -64,12 +65,23 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
     fun updateRole(role: String) {
         _uiState.value = _uiState.value.copy(role = role)
     }
-    fun updateFilter(filter: String) {
-        _uiState.value = _uiState.value.copy(filter = filter)
+    fun updateSearchFilter(filter: String) {
+        _uiState.value = _uiState.value.copy(searchFilter = filter)
     }
-    fun getFilteredRequests(query: String) : List<RequestResponse> {
-        val filteredRequests = _uiState.value.requests.filter { request ->
+
+    fun updateStatusFilter(filter: String) {
+        _uiState.value = _uiState.value.copy(statusFilter = filter)
+    }
+
+    fun getRequestsBySearchFilter(requests: List<RequestResponse>,query: String) : List<RequestResponse> {
+        val filteredRequests = requests.filter { request ->
             request.artWork.title.contains(query, ignoreCase = true)
+        }
+        return filteredRequests
+    }
+    fun getRequestsByStatusFilter(requests: List<RequestResponse>,query: String) : List<RequestResponse> {
+        val filteredRequests = requests.filter { request ->
+            request.status.contains(query, ignoreCase = true)
         }
         return filteredRequests
     }
@@ -79,24 +91,19 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
         viewModelScope.launch {
             try {
                 updateIsLoading(true)
-                var token = ""
-                viewModelScope.launch {
-                    dataStoreManager.token.let {
-                        token = it.first()!!
-                    }
-                }
+                val token = dataStoreManager.token.first() ?: ""
 
                 val response = when (_uiState.value.role) {
                     "ARTIST" -> {
-                        TecnisisApi.artistService.getArtistRequests(token,id)
+                        TecnisisApi.artistService.getArtistRequests("Bearer $token",id)
                     }
 
                     "ART-EVALUATOR" -> {
-                        TecnisisApi.specialistService.getArtisticRequests(token,id)
+                        TecnisisApi.specialistService.getArtisticRequests("Bearer $token",id)
                     }
 
                     else -> {
-                        TecnisisApi.specialistService.getEconomicRequests(token,id)
+                        TecnisisApi.specialistService.getEconomicRequests("Bearer $token",id)
                     }
                 }
                 if (response.isSuccessful) {
@@ -104,6 +111,7 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
                         updateIsLoading(false)
                         updateRequests(requests)
                         resetMessage()
+                        updateRequestStatus()
                     }
                 } else {
                     updateIsLoading(false)
@@ -114,6 +122,31 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
             catch (e: Exception) {
                 updateIsLoading(false)
                 updateMessage("Error: ${e.message}")
+            }
+        }
+    }
+    fun updateRequestStatus(){
+        viewModelScope.launch {
+            val token = dataStoreManager.token.first() ?: ""
+            for (request in _uiState.value.requests){
+                when (_uiState.value.role) {
+                    "ART-EVALUATOR" -> {
+                        val artisticResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest("Bearer $token",request.id)
+                        if (artisticResponse.isSuccessful) {
+                            artisticResponse.body()?.let { artisticEvaluation ->
+                                statusList.add(artisticEvaluation.status)
+                            }
+                        }
+                    }
+                    "ECONOMIC-EVALUATOR" -> {
+                        val economicResponse = TecnisisApi.evaluationService.getEconomicEvaluationByRequest("Bearer $token",request.id)
+                        if (economicResponse.isSuccessful) {
+                            economicResponse.body()?.let { economicEvaluation ->
+                                statusList.add(economicEvaluation.status)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

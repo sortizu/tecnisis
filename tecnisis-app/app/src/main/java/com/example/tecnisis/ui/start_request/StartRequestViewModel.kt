@@ -1,5 +1,6 @@
 package com.example.tecnisis.ui.start_request
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tecnisis.config.datastore.DataStoreManager
@@ -136,21 +137,23 @@ class StartRequestViewModel(dataStoreManager: DataStoreManager): ViewModel() {
                     techniqueId = _techniqueId
                 )
                 // Save artwork
-                val artworkResponse = TecnisisApi.artworkService.saveArtwork(token, artworkRequest)
+                val artworkResponse = TecnisisApi.artworkService.saveArtwork("Bearer $token", artworkRequest)
                 var _artworkId = -1L
                 if (artworkResponse.isSuccessful) {
                     artworkResponse.body()?.let {
                         _artworkId = it.id
                     }
                 }else{
-                    updateMessage("Error al guardar la obra de arte")
+
+                    val errorBody = JSONObject(artworkResponse.errorBody()?.string()!!)
+                    Log.d("error", errorBody.getString("error"))
                     return@launch
                 }
                 val request = CreateRequest(
                     "Pending",
                     _artworkId
                 )
-                val _requestResponse = TecnisisApi.requestService.createRequest(token,request)
+                val _requestResponse = TecnisisApi.requestService.createRequest("Bearer $token",request)
                 if (_requestResponse.isSuccessful) {
                     _requestResponse.body()?.let {
                         updateMessage("Solicitud enviada con éxito")

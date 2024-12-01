@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -41,12 +42,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomBasicTextField
 import com.example.tecnisis.ui.components.CustomDatePickerField
+import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SelectableListItem
 import com.example.tecnisis.ui.components.SingleChoiceDialog
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
+import com.example.tecnisis.ui.components.TopBarState
 import kotlinx.coroutines.delay
 
 @Composable
@@ -56,7 +61,8 @@ fun StartRequestScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
-    onStartRequest: MutableState<() -> Unit>
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>
 ){
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -64,8 +70,17 @@ fun StartRequestScreen(
     val isDialogVisible = uiState.isDialogVisible //by viewModel.isDialogVisible.observeAsState(false)
     val message = uiState.message
 
-    onStartRequest.value = {
-        viewModel.startRequest()
+    topAppBar.value = {
+        TecnisisTopAppBar(
+            state = TopBarState.COLLAPSED
+        )
+    }
+
+    floatingButton.value = {
+        CustomFloatingButton(
+            onClick = { viewModel.startRequest() },
+            icon = Icons.Default.Save
+        )
     }
 
     LaunchedEffect(uiState.creationSuccessful) {
@@ -146,6 +161,7 @@ fun StartRequestScreen(
                     viewModel.updateIsDialogVisible(true)
                 }
             )
+            BottomPattern()
             if (isDialogVisible) {
                 SingleChoiceDialog(
                     title = "Seleccionar tecnica",
