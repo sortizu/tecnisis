@@ -20,8 +20,5 @@ public class ArtisticEvaluationCreateRequest  {
     @Max(value = 10, message = "rating must be less than or equal to 10")
     private BigDecimal rating;
 
-    @Pattern(regexp = "APPROVED|REJECTED", message = "result must be APPROVED or REJECTED")
-    private String result;
-
     private Long documentId;
 }

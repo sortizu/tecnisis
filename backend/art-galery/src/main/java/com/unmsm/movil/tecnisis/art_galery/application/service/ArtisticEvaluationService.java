@@ -66,6 +66,13 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
     }
 
     @Override
+    public ArtisticEvaluation findByRequestId(Long id) {
+        return artisticEvaluationPersistencePort
+                .findByRequestId(id)
+                .orElseThrow(ArtisticEvaluationNotFoundException::new);
+    }
+
+    @Override
     public void delete(Long id) {
         if (artisticEvaluationPersistencePort.findById(id).isEmpty()) throw new ArtisticEvaluationNotFoundException();
         artisticEvaluationPersistencePort.deleteById(id);
@@ -106,4 +113,5 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
         // Guardar la evaluación económica
         economicEvaluationPersistencePort.save(economicEvaluation);
     }
+
 }

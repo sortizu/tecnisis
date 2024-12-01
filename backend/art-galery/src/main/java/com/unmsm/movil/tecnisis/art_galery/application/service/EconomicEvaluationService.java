@@ -82,6 +82,13 @@ public class EconomicEvaluationService implements EconomicEvaluationServicePort 
     }
 
     @Override
+    public EconomicEvaluation findByRequestId(Long requestId) {
+        return economicEvaluationPersistencePort
+                .findByRequestId(requestId)
+                .orElseThrow(EconomicEvaluationNotFoundException::new);
+    }
+
+    @Override
     public void delete(Long id) {
         if (economicEvaluationPersistencePort.findById(id).isEmpty()) throw new EconomicEvaluationNotFoundException();
         economicEvaluationPersistencePort.deleteById(id);

@@ -10,4 +10,5 @@ public interface RequestPersistencePort {
     List<Request> findAll();
     Request save(Request request);
     void deleteById(Long id);
+    List<Request> findByStatus(String status);
 }

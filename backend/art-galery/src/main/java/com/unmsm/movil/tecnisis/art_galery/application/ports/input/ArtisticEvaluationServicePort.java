@@ -8,5 +8,6 @@ public interface ArtisticEvaluationServicePort {
     ArtisticEvaluation findById(Long id);
     List<ArtisticEvaluation> findAll();
     ArtisticEvaluation update(Long id, ArtisticEvaluation artisticEvaluation);
+    ArtisticEvaluation findByRequestId(Long id);
     void delete(Long id);
 }

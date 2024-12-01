@@ -13,31 +13,38 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/artistic-evaluations")
+@RequestMapping("/artistic-evaluations/v1/api")
 @Tag(name = "Artistic Evaluation Controller", description = "Endpoint to management artistic evaluations")
 public class ArtisticEvaluationRestAdapter {
 
     private final ArtisticEvaluationServicePort servicePort;
     private final ArtisticEvaluationRestMapper restMapper;
 
-    @GetMapping("/v1/api")
+    @GetMapping
     public List<ArtisticEvaluationResponse> findAll() {
         return restMapper.toArtisticEvaluationResponseList(servicePort.findAll());
     }
 
-    @GetMapping("/v1/api/{id}")
+    @GetMapping("/{id}")
     public ArtisticEvaluationResponse findById(@PathVariable Long id) {
         return restMapper.toArtisticEvaluationResponse(servicePort.findById(id));
     }
 
-    @PutMapping("/v1/api/{id}")
+    @GetMapping("/request/{id}")
+    public ArtisticEvaluationResponse findByRequestId(@PathVariable Long id) {
+        return restMapper.toArtisticEvaluationResponse(
+                servicePort.findByRequestId(id)
+        );
+    }
+
+    @PutMapping("/{id}")
     public ArtisticEvaluationResponse update(@Valid @RequestBody ArtisticEvaluationCreateRequest request, @PathVariable Long id) {
         return restMapper.toArtisticEvaluationResponse(
                 servicePort.update(id, restMapper.toArtisticEvaluation(request))
         );
     }
 
-    @DeleteMapping("/v1/api/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         servicePort.delete(id);
         return ResponseEntity.noContent().build();

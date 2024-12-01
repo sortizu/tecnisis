@@ -9,6 +9,7 @@ public interface EconomicEvaluationServicePort {
     List<EconomicEvaluation> findAll();
     EconomicEvaluation save(EconomicEvaluation economicEvaluation);
     EconomicEvaluation update(Long id, EconomicEvaluation economicEvaluation);
+    EconomicEvaluation findByRequestId(Long requestId);
     void delete(Long id);
 
 }

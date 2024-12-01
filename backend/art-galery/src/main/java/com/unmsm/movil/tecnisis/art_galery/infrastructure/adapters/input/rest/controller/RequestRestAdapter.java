@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/requests")
+@RequestMapping("/requests/v1/api")
 @Tag(name = "Request Controller", description = "Endpoint to management requests")
 public class RequestRestAdapter {
 
@@ -25,17 +25,17 @@ public class RequestRestAdapter {
     private final RequestRestMapper requestMapper;
     private final ArtisticEvaluationRestMapper artisticEvaluationMapper;
 
-    @GetMapping("/v1/api")
+    @GetMapping
     public List<RequestResponse> findAll() {
         return requestMapper.toRequestResponseList(servicePort.findAll());
     }
 
-    @GetMapping("/v1/api/{id}")
+    @GetMapping("/{id}")
     public RequestResponse findById(@PathVariable Long id) {
         return requestMapper.toRequestResponse(servicePort.findById(id));
     }
 
-    @GetMapping("/v1/api/{id}/artistic-evaluation")
+    @GetMapping("/{id}/artistic-evaluation")
     public ArtisticEvaluationResponse findArtisticEvaluationByRequestId(@PathVariable Long id) {
         return artisticEvaluationMapper
                 .toArtisticEvaluationResponse(
@@ -43,7 +43,13 @@ public class RequestRestAdapter {
                 );
     }
 
-    @PostMapping("/v1/api")
+    @GetMapping("/{id}/complete-process")
+    public ResponseEntity<Void> completeProcess(@PathVariable Long id) {
+        servicePort.completeProcess(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
     public ResponseEntity<RequestResponse> save(@Valid @RequestBody RequestCreateRequest request) {
         RequestResponse response = requestMapper.toRequestResponse(
                 servicePort.save(requestMapper.toRequest(request)));
@@ -52,14 +58,14 @@ public class RequestRestAdapter {
                 .body(response);
     }
 
-    @PutMapping("/v1/api/{id}")
+    @PutMapping("/{id}")
     public RequestResponse update(@Valid @RequestBody RequestCreateRequest request, @PathVariable Long id) {
         return requestMapper.toRequestResponse(
                 servicePort.update(id, requestMapper.toRequest(request))
         );
     }
 
-    @DeleteMapping("/v1/api/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         servicePort.delete(id);
         return ResponseEntity.noContent().build();

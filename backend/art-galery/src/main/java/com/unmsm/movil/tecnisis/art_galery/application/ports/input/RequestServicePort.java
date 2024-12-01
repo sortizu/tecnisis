@@ -11,5 +11,6 @@ public interface RequestServicePort {
     ArtisticEvaluation findArtisticEvaluationByRequestId(Long id);
     Request save(Request request);
     Request update(Long id, Request request);
+    void completeProcess(Long requestId);
     void delete(Long id);
 }

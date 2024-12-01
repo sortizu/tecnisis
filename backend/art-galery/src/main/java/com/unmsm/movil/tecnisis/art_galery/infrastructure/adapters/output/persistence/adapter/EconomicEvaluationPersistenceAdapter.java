@@ -44,4 +44,9 @@ public class EconomicEvaluationPersistenceAdapter implements EconomicEvaluationP
                 .findByRequestId(requestId)
                 .map(mapper::toEconomicEvaluation);
     }
+
+    @Override
+    public List<EconomicEvaluation> findByStatus(String status) {
+        return mapper.toEconomicEvaluationList(repository.findByStatus(status));
+    }
 }

@@ -40,8 +40,16 @@ public enum ErrorCatalog {
     // parameters
     INVALID_PARAMETER("ERR_GEN_001", "Invalid parameter"),
 
+    // manager
+    MANAGER_NOT_FOUND("ERR_MAN_001", "Manager not found"),
+
+    // process
+    PROCESS_NOT_READY("ERR_PRO_001", "Process not ready for completion"),
+
     // generic error
     GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred");
+
+
 
     private final String code;
     private final String message;

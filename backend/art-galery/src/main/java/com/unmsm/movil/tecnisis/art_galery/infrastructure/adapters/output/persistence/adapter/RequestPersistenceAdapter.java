@@ -38,4 +38,9 @@ public class RequestPersistenceAdapter implements RequestPersistencePort {
     public void deleteById(Long id) {
         requestRepository.deleteById(id);
     }
+
+    @Override
+    public List<Request> findByStatus(String status) {
+        return requestMapper.toRequestList(requestRepository.findByStatus(status));
+    }
 }
