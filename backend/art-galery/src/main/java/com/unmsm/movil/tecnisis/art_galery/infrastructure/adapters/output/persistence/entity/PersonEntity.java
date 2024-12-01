@@ -27,8 +27,8 @@ public class PersonEntity {
     @Column(name = "user_role")
     private String role;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_user", referencedColumnName = "id_user", nullable = true)
+    @OneToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     @JsonManagedReference
     private UserEntity user;
 }

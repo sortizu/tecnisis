@@ -12,6 +12,6 @@ public class Person {
     private String gender;
     private String phone;
     private String role;
-    //@JsonIgnore
-    //private User user;
+    private Long rolId;
+    private User user;
 }

@@ -17,6 +17,26 @@ import static com.unmsm.movil.tecnisis.art_galery.utils.ErrorCatalog.*;
 public class GlobalControllerAdvice {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProcessNotReadyForCompletionException.class)
+    public ErrorResponse handleProcessNotReadyForCompletionException() {
+        return ErrorResponse.builder()
+                .code(PROCESS_NOT_READY.getCode())
+                .message(PROCESS_NOT_READY.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ManagerNotFoundException.class)
+    public ErrorResponse handleManagerNotFoundException() {
+        return ErrorResponse.builder()
+                .code(MANAGER_NOT_FOUND.getCode())
+                .message(MANAGER_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ArtistNotFoundException.class)
     public ErrorResponse handleArtistNotFoundException() {
         return ErrorResponse.builder()
@@ -112,6 +132,16 @@ public class GlobalControllerAdvice {
         return ErrorResponse.builder()
                 .code(USER_NOT_FOUND.getCode())
                 .message(USER_NOT_FOUND.getMessage())
+                .timeStamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(RoleNotSupportedException.class)
+    public ErrorResponse handleRoleNotFoundException() {
+        return ErrorResponse.builder()
+                .code(PERSON_ROLE_NOT_SUPPORTED.getCode())
+                .message(PERSON_ROLE_NOT_SUPPORTED.getMessage())
                 .timeStamp(LocalDateTime.now())
                 .build();
     }

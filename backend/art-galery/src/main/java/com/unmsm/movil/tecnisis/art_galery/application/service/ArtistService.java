@@ -17,7 +17,7 @@ import java.util.List;
 public class ArtistService implements ArtistServicePort {
 
     private final ArtistPersistencePort artistPersistencePort;
-    private final PersonPersistencePort personPersistencePort;
+    private final PersonService personService;
 
     @Override
     public Artist findById(Long id) {
@@ -39,26 +39,12 @@ public class ArtistService implements ArtistServicePort {
     }
 
     @Override
-    public Artist save(Artist artist) {
-        return personPersistencePort.findById(artist.getPerson().getId())
-                .map(person -> {
-                    artist.setPerson(person);
-                    return artistPersistencePort.save(artist);
-                })
-                .orElseThrow(PersonNotFoundException::new);
-    }
-
-    @Override
     public Artist update(Long id, Artist request) {
         return artistPersistencePort.findById(id)
-                .map(artist -> personPersistencePort
-                        .findById(request.getPerson().getId())
-                        .map(person -> {
-                            artist.setPerson(person);
-                            return artistPersistencePort.save(artist);
-                        })
-                        .orElseThrow(PersonNotFoundException::new)
-                )
+                .map(a -> {
+                    a.setPerson(personService.update(a.getPerson().getId(), request.getPerson()));
+                    return artistPersistencePort.save(a);
+                })
                 .orElseThrow(ArtistNotFoundException::new);
     }
 

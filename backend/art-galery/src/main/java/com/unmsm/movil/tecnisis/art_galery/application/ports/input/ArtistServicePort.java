@@ -8,7 +8,6 @@ public interface ArtistServicePort {
     Artist findById(Long id);
     List<Artist> findAll();
     List<Request> findRequestsById(Long id);
-    Artist save(Artist artist);
     Artist update(Long id, Artist artist);
     void delete(Long id);
 }

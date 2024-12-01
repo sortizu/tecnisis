@@ -14,8 +14,7 @@ import java.util.List;
 @Mapper(componentModel = "spring",
         uses = {SpecialistRestMapper.class, RequestRestMapper.class, DocumentRestMapper.class})
 public interface ArtisticEvaluationRestMapper {
-    @Mapping(target = "specialist", expression = "java(mapToSpecialist(artisticEvaluationCreateRequest.getSpecialistId()))")
-    @Mapping(target = "request", expression = "java(mapToRequest(artisticEvaluationCreateRequest.getRequestId()))")
+    
     @Mapping(target = "document", expression = "java(mapToDocument(artisticEvaluationCreateRequest.getDocumentId()))")
     ArtisticEvaluation  toArtisticEvaluation(ArtisticEvaluationCreateRequest artisticEvaluationCreateRequest);
 
@@ -24,18 +23,22 @@ public interface ArtisticEvaluationRestMapper {
     List<ArtisticEvaluationResponse> toArtisticEvaluationResponseList(List<ArtisticEvaluation> artisticEvaluationList);
 
     default Specialist mapToSpecialist(Long id) {
+        if (id == null) return null;
+
         return Specialist.builder()
                 .id(id)
                 .build();
     }
 
     default Request mapToRequest(Long id) {
+        if (id == null) return null;
         return Request.builder()
                 .id(id)
                 .build();
     }
 
     default Document mapToDocument(Long id) {
+        if (id == null) return null;
         return Document.builder()
                 .id(id)
                 .build();

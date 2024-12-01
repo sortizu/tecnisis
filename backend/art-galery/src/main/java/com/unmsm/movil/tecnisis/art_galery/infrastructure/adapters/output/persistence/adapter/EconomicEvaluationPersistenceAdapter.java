@@ -37,4 +37,16 @@ public class EconomicEvaluationPersistenceAdapter implements EconomicEvaluationP
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
+
+    @Override
+    public Optional<EconomicEvaluation> findByRequestId(Long requestId) {
+        return repository
+                .findByRequestId(requestId)
+                .map(mapper::toEconomicEvaluation);
+    }
+
+    @Override
+    public List<EconomicEvaluation> findByStatus(String status) {
+        return mapper.toEconomicEvaluationList(repository.findByStatus(status));
+    }
 }

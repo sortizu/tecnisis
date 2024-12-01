@@ -25,11 +25,14 @@ public class EconomicEvaluationEntity {
     @Column(name = "gallery_percentage")
     private BigDecimal galleryPercentage;
 
+    private String status;
+
     @ManyToOne
-    @JoinColumn(name = "id_specialist", nullable = false)
+    @JoinColumn(name = "id_specialist", referencedColumnName = "id_specialist", nullable = false)
+    @JsonManagedReference
     private SpecialistEntity specialist;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "id_request", referencedColumnName = "id_request", nullable = false)
     @JsonManagedReference
     private RequestEntity request;

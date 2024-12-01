@@ -12,6 +12,7 @@ public class ArtisticEvaluation {
     private LocalDate evaluationDate;
     private BigDecimal rating;
     private String result;
+    private String status;
     private Specialist specialist;
     private Request request;
     private Document document;

@@ -10,5 +10,6 @@ public interface EconomicEvaluationPersistencePort {
     List<EconomicEvaluation> findAll();
     EconomicEvaluation save(EconomicEvaluation economicEvaluation);
     void deleteById(Long id);
-
+    Optional<EconomicEvaluation> findByRequestId(Long requestId);
+    List<EconomicEvaluation> findByStatus(String status);
 }
