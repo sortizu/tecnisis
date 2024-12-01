@@ -1,14 +1,14 @@
 package com.example.tecnisis.ui.login
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -31,18 +31,20 @@ import androidx.navigation.NavHostController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
 import com.example.tecnisis.config.datastore.DataStoreManager
+import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomEmailField
+import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.components.CustomPasswordField
 import com.example.tecnisis.ui.components.InfoBox
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    onLogin: MutableState<() -> Unit>,
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>,
     navController: NavHostController,
     snackbarHostState: SnackbarHostState
 ) {
@@ -52,8 +54,13 @@ fun LoginScreen(
     val dataStoreManager = remember { DataStoreManager(context) }
     val message by viewModel.message.observeAsState("")
 
-    onLogin.value = {
-        viewModel.validateUser(dataStoreManager)
+    topAppBar.value = {}
+
+    floatingButton.value = {
+        CustomFloatingButton(
+            onClick = {viewModel.validateUser(dataStoreManager)},
+            icon = Icons.Default.ArrowForward
+        )
     }
 
     LaunchedEffect(uiState.isLoginSuccessful) {
@@ -153,6 +160,7 @@ fun LoginScreen(
                     modifier = Modifier.clickable { navController.navigate(TecnisisScreen.SignUp.name) }
                 )
             }
+            BottomPattern()
         }
     }
 

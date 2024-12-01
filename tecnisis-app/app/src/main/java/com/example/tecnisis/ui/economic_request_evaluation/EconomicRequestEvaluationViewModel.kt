@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
+import com.example.tecnisis.data.document.DocumentRequest
 import com.example.tecnisis.data.evaluations.EconomicEvaluationRequest
 import com.example.tecnisis.data.request.RequestResponse
 import com.example.tecnisis.ui.components.convertMillisToDate
@@ -20,6 +21,7 @@ data class EconomicRequestReviewUiState(
     val galleryPercentage: Double = 0.0,
     val document: String = "",
     val request: RequestResponse? = null,
+    val evaluationSaved: Boolean = false,
     val date: String = "",
 )
 
@@ -52,6 +54,9 @@ class EconomicRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     }
     fun updateMessage(newMessage: String) {
         _message.value = newMessage
+    }
+    fun updateEvaluationSaved(newEvaluationSaved: Boolean) {
+        _uiState.value = _uiState.value.copy(evaluationSaved = newEvaluationSaved)
     }
 
     fun getRequest(id: Long) {
@@ -93,24 +98,53 @@ class EconomicRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 dataStoreManager.token.let {
                     token = it.first()!!
                 }
+
+                var idEvaluation = -1L
+                val evaluationResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest(token, _uiState.value.request!!.id)
+                if (evaluationResponse.isSuccessful){
+                    evaluationResponse.body()?.let {
+                        idEvaluation = it.id
+                    }
+                }
+
+                var status = "Approved"
                 var idRole = -1L
                 dataStoreManager.idRole.let {
                     idRole = it.first()!!.toLong()
                 }
+                // Register document
+                var documentId=-1L
+                val documentResponse = TecnisisApi.documentService.uploadDocument(
+                    "Bearer $token",
+                    DocumentRequest(
+                        path = document
+                    )
+                )
+                if (documentResponse.isSuccessful){
+                    documentResponse.body()?.let {
+                        documentId = it.id
+                    }
+                }
+
+
+
                 val specialistId = idRole
-                val response = TecnisisApi.evaluationService.saveEconomicEvaluation(
-                    token,
+                val response = TecnisisApi.evaluationService.updateEconomicEvaluation(
+                    "Bearer $token",
                     EconomicEvaluationRequest(
                         evaluationDate = evaluationDate,
                         salePrice = salePrice,
                         galleryPercentage = galleryPercentage,
-                        specialistId = idRole,
-                        document = document
-                    )
+                        specialistId = specialistId,
+                        documentId = documentId,
+                        status = status
+                    ),
+                    idEvaluation
                 )
                 if (response.isSuccessful){
                     response.body()?.let {
-                        _message.value = it
+                        updateEvaluationSaved(true)
+                        updateMessage("Evaluación guardada correctamente")
                     }
                 }
                 else{

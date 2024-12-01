@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,7 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
+import com.example.tecnisis.ui.components.BottomPattern
 import com.example.tecnisis.ui.components.CustomDatePickerField
+import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.CustomSingleChoiceSegmentedButton
 
@@ -40,6 +43,8 @@ import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SelectableListItem
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
+import com.example.tecnisis.ui.components.TopBarState
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +54,8 @@ fun ArtisticRequestReviewScreen(
     viewModel: ArtisticRequestEvaluationViewModel,
     modifier: Modifier = Modifier,
     navController: NavController,
-    floatingButtonPressed: MutableState<() -> Unit>
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>
 ){
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -57,13 +63,22 @@ fun ArtisticRequestReviewScreen(
     val message by viewModel.message.observeAsState("")
     val options = listOf("Aprobar", "Desaprobar")
 
-    floatingButtonPressed.value = {
-        viewModel.saveReview()
+    topAppBar.value = {
+        TecnisisTopAppBar(
+            state = TopBarState.COLLAPSED
+        )
+    }
+
+    floatingButton.value = {
+        CustomFloatingButton(
+            onClick = { viewModel.saveReview() },
+            icon = Icons.Default.Add
+        )
     }
 
     LaunchedEffect(uiState.evaluationSaved) {
         if (uiState.evaluationSaved) {
-            delay(500)
+            delay(100)
             navController.navigate(TecnisisScreen.ListRequests.name)
         }
     }
@@ -116,6 +131,7 @@ fun ArtisticRequestReviewScreen(
             text = stringResource(R.string.attach_review_document),
             onClick = {}
         )
+        BottomPattern()
     }
 }
 

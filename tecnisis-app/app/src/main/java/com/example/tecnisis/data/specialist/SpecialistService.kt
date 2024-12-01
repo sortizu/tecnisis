@@ -5,16 +5,17 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import com.example.tecnisis.data.request.RequestResponse
 import retrofit2.http.Header
+import retrofit2.http.Path
 
 interface SpecialistService {
     @GET("specialists/v1/api")
     suspend fun getSpecialist(@Header("Authorization") token: String, @Query("id") id: Long): Response<SpecialistResponse>
 
-    @GET("specialists/v1/api/artisticRequests")
-    suspend fun getArtisticRequests(@Header("Authorization") token: String, @Query("id") id: Long): Response<List<RequestResponse>>
+    @GET("specialists/v1/api/artisticRequests/{id}")
+    suspend fun getArtisticRequests(@Header("Authorization") token: String, @Path("id") id: Long): Response<List<RequestResponse>>
 
-    @GET("specialists/v1/api/economicRequests")
-    suspend fun getEconomicRequests(@Header("Authorization") token: String, @Query("id") id: Long): Response<List<RequestResponse>>
+    @GET("specialists/v1/api/economicRequests/{id}")
+    suspend fun getEconomicRequests(@Header("Authorization") token: String, @Path("id") id: Long): Response<List<RequestResponse>>
 
 
 }

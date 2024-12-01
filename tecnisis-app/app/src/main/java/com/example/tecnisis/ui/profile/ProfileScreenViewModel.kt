@@ -24,14 +24,15 @@ data class ProfileScreenUiState(
     val role: String = ""
 )
 
-class ProfileScreenViewModel(idPerson: Long): ViewModel() {
+class ProfileScreenViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     private val _uiState = MutableStateFlow(ProfileScreenUiState())
     val uiState: StateFlow<ProfileScreenUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData("")
     val message: LiveData<String> = _message
+    private val _dataStoreManager = dataStoreManager
 
     init {
-        loadProfile(idPerson)
+        loadProfile()
     }
 
     fun updateIdPerson(newIdPerson: Long) {
@@ -59,10 +60,12 @@ class ProfileScreenViewModel(idPerson: Long): ViewModel() {
         _message.value = message
     }
 
-    fun loadProfile(idPerson: Long) {
+    fun loadProfile() {
         viewModelScope.launch {
+            val token = _dataStoreManager.token.first()!!
+            val idPerson = _dataStoreManager.idPerson.first()!!.toLong()
             updateIdPerson(idPerson)
-            val response = TecnisisApi.personService.getPerson(idPerson)
+            val response = TecnisisApi.personService.getPerson("Bearer $token",idPerson)
             if (response.isSuccessful) {
                 response.body()?.let { person ->
                     updateName(person.name)
@@ -75,6 +78,7 @@ class ProfileScreenViewModel(idPerson: Long): ViewModel() {
                         "ECONOMIC-EVALUATOR" -> updateRole("Evaluador económico")
                         "MANAGER" -> updateRole("Administrador")
                     }
+
                 }
             }
         }
@@ -82,6 +86,7 @@ class ProfileScreenViewModel(idPerson: Long): ViewModel() {
 
     fun updateProfile() {
         viewModelScope.launch {
+            val token = _dataStoreManager.token.first()!!
             val request = PersonRequest(
                 name = _uiState.value.name,
                 dni = _uiState.value.dni,
@@ -90,7 +95,7 @@ class ProfileScreenViewModel(idPerson: Long): ViewModel() {
                 role = _uiState.value.role,
                 gender = "X"
             )
-            val response = TecnisisApi.personService.updatePerson(request, _uiState.value.idPerson)
+            val response = TecnisisApi.personService.updatePerson("Bearer $token",request, _uiState.value.idPerson)
             if (response.isSuccessful) {
                 updateMessage("Perfil actualizado correctamente")
             }

@@ -1,13 +1,12 @@
 package com.example.tecnisis.ui.artistic_request_evaluation
 
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tecnisis.R
 import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
+import com.example.tecnisis.data.document.DocumentRequest
 import com.example.tecnisis.data.evaluations.ArtisticEvaluationRequest
 import com.example.tecnisis.data.request.RequestResponse
 import com.example.tecnisis.ui.components.convertMillisToDate
@@ -89,10 +88,10 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
     fun saveReview() {
         viewModelScope.launch {
             try{
-                val date = _uiState.value.date
-                val rating = _uiState.value.rating
-                val result = _uiState.value.result
-                val reviewDocument = _uiState.value.reviewDocument
+                var date = _uiState.value.date
+                var rating = _uiState.value.rating
+                var result = _uiState.value.result
+                var reviewDocument = _uiState.value.reviewDocument
                 if (date.isEmpty() || rating == 0.0f || result.isEmpty() || reviewDocument.isEmpty()){
                     updateMessage("Por favor, completa todos los campos")
                     return@launch
@@ -105,15 +104,48 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 dataStoreManager.token.let {
                     token = it.first()!!
                 }
-                val response = TecnisisApi.evaluationService.saveArtisticEvaluation(
-                    token,
+                //
+                var idEvaluation = -1L
+                val evaluationResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest(token, _uiState.value.request!!.id)
+                if (evaluationResponse.isSuccessful){
+                    evaluationResponse.body()?.let {
+                        idEvaluation = it.id
+                    }
+                }
+                //
+                var status = ""
+                if (result == "Desaprobar"){
+                    status = "Rejected"
+                    result = "R"
+                }
+                else {
+                    status = "Approved"
+                    result = "A"
+                }
+                // Register document
+                var documentId=-1L
+                val documentResponse = TecnisisApi.documentService.uploadDocument(
+                    "Bearer $token",
+                    DocumentRequest(
+                        path = reviewDocument
+                    )
+                )
+                if (documentResponse.isSuccessful){
+                    documentResponse.body()?.let {
+                        documentId = it.id
+                    }
+                }
+
+                val response = TecnisisApi.evaluationService.updateArtisticEvaluation(
+                    "Bearer $token",
                     ArtisticEvaluationRequest(
                         evaluationDate = date,
                         rating = rating.toInt(),
                         result = result,
+                        status = status,
                         specialistId = idRole,
-                        document = reviewDocument
-                    )
+                        documentId = documentId
+                    ), idEvaluation
                 )
                 if (response.isSuccessful){
                     response.body()?.let {

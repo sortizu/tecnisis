@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -29,10 +30,13 @@ import androidx.navigation.NavController
 import com.example.tecnisis.R
 import com.example.tecnisis.TecnisisScreen
 import com.example.tecnisis.ui.components.CustomBasicTextField
+import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.CustomPhoneNumberField
 import com.example.tecnisis.ui.components.LabelItem
 import com.example.tecnisis.ui.components.ScreenTitle
+import com.example.tecnisis.ui.components.TecnisisTopAppBar
+import com.example.tecnisis.ui.components.TopBarState
 
 @Composable
 fun ProfileScreen(
@@ -40,13 +44,23 @@ fun ProfileScreen(
     viewModel: ProfileScreenViewModel,
     modifier: Modifier = Modifier,
     navController: NavController,
-    floatingButtonPressed: MutableState<() -> Unit>
+    floatingButton: MutableState<@Composable () -> Unit>,
+    topAppBar: MutableState<@Composable () -> Unit>
 ){
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    floatingButtonPressed.value = {
-        viewModel.updateProfile()
+    topAppBar.value = {
+        TecnisisTopAppBar(
+            state = TopBarState.EXPANDED
+        )
+    }
+
+    floatingButton.value = {
+        CustomFloatingButton(
+            onClick = { viewModel.updateProfile() },
+            icon = Icons.Default.Add
+        )
     }
 
     Column(

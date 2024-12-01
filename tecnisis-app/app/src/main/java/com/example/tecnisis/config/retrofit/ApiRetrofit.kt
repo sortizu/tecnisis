@@ -2,6 +2,7 @@ package com.example.tecnisis.config.retrofit
 
 import com.example.tecnisis.data.artist.ArtistService
 import com.example.tecnisis.data.artwork.ArtworkService
+import com.example.tecnisis.data.document.DocumentService
 import com.example.tecnisis.data.evaluations.EvaluationService
 import com.example.tecnisis.data.person.PersonService
 import com.example.tecnisis.data.request.RequestService
@@ -53,6 +54,12 @@ object TecnisisApi {
     }
     val artistService: ArtistService by lazy {
         retrofit.create(ArtistService::class.java)
+    }
+    val documentService: DocumentService by lazy {
+        retrofit.create(DocumentService::class.java)
+    }
+    val startRequestService: StartRequestService by lazy {
+        retrofit.create(StartRequestService::class.java)
     }
     val artworkService: ArtworkService by lazy {
         retrofit.create(ArtworkService::class.java)
