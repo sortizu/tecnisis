@@ -47,8 +47,13 @@ public enum ErrorCatalog {
     PROCESS_NOT_READY("ERR_PRO_001", "Process not ready for completion"),
 
     // generic error
-    GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred");
+    GENERIC_ERROR("ERR_GEN_002", "An unexpected error occurred"),
 
+    // credentials
+    INVALID_CREDENTIALS("ERR_ACC_002", "Invalid credentials"),
+
+    // login
+    ACCOUNT_LOCKED("ERR_USR_002", "Account locked");
 
 
     private final String code;
