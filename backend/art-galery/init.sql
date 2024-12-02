@@ -11,28 +11,6 @@ DO $$
         END IF;
     END $$;
 
-DO $$
-    BEGIN
-        IF NOT EXISTS (
-            SELECT 1
-            FROM pg_roles
-            WHERE rolname = 'tecnisis_user'
-        ) THEN
-            CREATE ROLE tecnisis_user WITH LOGIN PASSWORD 'tecnisis_password';
-        END IF;
-    END $$;
-
--- Asignar permisos al rol para el esquema o la base de datos
-GRANT ALL PRIVILEGES ON DATABASE tecnisis TO tecnisis_user;
--- Otorgar permisos al rol para el esquema
-GRANT USAGE ON SCHEMA tecnisis TO tecnisis_user;
-
--- Otorgar permisos para las tablas existentes
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA tecnisis TO tecnisis_user;
-
--- Otorgar permisos para las secuencias existentes
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA tecnisis TO tecnisis_user;
-
 
 -- Switch to the created database
 \c tecnisis
@@ -63,7 +41,7 @@ CREATE TABLE persons (
     name VARCHAR(255) NOT NULL,
     id_number VARCHAR(20) NOT NULL UNIQUE,
     address VARCHAR(255),
-    gender VARCHAR(1) NOT NULL CHECK (gender IN ('M', 'F')),
+    gender VARCHAR(1) NOT NULL CHECK (gender IN ('M', 'F', 'X')),
     phone VARCHAR(9),
     user_role VARCHAR(50) NOT NULL CHECK (user_role IN ('ARTIST', 'ART-EVALUATOR', 'ECONOMIC-EVALUATOR', 'MANAGER')),
     id_user BIGINT UNIQUE,

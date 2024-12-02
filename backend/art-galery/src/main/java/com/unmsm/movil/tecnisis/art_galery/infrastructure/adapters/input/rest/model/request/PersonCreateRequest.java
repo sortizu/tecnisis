@@ -19,7 +19,7 @@ public class PersonCreateRequest {
 
     @NotBlank(message = "Gender is required")
     @Size(max = 1, message = "Gender must be 1 character")
-    @Pattern(regexp = "[MF]", message = "Gender must be 'M' or 'F'")
+    @Pattern(regexp = "[MFX]", message = "Gender must be 'M' or 'F'")
     private String gender;
 
     @Pattern(regexp = "\\d{9}", message = "Phone must be a valid 9-digit number")

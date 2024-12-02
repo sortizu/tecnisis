@@ -12,6 +12,7 @@ public class ArtisticEvaluationResponse {
     private LocalDate evaluationDate;
     private BigDecimal rating;
     private String result;
+    private String status;
     private SpecialistResponse specialist;
     private RequestResponse request;
     private DocumentResponse document;

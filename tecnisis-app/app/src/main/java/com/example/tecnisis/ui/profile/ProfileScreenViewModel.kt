@@ -64,7 +64,6 @@ class ProfileScreenViewModel(dataStoreManager: DataStoreManager): ViewModel() {
         viewModelScope.launch {
             val token = _dataStoreManager.token.first()!!
             val idPerson = _dataStoreManager.idPerson.first()!!.toLong()
-            updateIdPerson(idPerson)
             val response = TecnisisApi.personService.getPerson("Bearer $token",idPerson)
             if (response.isSuccessful) {
                 response.body()?.let { person ->
@@ -72,6 +71,7 @@ class ProfileScreenViewModel(dataStoreManager: DataStoreManager): ViewModel() {
                     updateDNI(person.dni)
                     updatePhone(person.phone)
                     updateAddress(person.address)
+                    updateIdPerson(person.id)
                     when (person.role) {
                         "ARTIST" -> updateRole("Artista")
                         "ART-EVALUATOR" -> updateRole("Evaluador artístico")

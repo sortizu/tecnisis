@@ -68,7 +68,6 @@ public class RequestService implements RequestServicePort {
             return requestPersistencePort.save(request);
         }
 
-        request.setStatus("APPROVED");
         Specialist specialist = specialists.get(0);
 
         // Guardar el request
@@ -82,7 +81,7 @@ public class RequestService implements RequestServicePort {
         ArtisticEvaluation artisticEvaluation = ArtisticEvaluation
                 .builder()
                 .rating(BigDecimal.ZERO)
-                .status("APPROVED")
+                .status("PENDING")
                 .specialist(specialist)
                 .request(managedRequest) // Usar el request gestionado
                 .build();

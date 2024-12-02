@@ -118,7 +118,7 @@ fun TecnisisApp() {
                     topAppBar = topAppBar
                 )
             }
-            composable(route = TecnisisScreen.ArtisticRequestEvaluation.name) {
+            composable(route = TecnisisScreen.ArtisticRequestEvaluation.name + "/{requestId}") {
                 val requestId = it.arguments?.getString("requestId")?.toLong()
                 ArtisticRequestReviewScreen(
                     viewModel = ArtisticRequestEvaluationViewModel(requestId!!,dataStoreManager),

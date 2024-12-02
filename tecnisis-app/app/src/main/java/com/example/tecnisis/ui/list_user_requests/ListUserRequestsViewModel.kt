@@ -1,5 +1,6 @@
 package com.example.tecnisis.ui.list_user_requests
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +20,7 @@ data class ListUserRequestUiState(
     val isLoading: Boolean = false,
     val requests: List<RequestResponse> = emptyList(),
     val searchFilter: String = "",
-    val statusFilter: String = "",
+    val statusFilter: String = "PENDING",
     val message: String = "",
     val role: String = ""
 )
@@ -32,18 +33,7 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
     val dataStoreManager: DataStoreManager = dataStoreManager
     var statusList: MutableList<String> = mutableListOf()
     init {
-        var role = ""
-        var idRole = ""
-        viewModelScope.launch {
-            dataStoreManager.role.let {
-                role = it.first()!!
-            }
-            dataStoreManager.idRole.let {
-                idRole = it.first()!!
-            }
-        }
-        updateRole(role)
-        loadRequests(idRole.toLong())
+        loadRequests()
     }
 
     fun updateIsLoading(isLoading: Boolean) {
@@ -87,12 +77,21 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
     }
 
     // Updates the UI state with a new list of requests
-    fun loadRequests(id: Long){
+    fun loadRequests(){
         viewModelScope.launch {
             try {
+                var id= -1L
+                dataStoreManager.idRole.let {
+                    id = it.first()!!.toLong()
+                }
+                var role = ""
+                dataStoreManager.role.let {
+                    role = it.first()!!
+                }
+                updateRole(role)
                 updateIsLoading(true)
                 val token = dataStoreManager.token.first() ?: ""
-
+                var requests = emptyList<RequestResponse>()
                 val response = when (_uiState.value.role) {
                     "ARTIST" -> {
                         TecnisisApi.artistService.getArtistRequests("Bearer $token",id)
@@ -107,17 +106,40 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
                     }
                 }
                 if (response.isSuccessful) {
-                    response.body()?.let { requests ->
-                        updateIsLoading(false)
-                        updateRequests(requests)
-                        resetMessage()
-                        updateRequestStatus()
+                    response.body()?.let {
+                        requests = it
                     }
                 } else {
                     updateIsLoading(false)
                     val errorBody = JSONObject(response.errorBody()?.string()!!)
                     updateMessage(errorBody.getString("message"))
+                    return@launch
                 }
+                for (request in requests){
+
+                    when (role) {
+                        "ART-EVALUATOR" -> {
+
+                            val artisticResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest("Bearer $token",request.id)
+                            if (artisticResponse.isSuccessful) {
+                                artisticResponse.body()?.let { artisticEvaluation ->
+                                    request.status = artisticEvaluation.status
+                                    Log.d("ArtisticEvaluation", "Status: ${artisticEvaluation.status}")
+                                }
+                            }
+                        }
+                        "ECONOMIC-EVALUATOR" -> {
+                            val economicResponse = TecnisisApi.evaluationService.getEconomicEvaluationByRequest("Bearer $token",request.id)
+                            if (economicResponse.isSuccessful) {
+                                economicResponse.body()?.let { economicEvaluation ->
+                                    request.status = economicEvaluation.status
+                                }
+                            }
+                        }
+                    }
+                }
+                updateRequests(requests)
+                updateIsLoading(false)
             }
             catch (e: Exception) {
                 updateIsLoading(false)
@@ -125,29 +147,5 @@ class ListUserRequestsViewModel(dataStoreManager: DataStoreManager): ViewModel()
             }
         }
     }
-    fun updateRequestStatus(){
-        viewModelScope.launch {
-            val token = dataStoreManager.token.first() ?: ""
-            for (request in _uiState.value.requests){
-                when (_uiState.value.role) {
-                    "ART-EVALUATOR" -> {
-                        val artisticResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest("Bearer $token",request.id)
-                        if (artisticResponse.isSuccessful) {
-                            artisticResponse.body()?.let { artisticEvaluation ->
-                                statusList.add(artisticEvaluation.status)
-                            }
-                        }
-                    }
-                    "ECONOMIC-EVALUATOR" -> {
-                        val economicResponse = TecnisisApi.evaluationService.getEconomicEvaluationByRequest("Bearer $token",request.id)
-                        if (economicResponse.isSuccessful) {
-                            economicResponse.body()?.let { economicEvaluation ->
-                                statusList.add(economicEvaluation.status)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+
 }

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,54 +86,68 @@ fun ArtisticRequestReviewScreen(
 
     Column(
         modifier = Modifier
-            .padding(0.dp)
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        val context = LocalContext.current
-        ScreenTitle(text = context.getString(currentScreen.title))
-        // Image upload area
-        ImageCard(
-            image = request!!.artWork.image,
-            title = request.artWork.title,
-            date = request.artWork.creationDate,
-            dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString()
-        )
-        SelectableListItem(
-            text = request.artWork.artist.person.name,
-            icon = Icons.Default.Person,
-            iconDescription = "Artist"
-        )
-        CustomSingleChoiceSegmentedButton(
-            options = options,
-            onSelectionChanged = {
-                viewModel.updateResult(options[it])
-            }
-        )
-        // Input fields
+    ){
+        Column(
+            modifier = Modifier
+                .padding(0.dp)
+                .fillMaxSize()
+                .padding(start = 16.dp, end = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            when {
+                uiState.isLoading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
 
-        CustomNumberField(
-            label = "Calificación (N/100)",
-            value = "0.0",
-            onValueChange = {
-                viewModel.updateRating(it.toFloat())
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        CustomDatePickerField(
-            defaultDate = "",
-            onDateSelected = {
-                viewModel.updateDate(it)
+                else -> {
+                    val context = LocalContext.current
+                    ScreenTitle(text = context.getString(currentScreen.title))
+                    // Image upload area
+                    ImageCard(
+                        image = request!!.artWork.image,
+                        title = request.artWork.title,
+                        date = request.artWork.creationDate,
+                        dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString()
+                    )
+                    SelectableListItem(
+                        text = request.artWork.artist.person.name,
+                        icon = Icons.Default.Person,
+                        iconDescription = "Artist"
+                    )
+                    CustomSingleChoiceSegmentedButton(
+                        options = options,
+                        onSelectionChanged = {
+                            viewModel.updateResult(options[it])
+                        }
+                    )
+                    // Input fields
+
+                    CustomNumberField(
+                        label = "Calificación (N/100)",
+                        value = "0.0",
+                        onValueChange = {
+                            viewModel.updateRating(it.toFloat())
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    CustomDatePickerField(
+                        defaultDate = "",
+                        onDateSelected = {
+                            viewModel.updateDate(it)
+                        }
+                    )
+                    HighlightButton(
+                        text = stringResource(R.string.attach_review_document),
+                        onClick = {}
+                    )
+                }
             }
-        )
-        HighlightButton(
-            text = stringResource(R.string.attach_review_document),
-            onClick = {}
-        )
+        }
         BottomPattern()
     }
+
 }
 
 @Preview(showBackground = true)

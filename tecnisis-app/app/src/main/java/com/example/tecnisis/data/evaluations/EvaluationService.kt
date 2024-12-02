@@ -12,8 +12,8 @@ interface EvaluationService {
     suspend fun updateArtisticEvaluation(@Header("Authorization") token: String, @Body evaluationRequest: ArtisticEvaluationRequest, @Path("id") id: Long): Response<ArtisticEvaluationResponse>
     @POST("economic-evaluations/v1/api/{id}")
     suspend fun updateEconomicEvaluation(@Header("Authorization") token: String, @Body evaluationRequest: EconomicEvaluationRequest, @Path("id") id: Long): Response<EconomicEvaluationResponse>
-    @GET("artistic-evaluations/v1/api/requests/{id}")
+    @GET("artistic-evaluations/v1/api/request/{id}")
     suspend fun getArtisticEvaluationByRequest(@Header("Authorization") token: String, @Path("id") id: Long): Response<ArtisticEvaluationResponse>
-    @GET("economic-evaluations/v1/api/requests/{id}")
+    @GET("economic-evaluations/v1/api/request/{id}")
     suspend fun getEconomicEvaluationByRequest(@Header("Authorization") token: String, @Path("id") id: Long): Response<ArtisticEvaluationResponse>
 }

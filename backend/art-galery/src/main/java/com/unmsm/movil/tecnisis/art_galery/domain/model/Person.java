@@ -13,5 +13,5 @@ public class Person {
     private String phone;
     private String role;
     private Long rolId;
-    private User user;
+    //private User user;
 }

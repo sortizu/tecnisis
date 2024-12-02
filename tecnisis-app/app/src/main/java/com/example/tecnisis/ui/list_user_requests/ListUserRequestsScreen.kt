@@ -1,5 +1,6 @@
 package com.example.tecnisis.ui.list_user_requests
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -95,9 +96,9 @@ fun ListUserRequestsScreen(
                         options = listOf("Pendientes", "Aprobadas", "Rechazadas"),
                         onSelectionChanged = {
                             when (it){
-                                0 -> { viewModel.updateStatusFilter("Pending") }
-                                1 -> { viewModel.updateStatusFilter("Approved") }
-                                2 -> { viewModel.updateStatusFilter("Rejected") }
+                                0 -> { viewModel.updateStatusFilter("PENDING") }
+                                1 -> { viewModel.updateStatusFilter("APPROVED") }
+                                2 -> { viewModel.updateStatusFilter("REJECTED") }
                             }
                         }
                     )
@@ -108,8 +109,8 @@ fun ListUserRequestsScreen(
                         options = listOf("Pendientes", "Revisadas"),
                         onSelectionChanged = {
                             when (it){
-                                0 -> { viewModel.updateStatusFilter("Pending") }
-                                1 -> { viewModel.updateStatusFilter("Approved") }
+                                0 -> { viewModel.updateStatusFilter("PENDING") }
+                                1 -> { viewModel.updateStatusFilter("APPROVED") }
                             }
                         }
                     )
@@ -156,7 +157,9 @@ fun ListUserRequestsScreen(
                 }
             }
             // Bottom Pattern Background
-
+            Text(
+                text = uiState.message
+            )
 
         }
         Spacer(modifier = Modifier.height(8.dp))

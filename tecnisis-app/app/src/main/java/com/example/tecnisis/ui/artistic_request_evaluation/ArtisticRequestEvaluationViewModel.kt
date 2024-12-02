@@ -23,7 +23,8 @@ data class ArtisticRequestEvaluationUiState(
     val request: RequestResponse? = null,
     val reviewDocument: String = "",
     val evaluationSaved: Boolean = false,
-    val date: String = ""
+    val date: String = "",
+    val isLoading: Boolean = false
 )
 
 class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: DataStoreManager): ViewModel() {
@@ -62,14 +63,19 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
         _uiState.value = _uiState.value.copy(evaluationSaved = newEvaluationSaved)
     }
 
+    fun updateLoading(newLoading: Boolean) {
+        _uiState.value = _uiState.value.copy(isLoading = newLoading)
+    }
+
     fun getRequest(id: Long) {
         viewModelScope.launch {
             try {
+                updateLoading(true)
                 var token = ""
                 dataStoreManager.token.let {
                     token = it.first()!!
                 }
-                val response = TecnisisApi.requestService.getRequest(token, id)
+                val response = TecnisisApi.requestService.getRequest("Bearer $token", id)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         updateRequest(it[0])
@@ -78,6 +84,7 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                     _message.value = response.message()
                     return@launch
                 }
+                updateLoading(false)
             }
             catch (e: Exception) {
                 _message.value = e.message
@@ -106,7 +113,7 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 }
                 //
                 var idEvaluation = -1L
-                val evaluationResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest(token, _uiState.value.request!!.id)
+                val evaluationResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest("Bearer $token", _uiState.value.request!!.id)
                 if (evaluationResponse.isSuccessful){
                     evaluationResponse.body()?.let {
                         idEvaluation = it.id
@@ -115,11 +122,11 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 //
                 var status = ""
                 if (result == "Desaprobar"){
-                    status = "Rejected"
+                    status = "REJECTED"
                     result = "R"
                 }
                 else {
-                    status = "Approved"
+                    status = "APPROVED"
                     result = "A"
                 }
                 // Register document

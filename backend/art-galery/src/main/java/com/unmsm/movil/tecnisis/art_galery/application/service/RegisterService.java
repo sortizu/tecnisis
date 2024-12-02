@@ -31,12 +31,13 @@ public class RegisterService {
         person.setGender(request.getGender());
         person.setPhone(request.getPhone());
         person.setRole(request.getUserRole());
+        
 
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPerson(person);
-
+        
         User savedUser = userPersistencePort.save(user);
 
         switch (request.getUserRole().toLowerCase()) {

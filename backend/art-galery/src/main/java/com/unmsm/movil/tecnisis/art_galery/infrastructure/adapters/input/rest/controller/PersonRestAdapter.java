@@ -1,47 +1,44 @@
 package com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.controller;
 
-import com.unmsm.movil.tecnisis.art_galery.application.ports.input.ArtistServicePort;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.ArtistRestMapper;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.RequestRestMapper;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.ArtistResponse;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.RequestResponse;
-import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.update.ArtistUpdateRequest;
+import com.unmsm.movil.tecnisis.art_galery.application.ports.input.PersonServicePort;
+import com.unmsm.movil.tecnisis.art_galery.domain.model.Person;
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.mapper.PersonRestMapper;
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.request.PersonCreateRequest;
+import com.unmsm.movil.tecnisis.art_galery.infrastructure.adapters.input.rest.model.response.PersonResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/artists/v1/api")
-@Tag(name = "Artist Controller", description = "Endpoint to management artists")
-public class ArtistRestAdapter {
+@RequestMapping("/persons/v1/api")
+@Tag(name = "Person Controller", description = "Endpoint to management persons")
+public class PersonRestAdapter {
 
-    private final ArtistServicePort servicePort;
-    private final ArtistRestMapper artistMapper;
-    private final RequestRestMapper requestMapper;
+    private final PersonServicePort servicePort;
+    private final PersonRestMapper restMapper;
 
     @GetMapping
-    public List<ArtistResponse> findAll() {
-        return artistMapper.toArtistResponseList(servicePort.findAll());
+    public List<PersonResponse> findAll() {
+        return restMapper.toPersonResponseList(servicePort.findAll());
     }
 
     @GetMapping("/{id}")
-    public ArtistResponse findById(@PathVariable Long id) {
-        return artistMapper.toArtistResponse(servicePort.findById(id));
+    public PersonResponse findById(@PathVariable Long id) {
+        return restMapper.toPersonResponse(servicePort.findById(id));
     }
 
-    @GetMapping("/requests/{id}")
-    public List<RequestResponse> findRequestsById(@PathVariable Long id) {
-        return requestMapper.toRequestResponseList(servicePort.findRequestsById(id));
-    }
-
-    @PutMapping("/{id}")
-    public ArtistResponse update(@Valid @RequestBody ArtistUpdateRequest request, @PathVariable Long id) {
-        return artistMapper.toArtistResponse(
-                servicePort.update(id, artistMapper.toArtist(request)));
+    @PostMapping
+    public ResponseEntity<PersonResponse> save(@Valid @RequestBody PersonCreateRequest request) {
+        Person personSaved = servicePort.save(restMapper.toPerson(request));
+        PersonResponse response = restMapper.toPersonResponse(personSaved);
+        return ResponseEntity
+                .created(URI.create(response.getRole() + "/" + personSaved.getRolId()))
+                .body(response);
     }
 
     @DeleteMapping("/{id}")

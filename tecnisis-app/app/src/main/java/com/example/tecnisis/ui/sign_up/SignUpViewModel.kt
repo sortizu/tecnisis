@@ -107,7 +107,7 @@ class SignUpViewModel () : ViewModel() {
                         address = _address,
                         gender = "X",
                         phone = _phone,
-                        userRole = "ARTIST"
+                        userRole = "MANAGER"
                     )
                     val response = TecnisisApi.signUpService.registerPerson(signUpRequest)
                     if (response.isSuccessful) {

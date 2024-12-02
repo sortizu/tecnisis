@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 data class RequestResponse(
     val id: Long,
     val date: String,
-    val status: String,
+    var status: String,
     @SerializedName("art_work")
     val artWork: ArtworkResponse
 )

@@ -19,6 +19,7 @@ public class ArtisticEvaluationCreateRequest  {
     @Min(value = 0, message = "rating must be greater than or equal to 0")
     @Max(value = 10, message = "rating must be less than or equal to 10")
     private BigDecimal rating;
-
+    private String result;
+    private String status;
     private Long documentId;
 }

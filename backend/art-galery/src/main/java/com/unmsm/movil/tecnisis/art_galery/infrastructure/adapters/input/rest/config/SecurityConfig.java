@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/login", "/api/auth/register","/techniques/v1/api","/users/v1/api/rol-by-id/**").permitAll()
-                        .requestMatchers("/requests/v1/api/**","/artworks/v1/api/**","/specialists/v1/api/**","/artists/v1/api/**").authenticated()
+                        .requestMatchers("/requests/v1/api/**","/artworks/v1/api/**","/specialists/v1/api/**","/artists/v1/api/**","/persons/v1/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
