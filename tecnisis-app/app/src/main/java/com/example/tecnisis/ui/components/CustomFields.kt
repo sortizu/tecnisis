@@ -36,7 +36,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomBasicTextField(label: String, value: String, modifier: Modifier = Modifier ,onValueChange: (String) -> Unit){
+fun CustomBasicTextField(label: String, value: String, modifier: Modifier = Modifier ,onValueChange: (String) -> Unit, editable : Boolean = true){
     val inputBackgroundColor = Color(0xFFFFEBEE)
     TextField(
         value = value,
@@ -46,12 +46,13 @@ fun CustomBasicTextField(label: String, value: String, modifier: Modifier = Modi
         colors = TextFieldDefaults.colors(
             focusedContainerColor = inputBackgroundColor,
             unfocusedContainerColor = inputBackgroundColor
-        )
+        ),
+        enabled = editable
     )
 }
 
 @Composable
-fun CustomEmailField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit){
+fun CustomEmailField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit, editable : Boolean = true){
     val inputBackgroundColor = Color(0xFFFFEBEE)
     TextField(
         value = value,
@@ -62,12 +63,13 @@ fun CustomEmailField(label: String, value: String, modifier: Modifier = Modifier
         colors = TextFieldDefaults.colors(
             focusedContainerColor = inputBackgroundColor,
             unfocusedContainerColor = inputBackgroundColor
-        )
+        ),
+        enabled = editable
     )
 }
 
 @Composable
-fun CustomPasswordField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit) {
+fun CustomPasswordField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit, editable : Boolean = true) {
     val inputBackgroundColor = Color(0xFFFFEBEE)
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -88,12 +90,13 @@ fun CustomPasswordField(label: String, value: String, modifier: Modifier = Modif
                     contentDescription = if (passwordVisible) "Hide password" else "Show password"
                 )
             }
-        }
+        },
+        enabled = editable
     )
 }
 
 @Composable
-fun CustomNumberField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit){
+fun CustomNumberField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit, editable : Boolean = true){
     val inputBackgroundColor = Color(0xFFFFEBEE)
     TextField(
         value = value,
@@ -104,12 +107,13 @@ fun CustomNumberField(label: String, value: String, modifier: Modifier = Modifie
         colors = TextFieldDefaults.colors(
             focusedContainerColor = inputBackgroundColor,
             unfocusedContainerColor = inputBackgroundColor
-        )
+        ),
+        enabled = editable
     )
 }
 
 @Composable
-fun CustomPhoneNumberField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit){
+fun CustomPhoneNumberField(label: String, value: String, modifier: Modifier = Modifier, onValueChange: (String) -> Unit, editable : Boolean = true){
     val inputBackgroundColor = Color(0xFFFFEBEE)
     TextField(
         value = value,
@@ -120,7 +124,8 @@ fun CustomPhoneNumberField(label: String, value: String, modifier: Modifier = Mo
         colors = TextFieldDefaults.colors(
             focusedContainerColor = inputBackgroundColor,
             unfocusedContainerColor = inputBackgroundColor
-        )
+        ),
+        enabled = editable
     )
 }
 
@@ -130,7 +135,8 @@ fun CustomDatePickerField(
     label: String = stringResource(R.string.date_of_realisation),
     defaultDate: String? = null,
     onDateSelected: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    editable : Boolean = true
 ) {
     val initalSelectedDateMillis = defaultDate?.let {
         SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).parse(it)?.time
@@ -147,7 +153,11 @@ fun CustomDatePickerField(
         label = { Text(label) },
         readOnly = true,
         trailingIcon = {
-            IconButton(onClick = { showDatePickerDialog = true }) {
+            IconButton(onClick = {
+            if (editable){
+                showDatePickerDialog = true
+            }
+            }) {
                 Icon(
                     imageVector = Icons.Default.DateRange,
                     contentDescription = "Select date"
@@ -156,7 +166,8 @@ fun CustomDatePickerField(
         },
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .height(64.dp),
+        enabled = editable
     )
 
     if (showDatePickerDialog) {

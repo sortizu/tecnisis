@@ -1,7 +1,9 @@
 package com.example.tecnisis.ui.components
 
 
+import android.content.Context
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -332,4 +334,10 @@ fun TecnisisTopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
         modifier = modifier
     )
+}
+
+public fun uriToBase64(context: Context, uri: Uri): String {
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val bytes = inputStream?.readBytes()
+    return Base64.encodeToString(bytes, Base64.DEFAULT)
 }

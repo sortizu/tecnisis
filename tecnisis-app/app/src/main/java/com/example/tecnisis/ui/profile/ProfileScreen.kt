@@ -52,7 +52,8 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     floatingButton: MutableState<@Composable () -> Unit>,
-    topAppBar: MutableState<@Composable () -> Unit>
+    topAppBar: MutableState<@Composable () -> Unit>,
+    editable : Boolean = false
 ){
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -64,10 +65,12 @@ fun ProfileScreen(
     }
 
     floatingButton.value = {
-        CustomFloatingButton(
-            onClick = { viewModel.updateProfile() },
-            icon = Icons.Default.Save
-        )
+        if (editable){
+            CustomFloatingButton(
+                onClick = { viewModel.updateProfile() },
+                icon = Icons.Default.Save
+            )
+        }
     }
 
     Scaffold {
@@ -104,7 +107,9 @@ fun ProfileScreen(
                     stringResource(R.string.name),
                     uiState.name,
                     Modifier.fillMaxWidth(),
-                    onValueChange = { viewModel.updateName(it) })
+                    onValueChange = { viewModel.updateName(it) },
+                    editable = editable
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -113,18 +118,24 @@ fun ProfileScreen(
                         stringResource(R.string.dni),
                         uiState.dni,
                         Modifier.weight(1f),
-                        onValueChange = { viewModel.updateDNI(it) })
+                        onValueChange = { viewModel.updateDNI(it) },
+                        editable = editable
+                    )
                     CustomPhoneNumberField(
                         stringResource(R.string.phone),
                         uiState.phone,
                         Modifier.weight(1f),
-                        onValueChange = { viewModel.updatePhone(it) })
+                        onValueChange = { viewModel.updatePhone(it) },
+                        editable = editable
+                    )
                 }
                 CustomBasicTextField(
                     stringResource(R.string.address),
                     uiState.address,
                     Modifier.fillMaxWidth(),
-                    onValueChange = { viewModel.updateAddress(it) })
+                    onValueChange = { viewModel.updateAddress(it) },
+                    editable = editable
+                )
             }
             BottomPattern()
         }

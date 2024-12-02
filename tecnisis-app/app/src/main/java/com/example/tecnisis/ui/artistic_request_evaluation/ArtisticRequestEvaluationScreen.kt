@@ -1,22 +1,23 @@
 package com.example.tecnisis.ui.artistic_request_evaluation
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -25,9 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,13 +38,13 @@ import com.example.tecnisis.ui.components.CustomDatePickerField
 import com.example.tecnisis.ui.components.CustomFloatingButton
 import com.example.tecnisis.ui.components.CustomNumberField
 import com.example.tecnisis.ui.components.CustomSingleChoiceSegmentedButton
-
 import com.example.tecnisis.ui.components.HighlightButton
 import com.example.tecnisis.ui.components.ImageCard
 import com.example.tecnisis.ui.components.ScreenTitle
 import com.example.tecnisis.ui.components.SelectableListItem
 import com.example.tecnisis.ui.components.TecnisisTopAppBar
 import com.example.tecnisis.ui.components.TopBarState
+import com.example.tecnisis.ui.components.uriToBase64
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +55,9 @@ fun ArtisticRequestReviewScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     floatingButton: MutableState<@Composable () -> Unit>,
-    topAppBar: MutableState<@Composable () -> Unit>
+    topAppBar: MutableState<@Composable () -> Unit>,
+    snackbarHostState: SnackbarHostState,
+    editable: Boolean = false
 ){
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -71,10 +72,12 @@ fun ArtisticRequestReviewScreen(
     }
 
     floatingButton.value = {
-        CustomFloatingButton(
-            onClick = { viewModel.saveReview() },
-            icon = Icons.Default.Add
-        )
+        if (editable) {
+            CustomFloatingButton(
+                onClick = { viewModel.saveReview() },
+                icon = Icons.Default.Save
+            )
+        }
     }
 
     LaunchedEffect(uiState.evaluationSaved) {
@@ -84,67 +87,102 @@ fun ArtisticRequestReviewScreen(
         }
     }
 
+    LaunchedEffect(message) {
+        if (message.isNotEmpty()) {
+            delay(100)
+            snackbarHostState.showSnackbar(message)
+            viewModel.updateMessage("")
+        }
+    }
+
+    val pdfLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val pdfBase64 = uriToBase64(context, it)
+            viewModel.updateReviewDocument(pdfBase64)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ){
         Column(
             modifier = Modifier
                 .padding(0.dp)
-                .fillMaxSize()
                 .padding(start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            ScreenTitle(text = context.getString(currentScreen.title))
             when {
                 uiState.isLoading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
 
-                else -> {
-                    val context = LocalContext.current
-                    ScreenTitle(text = context.getString(currentScreen.title))
-                    // Image upload area
+                request != null -> {
+
                     ImageCard(
-                        image = request!!.artWork.image,
+                        image = request.artWork.image,
                         title = request.artWork.title,
                         date = request.artWork.creationDate,
-                        dimensions = request?.artWork?.width.toString() + " x " + request?.artWork?.height.toString()
+                        dimensions = request.artWork.width.toString() + " x " + request.artWork.height.toString()
                     )
                     SelectableListItem(
                         text = request.artWork.artist.person.name,
                         icon = Icons.Default.Person,
-                        iconDescription = "Artist"
+                        iconDescription = "Artist",
+                        onClick = {
+                            navController.navigate(TecnisisScreen.Profile.name + "/${request.artWork.artist.person.id}/false")
+                        }
                     )
+
                     CustomSingleChoiceSegmentedButton(
                         options = options,
                         onSelectionChanged = {
                             viewModel.updateResult(options[it])
-                        }
+                        },
+                        defaultSelectedIndex = when (uiState.result){
+                            "APPROVED" -> 0
+                            "REJECTED" -> 1
+                            else -> 0
+                        },
+                        editable = editable
                     )
+
                     // Input fields
 
                     CustomNumberField(
                         label = "Calificación (N/100)",
-                        value = "0.0",
+                        value = uiState.rating.toString(),
                         onValueChange = {
-                            viewModel.updateRating(it.toFloat())
+                            viewModel.updateRating(it.toDoubleOrNull() ?: 0.0)
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        editable = editable
                     )
                     CustomDatePickerField(
-                        defaultDate = "",
+                        defaultDate = uiState.date,
                         onDateSelected = {
                             viewModel.updateDate(it)
-                        }
+                        },
+                        editable = false
                     )
-                    HighlightButton(
-                        text = stringResource(R.string.attach_review_document),
-                        onClick = {}
-                    )
+                    if (editable){
+                        HighlightButton(
+                            text = stringResource(R.string.attach_review_document),
+                            onClick = { pdfLauncher.launch("application/pdf") }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
                 }
+
             }
         }
+        Spacer(modifier = Modifier.weight(1f))
         BottomPattern()
     }
 

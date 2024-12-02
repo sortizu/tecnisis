@@ -8,7 +8,7 @@ data class ArtisticEvaluationResponse(
     val id: Long,
     @SerializedName("evaluation_date")
     val evaluationDate: String,
-    val rating: Int,
+    val rating: Double,
     val result: String,
     val status: String,
     val specialist: SpecialistResponse,

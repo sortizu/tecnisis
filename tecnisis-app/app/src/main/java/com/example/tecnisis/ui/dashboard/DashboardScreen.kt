@@ -59,7 +59,7 @@ fun DashboardScreen(
                 navController.navigate(TecnisisScreen.Login.name)
             },
             onProfileClick = {
-                navController.navigate(TecnisisScreen.Profile.name)
+                navController.navigate(TecnisisScreen.Profile.name + "/-1L/false")
             }
         )
     }

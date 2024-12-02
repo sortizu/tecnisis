@@ -118,22 +118,28 @@ fun TecnisisApp() {
                     topAppBar = topAppBar
                 )
             }
-            composable(route = TecnisisScreen.ArtisticRequestEvaluation.name + "/{requestId}") {
+            composable(route = TecnisisScreen.ArtisticRequestEvaluation.name + "/{requestId}/{status}") {
                 val requestId = it.arguments?.getString("requestId")?.toLong()
+                val status = it.arguments?.getString("status")
                 ArtisticRequestReviewScreen(
-                    viewModel = ArtisticRequestEvaluationViewModel(requestId!!,dataStoreManager),
+                    viewModel = ArtisticRequestEvaluationViewModel(requestId!!, status!!,dataStoreManager),
                     navController = navController,
                     floatingButton = floatingButton,
-                    topAppBar = topAppBar
+                    topAppBar = topAppBar,
+                    snackbarHostState = snackbarHostState,
+                    editable = status == "PENDING"
                 )
             }
-            composable(route = TecnisisScreen.EconomicRequestEvaluation.name) {
+            composable(route = TecnisisScreen.EconomicRequestEvaluation.name + "/{requestId}/{status}") {
                 val requestId = it.arguments?.getString("requestId")?.toLong()
+                val status = it.arguments?.getString("status")
                 EconomicRequestEvaluationScreen(
-                    viewModel = EconomicRequestEvaluationViewModel(requestId!!,dataStoreManager),
+                    viewModel = EconomicRequestEvaluationViewModel(requestId!!, status!!, dataStoreManager),
                     navController = navController,
                     floatingButton = floatingButton,
-                    topAppBar = topAppBar
+                    topAppBar = topAppBar,
+                    editable = status == "PENDING",
+                    snackbarHostState = snackbarHostState
                 )
             }
             composable(route = TecnisisScreen.ViewRequest.name + "/{requestId}") {
@@ -143,15 +149,19 @@ fun TecnisisApp() {
                     viewModel = ViewRequestViewModel(requestId!!, dataStoreManager),
                     snackbarHostState = snackbarHostState,
                     floatingButton = floatingButton,
-                    topAppBar = topAppBar
+                    topAppBar = topAppBar,
+                    navController = navController
                 )
             }
-            composable(route = TecnisisScreen.Profile.name) {
+            composable(route = TecnisisScreen.Profile.name + "/{id}/{editable}") {
+                val id = it.arguments?.getString("id")?.toLong()
+                val editable = it.arguments?.getString("editable")?.toBoolean()
                 ProfileScreen(
-                    viewModel = ProfileScreenViewModel(dataStoreManager),
+                    viewModel = ProfileScreenViewModel(dataStoreManager,id!!),
                     navController = navController,
                     floatingButton = floatingButton,
-                    topAppBar = topAppBar
+                    topAppBar = topAppBar,
+                    editable = editable!!
                 )
             }
             composable(route = TecnisisScreen.Dashboard.name) {

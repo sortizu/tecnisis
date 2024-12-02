@@ -17,7 +17,7 @@ public class ArtisticEvaluationCreateRequest  {
 
     @NotNull(message = "rating is required")
     @Min(value = 0, message = "rating must be greater than or equal to 0")
-    @Max(value = 10, message = "rating must be less than or equal to 10")
+    @Max(value = 100, message = "rating must be less than or equal to 10")
     private BigDecimal rating;
     private String result;
     private String status;

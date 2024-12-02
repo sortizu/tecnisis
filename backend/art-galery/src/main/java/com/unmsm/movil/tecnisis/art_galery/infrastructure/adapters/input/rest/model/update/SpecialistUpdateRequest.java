@@ -9,6 +9,4 @@ public class SpecialistUpdateRequest {
     @NotNull(message = "person_id is required")
     private Boolean isAvailable;
 
-    @NotNull(message = "person is required")
-    private PersonUpdateRequest person;
 }

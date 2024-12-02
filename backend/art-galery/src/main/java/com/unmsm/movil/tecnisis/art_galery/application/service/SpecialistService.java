@@ -52,7 +52,10 @@ public class SpecialistService implements SpecialistServicePort {
     public Specialist update(Long id, Specialist request) {
         return specialistPersistencePort.findById(id)
                 .map(s -> {
-                    s.setPerson(personService.update(s.getPerson().getId(), request.getPerson()));
+                    if (request.getPerson() != null){
+                        s.setPerson(personService.update(s.getPerson().getId(), request.getPerson()));
+                    }
+            
                     return specialistPersistencePort.save(s);
                 })
                 .orElseThrow(SpecialistNotFoundException::new);

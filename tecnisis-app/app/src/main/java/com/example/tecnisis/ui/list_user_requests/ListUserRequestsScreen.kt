@@ -1,6 +1,5 @@
 package com.example.tecnisis.ui.list_user_requests
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,7 +48,9 @@ fun ListUserRequestsScreen(
     // Collect the UI state from the ViewModel
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val requests = viewModel.getRequestsByStatusFilter(viewModel.getRequestsBySearchFilter(uiState.requests, uiState.searchFilter), uiState.statusFilter)
+    var requests = viewModel.getRequestsBySearchFilter(uiState.requests, uiState.searchFilter)
+
+
 
     topAppBar.value = {
         TecnisisTopAppBar(
@@ -60,7 +59,7 @@ fun ListUserRequestsScreen(
                 navController.navigate(TecnisisScreen.Login.name)
             },
             onProfileClick = {
-                navController.navigate(TecnisisScreen.Profile.name)
+                navController.navigate(TecnisisScreen.Profile.name + "/-1/false")
             }
         )
     }
@@ -72,6 +71,8 @@ fun ListUserRequestsScreen(
         Column(
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Search bar at the top
             ScreenTitle(text = context.getString(currentScreen.title))
@@ -133,6 +134,9 @@ fun ListUserRequestsScreen(
                 }
 
                 else -> {
+                    if (uiState.role != "ARTIST"){
+                        requests = viewModel.getRequestsByStatusFilter(requests, uiState.statusFilter)
+                    }
                     // Display the list of requests if data is loaded successfully
                     LazyColumn (
                         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -141,10 +145,10 @@ fun ListUserRequestsScreen(
                             RequestCard(index + 1, requests[index], onCardClick = {
                                 when (uiState.role) {
                                     "ART-EVALUATOR" -> {
-                                        navController.navigate(TecnisisScreen.ArtisticRequestEvaluation.name + "/${requests[index].id}")
+                                        navController.navigate(TecnisisScreen.ArtisticRequestEvaluation.name + "/${requests[index].id}" + "/${requests[index].status}")
                                     }
                                     "ECONOMIC-EVALUATOR" -> {
-                                        navController.navigate(TecnisisScreen.EconomicRequestEvaluation.name + "/${requests[index].id}")
+                                        navController.navigate(TecnisisScreen.EconomicRequestEvaluation.name + "/${requests[index].id}" + "/${requests[index].status}")
                                     }
                                     else -> {
                                         navController.navigate(TecnisisScreen.ViewRequest.name + "/${requests[index].id}")

@@ -51,9 +51,10 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
         evaluation.setEvaluationDate(artisticEvaluation.getEvaluationDate());
         evaluation.setRating(artisticEvaluation.getRating());
         evaluation.setResult(artisticEvaluation.getResult());
+        evaluation.setStatus(artisticEvaluation.getStatus());
 
-        // Validar si el rating es mayor que 0
-        if (evaluation.getRating().compareTo(BigDecimal.ZERO) != 0 && !economicEvaluationExists(evaluation.getRequest())) {
+        // Validate if the evaluation is approved and there is no economic evaluation
+        if (evaluation.getResult().equals("APPROVED") && !economicEvaluationExists(evaluation.getRequest())) {
             List<Specialist> specialists = specialistPersistencePort
                     .findByRole("ECONOMIC-EVALUATOR")
                     .stream()
@@ -92,7 +93,7 @@ public class ArtisticEvaluationService implements ArtisticEvaluationServicePort 
             // Crear una evaluación económica con el especialista asignado
             economicEvaluation = EconomicEvaluation.builder()
                     .evaluationDate(LocalDate.now())
-                    .status("APPROVED")
+                    .status("PENDING")
                     .specialist(specialist)
                     .request(artisticEvaluation.getRequest())
                     .build();

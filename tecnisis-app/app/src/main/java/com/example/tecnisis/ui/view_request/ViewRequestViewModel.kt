@@ -63,30 +63,37 @@ class ViewRequestViewModel (requestId: Long, dataStoreManager: DataStoreManager)
                 val response = TecnisisApi.requestService.getRequest("Bearer $token",id)
                 if (response.isSuccessful){
                     response.body()?.let {
-                        for (request in it){
+                        /*for (request in it){
                             if (request.id == id){
                                 updateRequest(request)
                             }
-                        }
+                        }*/
+                        updateRequest(it)
                     }
                 }
 
                 else{
                     updateIsLoading(false)
                     return@launch
-                }/*
-                val artisticResponse = TecnisisApi.evaluationService.getArtisticEvaluation(id)
+                }
+                val artisticResponse = TecnisisApi.evaluationService.getArtisticEvaluationByRequest(
+                    "Bearer $token",
+                    id
+                )
                 if (artisticResponse.isSuccessful){
                     artisticResponse.body()?.let {
                         updateArtisticEvaluation(it)
                     }
                 }
-                val economicResponse = TecnisisApi.evaluationService.getEconomicEvaluation(id)
+                val economicResponse = TecnisisApi.evaluationService.getEconomicEvaluationByRequest(
+                    "Bearer $token",
+                    id
+                )
                 if (economicResponse.isSuccessful) {
                     economicResponse.body()?.let {
                         updateEconomicEvaluation(it)
                     }
-                }*/
+                }
                 updateIsLoading(false)
             }
             catch(e: Exception){

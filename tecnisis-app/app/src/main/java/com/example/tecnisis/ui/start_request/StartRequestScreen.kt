@@ -1,10 +1,8 @@
 package com.example.tecnisis.ui.start_request
 
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -29,7 +27,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,6 +49,7 @@ import com.example.tecnisis.ui.components.SelectableListItem
 import com.example.tecnisis.ui.components.SingleChoiceDialog
 import com.example.tecnisis.ui.components.TecnisisTopAppBar
 import com.example.tecnisis.ui.components.TopBarState
+import com.example.tecnisis.ui.components.uriToBase64
 import kotlinx.coroutines.delay
 
 @Composable
@@ -62,7 +60,8 @@ fun StartRequestScreen(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     floatingButton: MutableState<@Composable () -> Unit>,
-    topAppBar: MutableState<@Composable () -> Unit>
+    topAppBar: MutableState<@Composable () -> Unit>,
+    editable: Boolean = true
 ){
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -172,12 +171,6 @@ fun StartRequestScreen(
                 )
             }
         }
-}
-
-private fun uriToBase64(context: Context, uri: Uri): String {
-    val inputStream = context.contentResolver.openInputStream(uri)
-    val bytes = inputStream?.readBytes()
-    return Base64.encodeToString(bytes, Base64.DEFAULT)
 }
 
 @Composable

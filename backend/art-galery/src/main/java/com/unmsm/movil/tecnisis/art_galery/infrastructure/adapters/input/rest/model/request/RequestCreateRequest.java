@@ -9,6 +9,7 @@ import lombok.*;
 @Builder @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 public class RequestCreateRequest {
+    private String status;
     @NotNull(message = "artWorkId is required")
     private Long artWorkId;
 }

@@ -24,7 +24,7 @@ data class ProfileScreenUiState(
     val role: String = ""
 )
 
-class ProfileScreenViewModel(dataStoreManager: DataStoreManager): ViewModel() {
+class ProfileScreenViewModel(dataStoreManager: DataStoreManager, idPerson: Long = -1L): ViewModel() {
     private val _uiState = MutableStateFlow(ProfileScreenUiState())
     val uiState: StateFlow<ProfileScreenUiState> = _uiState.asStateFlow()
     private val _message = MutableLiveData("")
@@ -32,7 +32,7 @@ class ProfileScreenViewModel(dataStoreManager: DataStoreManager): ViewModel() {
     private val _dataStoreManager = dataStoreManager
 
     init {
-        loadProfile()
+        loadProfile(idPerson)
     }
 
     fun updateIdPerson(newIdPerson: Long) {
@@ -60,10 +60,15 @@ class ProfileScreenViewModel(dataStoreManager: DataStoreManager): ViewModel() {
         _message.value = message
     }
 
-    fun loadProfile() {
+    fun loadProfile(id: Long) {
         viewModelScope.launch {
             val token = _dataStoreManager.token.first()!!
-            val idPerson = _dataStoreManager.idPerson.first()!!.toLong()
+            var idPerson =-1L
+            if (id != -1L) {
+                idPerson = id
+            }else{
+                idPerson = _dataStoreManager.idPerson.first()!!.toLong()
+            }
             val response = TecnisisApi.personService.getPerson("Bearer $token",idPerson)
             if (response.isSuccessful) {
                 response.body()?.let { person ->

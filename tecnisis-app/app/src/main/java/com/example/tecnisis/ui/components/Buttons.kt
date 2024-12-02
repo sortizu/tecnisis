@@ -82,17 +82,21 @@ fun CustomFloatingButton(
 @Composable
 fun CustomSingleChoiceSegmentedButton(
     options: List<String>,
-    onSelectionChanged: (Int) -> Unit
+    defaultSelectedIndex: Int = 0,
+    onSelectionChanged: (Int) -> Unit,
+    editable: Boolean = true
 ) {
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableStateOf(defaultSelectedIndex) }
 
     SingleChoiceSegmentedButtonRow {
         options.forEachIndexed { index, label ->
             SegmentedButton(
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                 onClick = {
-                    selectedIndex = index
-                    onSelectionChanged(index) // Notify the caller
+                    if (editable) {
+                        selectedIndex = index
+                        onSelectionChanged(index)
+                    }
                 },
                 selected = index == selectedIndex
             ) {

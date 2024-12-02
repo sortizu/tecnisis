@@ -76,6 +76,7 @@ public class EconomicEvaluationService implements EconomicEvaluationServicePort 
         evaluation.setGalleryPercentage(economicEvaluation.getGalleryPercentage());
         evaluation.setSalesPrice(economicEvaluation.getSalesPrice());
         evaluation.setSpecialist(specialist);
+        evaluation.setStatus(economicEvaluation.getStatus());
         evaluation.setRequest(request);
         evaluation.setDocument(document);
         return economicEvaluationPersistencePort.save(evaluation);

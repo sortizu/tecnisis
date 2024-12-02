@@ -1,5 +1,6 @@
 package com.example.tecnisis.ui.artistic_request_evaluation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +9,9 @@ import com.example.tecnisis.config.datastore.DataStoreManager
 import com.example.tecnisis.config.retrofit.TecnisisApi
 import com.example.tecnisis.data.document.DocumentRequest
 import com.example.tecnisis.data.evaluations.ArtisticEvaluationRequest
+import com.example.tecnisis.data.request.CreateRequest
 import com.example.tecnisis.data.request.RequestResponse
+import com.example.tecnisis.data.specialist.SpecialistRequest
 import com.example.tecnisis.ui.components.convertMillisToDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +21,8 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 data class ArtisticRequestEvaluationUiState(
-    val rating: Float = 0.0f,
-    val result: String = "",
+    val rating: Double = 0.0,
+    val result: String = "Aprobar",
     val request: RequestResponse? = null,
     val reviewDocument: String = "",
     val evaluationSaved: Boolean = false,
@@ -27,19 +30,22 @@ data class ArtisticRequestEvaluationUiState(
     val isLoading: Boolean = false
 )
 
-class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: DataStoreManager): ViewModel() {
+class ArtisticRequestEvaluationViewModel(idRequest: Long, evaluationStatus: String, dataStoreManager: DataStoreManager): ViewModel() {
     private val _uiState = MutableStateFlow(ArtisticRequestEvaluationUiState())
     val uiState: StateFlow<ArtisticRequestEvaluationUiState> = _uiState.asStateFlow()
-    private val _message = MutableLiveData<String>()
+    private val _message = MutableLiveData<String>("")
     val message: LiveData<String> = _message
     private val dataStoreManager: DataStoreManager = dataStoreManager
 
     init {
+        if (evaluationStatus != "PENDING"){
+            loadEvaluation(idRequest)
+        }
         getRequest(idRequest)
         updateDate(System.currentTimeMillis())
     }
 
-    fun updateRating(newRating: Float) {
+    fun updateRating(newRating: Double) {
         _uiState.value = _uiState.value.copy(rating = newRating)
     }
     fun updateReviewDocument(newReviewDocument: String) {
@@ -52,7 +58,17 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
         _message.value = newMessage
     }
     fun updateResult(newResult: String) {
-        _uiState.value = _uiState.value.copy(result = newResult)
+        when (newResult){
+            "Aprobar" -> {
+                _uiState.value = _uiState.value.copy(result = "APPROVED")
+            }
+            "Desaprobar" -> {
+                _uiState.value = _uiState.value.copy(result = "REJECTED")
+            }
+            else -> {
+                _uiState.value = _uiState.value.copy(result = "APPROVED")
+            }
+        }
     }
 
     fun updateRequest(newRequest: RequestResponse) {
@@ -67,6 +83,28 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
         _uiState.value = _uiState.value.copy(isLoading = newLoading)
     }
 
+    fun loadEvaluation(idRequest: Long) {
+        viewModelScope.launch {
+            var token = ""
+            dataStoreManager.token.let {
+                token = it.first()!!
+            }
+            val response = TecnisisApi.evaluationService.getArtisticEvaluationByRequest(
+                "Bearer $token",
+                idRequest
+            )
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    updateRating(it.rating)
+                    _uiState.value = _uiState.value.copy(result = it.result)
+                    // format date to dd/MM/yyyy
+                    val date = it.evaluationDate.split("-").reversed().joinToString("/")
+                    _uiState.value = _uiState.value.copy(date = date)
+                }
+            }
+        }
+    }
+
     fun getRequest(id: Long) {
         viewModelScope.launch {
             try {
@@ -78,16 +116,15 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 val response = TecnisisApi.requestService.getRequest("Bearer $token", id)
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        updateRequest(it[0])
+                        updateRequest(it)
                     }
                 } else {
-                    _message.value = response.message()
-                    return@launch
+                    updateMessage("Error: ${response.errorBody()}")
                 }
                 updateLoading(false)
             }
             catch (e: Exception) {
-                _message.value = e.message
+                updateMessage("Error: ${e.message}")
             }
         }
     }
@@ -99,7 +136,7 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 var rating = _uiState.value.rating
                 var result = _uiState.value.result
                 var reviewDocument = _uiState.value.reviewDocument
-                if (date.isEmpty() || rating == 0.0f || result.isEmpty() || reviewDocument.isEmpty()){
+                if (date.isEmpty() || rating == 0.0 || result.isEmpty() || reviewDocument.isEmpty()){
                     updateMessage("Por favor, completa todos los campos")
                     return@launch
                 }
@@ -123,12 +160,14 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                 var status = ""
                 if (result == "Desaprobar"){
                     status = "REJECTED"
-                    result = "R"
+                    result = "REJECTED"
                 }
                 else {
                     status = "APPROVED"
-                    result = "A"
+                    result = "APPROVED"
                 }
+                // change date format to yyyy-MM-dd
+                date = date.split("/").reversed().joinToString("-")
                 // Register document
                 var documentId=-1L
                 val documentResponse = TecnisisApi.documentService.uploadDocument(
@@ -147,26 +186,53 @@ class ArtisticRequestEvaluationViewModel(idRequest: Long, dataStoreManager: Data
                     "Bearer $token",
                     ArtisticEvaluationRequest(
                         evaluationDate = date,
-                        rating = rating.toInt(),
+                        rating = rating,
                         result = result,
                         status = status,
                         specialistId = idRole,
                         documentId = documentId
                     ), idEvaluation
                 )
-                if (response.isSuccessful){
-                    response.body()?.let {
-                        updateEvaluationSaved(true)
-                        updateMessage("Evaluación guardada correctamente")
-                    }
-                }
-                else{
+                if (!response.isSuccessful){
                     val errorBody = JSONObject(response.errorBody()?.string()!!)
                     updateMessage(errorBody.get("details").toString())
+                    return@launch
+                }
+                // Update request
+                val requestResponse = TecnisisApi.requestService.updateRequest(
+                    "Bearer $token",
+                    CreateRequest(
+                        status = when (status) {
+                            "APPROVED" -> "PENDING"
+                            else -> "REJECTED"
+                        },
+                        artworkId = _uiState.value.request!!.artWork.id
+                    ),
+                    _uiState.value.request!!.id
+                )
+                if (!requestResponse.isSuccessful){
+                    val errorBody = JSONObject(response.errorBody()?.string()!!)
+                    updateMessage(errorBody.get("details").toString())
+                    return@launch
+                }
+                // update specialist availability
+                val specialistResponse = TecnisisApi.specialistService.updateSpecialist(
+                    token = "Bearer $token",
+                    specialist = SpecialistRequest(
+                        idRole,
+                        true)
+                    ,
+                    id = idRole
+                )
+                if (specialistResponse.isSuccessful) {
+                    specialistResponse.body()?.let {
+                        updateMessage("Evaluación guardada correctamente")
+                        updateEvaluationSaved(true)
+                    }
                 }
             }
             catch(e: Exception){
-                _message.value = e.message
+                updateMessage("Error: ${e.message}")
             }
         }
     }

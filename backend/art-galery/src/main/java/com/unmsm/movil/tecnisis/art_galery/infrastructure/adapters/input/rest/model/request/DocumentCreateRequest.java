@@ -8,6 +8,5 @@ import lombok.*;
 @NoArgsConstructor @AllArgsConstructor
 public class DocumentCreateRequest {
     @NotBlank(message = "document path is required")
-    @Size(max = 255, message = "document path must be less than 255 characters")
     private String path;
 }

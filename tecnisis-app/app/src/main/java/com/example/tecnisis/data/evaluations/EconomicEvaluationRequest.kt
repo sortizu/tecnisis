@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class EconomicEvaluationRequest(
     @SerializedName("evaluation_date")
     val evaluationDate: String,
-    @SerializedName("sale_price")
+    @SerializedName("sales_price")
     val salePrice: Double,
     @SerializedName("gallery_percentage")
     val galleryPercentage: Double,
@@ -13,5 +13,7 @@ data class EconomicEvaluationRequest(
     @SerializedName("specialist_id")
     val specialistId: Long,
     @SerializedName("document_id")
-    val documentId: Long
+    val documentId: Long,
+    @SerializedName("request_id")
+    val requestId: Long
 )
