@@ -105,9 +105,9 @@ class SignUpViewModel () : ViewModel() {
                         name = "$_name $_surnames",
                         idNumber = _dni,
                         address = _address,
-                        gender = "X",
+                        gender = "M",
                         phone = _phone,
-                        userRole = "MANAGER"
+                        userRole = "ARTIST"
                     )
                     val response = TecnisisApi.signUpService.registerPerson(signUpRequest)
                     if (response.isSuccessful) {
